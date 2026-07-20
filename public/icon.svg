@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Filmography film reel</title>
+  <rect width="512" height="512" rx="96" fill="#22211f"/>
+  <circle cx="256" cy="256" r="158" fill="#f2efe8"/>
+  <circle cx="256" cy="256" r="43" fill="#22211f"/>
+  <g fill="#b64b31">
+    <circle cx="256" cy="151" r="40"/>
+    <circle cx="356" cy="224" r="40"/>
+    <circle cx="318" cy="342" r="40"/>
+    <circle cx="194" cy="342" r="40"/>
+    <circle cx="156" cy="224" r="40"/>
+  </g>
+  <path d="M368 379h79c18 0 33 15 33 33v18H368z" fill="#f2efe8"/>
+</svg>
