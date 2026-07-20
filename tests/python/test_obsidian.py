@@ -103,6 +103,25 @@ def test_review_rejects_missing_rating_and_malformed_frontmatter(tmp_path: Path)
         parse_review_note(malformed)
 
 
+@pytest.mark.parametrize(
+    ("field", "message"),
+    [
+        ("title: {nested: value}", "title must be text"),
+        ("tags: {private: value}", "tags must be text"),
+        ("sourceUrl: {private: value}", "source URL must be text"),
+    ],
+)
+def test_review_rejects_structured_values_in_text_fields(
+    tmp_path: Path,
+    field: str,
+    message: str,
+) -> None:
+    note = _write(tmp_path / "Film.md", f"---\nrating: 8\n{field}\n---\nReview")
+
+    with pytest.raises(ValueError, match=message):
+        parse_review_note(note)
+
+
 def test_watchlist_parses_bullets_plain_lines_and_optional_fields(tmp_path: Path) -> None:
     note = _write(
         tmp_path / "Watchlist.md",
@@ -176,3 +195,33 @@ def test_import_reports_missing_inputs(tmp_path: Path) -> None:
         "reviews-not-found",
         "watchlist-not-found",
     ]
+
+
+def test_import_excludes_watchlist_note_when_it_is_inside_reviews_folder(tmp_path: Path) -> None:
+    reviews = tmp_path / "notes"
+    _write(reviews / "Arrival (2016).md", "---\nrating: 9\n---\nReview")
+    watchlist = _write(reviews / "Watchlist.md", "- Persona (1966)\n")
+
+    result = import_obsidian(reviews, watchlist)
+
+    assert not result.has_errors
+    assert [film.title for film in result.watched] == ["Arrival"]
+    assert [film.title for film in result.watchlist] == ["Persona"]
+
+
+def test_import_detects_duplicate_reviews_with_mixed_catalog_identity(tmp_path: Path) -> None:
+    reviews = tmp_path / "reviews"
+    _write(
+        reviews / "Crash catalogued.md",
+        "---\ntitle: Crash\nyear: 1996\ntmdbId: 884\nrating: 8\n---\nFirst",
+    )
+    _write(
+        reviews / "Crash plain.md",
+        "---\ntitle: Crash\nyear: 1996\nrating: 7\n---\nSecond",
+    )
+    watchlist = _write(tmp_path / "Watchlist.md", "")
+
+    result = import_obsidian(reviews, watchlist)
+
+    assert result.has_errors
+    assert any(item.code == "duplicate-review" for item in result.diagnostics)

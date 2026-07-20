@@ -11,7 +11,11 @@ from typing import Literal, cast
 import yaml
 from pydantic import ValidationError
 
-from filmography.models import WatchedFilm, WatchlistFilm, film_identity
+from filmography.models import (
+    WatchedFilm,
+    WatchlistFilm,
+    film_matches_any,
+)
 
 _FRONTMATTER_DELIMITER = re.compile(r"^---\s*$")
 _TITLE_YEAR = re.compile(r"^(?P<title>.+?)\s*\((?P<year>\d{4})\)\s*$")
@@ -67,8 +71,13 @@ def import_obsidian(reviews_dir: Path, watchlist_path: Path) -> ImportResult:
             Diagnostic("error", "reviews-not-found", "reviews folder does not exist", reviews_dir)
         )
     else:
+        watchlist_source = watchlist_path.resolve()
         review_paths = sorted(
-            (path for path in reviews_dir.rglob("*.md") if not path.name.startswith(".")),
+            (
+                path
+                for path in reviews_dir.rglob("*.md")
+                if not path.name.startswith(".") and path.resolve() != watchlist_source
+            ),
             key=lambda path: path.as_posix().casefold(),
         )
         if not review_paths:
@@ -112,9 +121,15 @@ def parse_review_note(path: Path) -> WatchedFilm:
     metadata, body, _ = _read_note(path)
     fallback_title, fallback_year = _split_title_year(path.stem)
     title_raw = _get(metadata, "title", "film", "movie")
-    title, title_year = _split_title_year(str(title_raw)) if title_raw is not None else (
-        fallback_title,
-        fallback_year,
+    if title_raw is not None and not isinstance(title_raw, str):
+        raise ValueError("title must be text")
+    title, title_year = (
+        _split_title_year(title_raw)
+        if title_raw is not None
+        else (
+            fallback_title,
+            fallback_year,
+        )
     )
     year = _optional_int(_get(metadata, "year"), "year")
     year = year if year is not None else title_year
@@ -151,7 +166,7 @@ def parse_watchlist_note(path: Path) -> tuple[list[WatchlistFilm], list[Diagnost
     _, body, body_start_line = _read_note(path)
     records: list[WatchlistFilm] = []
     diagnostics: list[Diagnostic] = []
-    seen: set[tuple[str, int | None]] = set()
+    seen: list[WatchlistFilm] = []
 
     for offset, raw_line in enumerate(body.splitlines()):
         line_number = body_start_line + offset
@@ -175,8 +190,7 @@ def parse_watchlist_note(path: Path) -> tuple[list[WatchlistFilm], list[Diagnost
                 )
             )
             continue
-        key = film_identity(record.title, record.year)
-        if key in seen:
+        if film_matches_any(record, seen):
             diagnostics.append(
                 Diagnostic(
                     "error",
@@ -187,7 +201,7 @@ def parse_watchlist_note(path: Path) -> tuple[list[WatchlistFilm], list[Diagnost
                 )
             )
             continue
-        seen.add(key)
+        seen.append(record)
         records.append(record)
     return records, diagnostics
 
@@ -235,8 +249,7 @@ def normalize_score(
 
 def _parse_watchlist_line(line: str) -> WatchlistFilm:
     segments = [
-        segment.strip()
-        for segment in re.split(r"\s+[\N{EM DASH}\N{EN DASH}]\s+|\s+\|\s+", line)
+        segment.strip() for segment in re.split(r"\s+[\N{EM DASH}\N{EN DASH}]\s+|\s+\|\s+", line)
     ]
     if not segments or not segments[0]:
         raise ValueError("missing film title")
@@ -359,16 +372,21 @@ def _string_list(value: object | None) -> list[str]:
     if isinstance(value, str):
         raw_values = re.split(r"\s*,\s*|\s+", value.strip())
     elif isinstance(value, list):
-        raw_values = [str(item) for item in cast(list[object], value)]
+        values = cast(list[object], value)
+        if not all(isinstance(item, str) for item in values):
+            raise ValueError("tags must contain only text values")
+        raw_values = cast(list[str], values)
     else:
-        raw_values = [str(value)]
+        raise ValueError("tags must be text or a list of text values")
     return [item.removeprefix("#").strip() for item in raw_values if item.strip()]
 
 
 def _optional_string(value: object | None) -> str | None:
     if value is None:
         return None
-    result = str(value).strip()
+    if not isinstance(value, str):
+        raise ValueError("source URL must be text")
+    result = value.strip()
     return result or None
 
 
@@ -395,24 +413,16 @@ def _duplicate_diagnostics(
     watched: list[WatchedFilm], watchlist: list[WatchlistFilm]
 ) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
-    seen_watched: set[tuple[str, int | None] | tuple[str, int]] = set()
+    seen_watched: list[WatchedFilm] = []
     for film in watched:
-        key: tuple[str, int | None] | tuple[str, int]
-        key = ("tmdb", film.tmdb_id) if film.tmdb_id is not None else film_identity(
-            film.title, film.year
-        )
-        if key in seen_watched:
+        if film_matches_any(film, seen_watched):
             diagnostics.append(
                 Diagnostic("error", "duplicate-review", f"duplicate review film: {film.title}")
             )
-        seen_watched.add(key)
+        seen_watched.append(film)
 
-    watched_titles = {film_identity(film.title, film.year) for film in watched}
-    watched_ids = {film.tmdb_id for film in watched if film.tmdb_id is not None}
     for film in watchlist:
-        if film_identity(film.title, film.year) in watched_titles or (
-            film.tmdb_id is not None and film.tmdb_id in watched_ids
-        ):
+        if film_matches_any(film, watched):
             diagnostics.append(
                 Diagnostic(
                     "error",
