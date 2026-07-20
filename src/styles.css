@@ -1170,6 +1170,11 @@ h3 {
 }
 
 @media (max-width: 800px) {
+  .site-header {
+    background: var(--paper);
+    backdrop-filter: none;
+  }
+
   .site-header__inner,
   .site-main,
   .site-footer {
@@ -1189,11 +1194,13 @@ h3 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0;
+    width: 100%;
     min-height: 4rem;
     padding-bottom: env(safe-area-inset-bottom);
     background: var(--surface);
     border-top: 1px solid var(--line);
     box-shadow: 0 -8px 25px rgb(38 34 28 / 7%);
+    justify-self: stretch;
   }
 
   .site-nav a {
