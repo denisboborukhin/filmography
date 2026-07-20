@@ -6,8 +6,10 @@ install:
 
 check:
 	npm run check
+	npm run lint
 	uv run ruff check python tests
-	uv run pyright python
+	uv run ruff format --check python tests/python
+	uv run pyright
 
 test: web-test python-test
 

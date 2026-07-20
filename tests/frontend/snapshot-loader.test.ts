@@ -62,6 +62,25 @@ describe('snapshot loader', () => {
     expect(result.warning).toMatch(/last journal saved/i)
   })
 
+  it('uses and remembers the CacheStorage snapshot when the network fails', async () => {
+    vi.mocked(fetch).mockRejectedValue(new TypeError('offline'))
+    vi.mocked(window.caches.match).mockResolvedValue(
+      new Response(JSON.stringify(snapshotFixture), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 200,
+      }),
+    )
+
+    const result = await loadSnapshot()
+
+    expect(window.caches.match).toHaveBeenCalledWith(SNAPSHOT_URL)
+    expect(result.source).toBe('cache-storage')
+    expect(result.snapshot).toEqual(snapshotFixture)
+    expect(JSON.parse(window.localStorage.getItem(SNAPSHOT_STORAGE_KEY) ?? '')).toEqual(
+      snapshotFixture,
+    )
+  })
+
   it('does not use a saved snapshot that no longer satisfies the schema', async () => {
     window.localStorage.setItem(SNAPSHOT_STORAGE_KEY, JSON.stringify({ schemaVersion: 0 }))
     vi.mocked(fetch).mockRejectedValue(new TypeError('offline'))

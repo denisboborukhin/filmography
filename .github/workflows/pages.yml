@@ -41,7 +41,7 @@ jobs:
       - name: Verify the committed snapshot
         run: |
           test -s public/data/filmography.json
-          node --input-type=module -e "import fs from 'node:fs'; const data = JSON.parse(fs.readFileSync('public/data/filmography.json', 'utf8')); if (data.schemaVersion !== 1) throw new Error('Unsupported snapshot schema');"
+          npm test -- --run tests/frontend/snapshot.test.ts
 
       # The updater deliberately does not run in CI. TMDB and AI credentials stay local.
       - name: Build static site
