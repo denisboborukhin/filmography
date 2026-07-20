@@ -1,0 +1,284 @@
+"""Small cached TMDB catalog adapter with conservative title matching."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+from collections.abc import Mapping
+from dataclasses import dataclass
+from datetime import date
+from pathlib import Path
+from typing import Literal, cast
+
+import httpx
+
+from filmography.models import FilmMetadata, film_identity
+
+_DEFAULT_BASE_URL = "https://api.themoviedb.org/3"
+_POSTER_BASE_URL = "https://image.tmdb.org/t/p/w780"
+
+
+class CatalogError(RuntimeError):
+    """Raised when TMDB cannot provide a valid response."""
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogMatch:
+    """A title lookup that requires an unambiguous exact title/year match."""
+
+    status: Literal["matched", "unresolved", "ambiguous"]
+    film: FilmMetadata | None
+    candidates: tuple[FilmMetadata, ...] = ()
+
+
+class TMDBClient:
+    """Synchronous TMDB client whose successful GET responses are cached on disk."""
+
+    def __init__(
+        self,
+        access_token: str,
+        cache_dir: Path,
+        *,
+        http_client: httpx.Client | None = None,
+        base_url: str = _DEFAULT_BASE_URL,
+        language: str = "en-US",
+    ) -> None:
+        if not access_token.strip():
+            raise ValueError("TMDB access token cannot be empty")
+        self._cache_dir = cache_dir
+        self._language = language
+        self._owns_client = http_client is None
+        self._client = http_client or httpx.Client(
+            base_url=base_url.rstrip("/"),
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+            },
+            timeout=20.0,
+        )
+        self._genres_by_id: dict[int, str] | None = None
+
+    def close(self) -> None:
+        if self._owns_client:
+            self._client.close()
+
+    def __enter__(self) -> TMDBClient:
+        return self
+
+    def __exit__(self, *_args: object) -> None:
+        self.close()
+
+    def get_movie(self, tmdb_id: int) -> FilmMetadata:
+        """Fetch a film by canonical ID."""
+
+        if tmdb_id < 1:
+            raise ValueError("TMDB ID must be positive")
+        payload = self._get_json(f"/movie/{tmdb_id}", {})
+        return self._film_from_payload(payload)
+
+    def match_movie(self, title: str, year: int | None = None) -> CatalogMatch:
+        """Return only an exact, unique title/year match; never pick by popularity."""
+
+        params: dict[str, str | int] = {"query": title, "include_adult": "false", "page": 1}
+        if year is not None:
+            params["year"] = year
+        payload = self._get_json("/search/movie", params)
+        raw_results = _list_of_mappings(payload.get("results"), "TMDB search results")
+        candidates = tuple(self._film_from_payload(item) for item in raw_results[:20])
+        requested_title = film_identity(title, None)[0]
+        exact_title = tuple(
+            film
+            for film in candidates
+            if requested_title
+            in {
+                film_identity(film.title, None)[0],
+                film_identity(film.original_title or "", None)[0],
+            }
+        )
+        exact = (
+            tuple(film for film in exact_title if film.year == year)
+            if year is not None
+            else exact_title
+        )
+        if len(exact) == 1:
+            return CatalogMatch("matched", exact[0], exact)
+        if len(exact) > 1:
+            return CatalogMatch("ambiguous", None, exact)
+        return CatalogMatch("unresolved", None, candidates[:5])
+
+    def discover_movies(
+        self,
+        preferred_genres: list[str],
+        *,
+        pages: int = 2,
+    ) -> list[FilmMetadata]:
+        """Fetch a stable candidate pool, optionally narrowed to preferred genres."""
+
+        if pages < 1 or pages > 5:
+            raise ValueError("pages must be between 1 and 5")
+        genres_by_id = self._genre_names()
+        ids_by_name = {name.casefold(): genre_id for genre_id, name in genres_by_id.items()}
+        genre_ids = sorted(
+            {
+                ids_by_name[name.casefold()]
+                for name in preferred_genres
+                if name.casefold() in ids_by_name
+            }
+        )
+        films: list[FilmMetadata] = []
+        seen: set[int] = set()
+        for page in range(1, pages + 1):
+            params: dict[str, str | int] = {
+                "include_adult": "false",
+                "include_video": "false",
+                "language": self._language,
+                "page": page,
+                "sort_by": "vote_average.desc",
+                "vote_count.gte": 250,
+            }
+            if genre_ids:
+                params["with_genres"] = "|".join(str(item) for item in genre_ids[:4])
+            payload = self._get_json("/discover/movie", params)
+            for item in _list_of_mappings(payload.get("results"), "TMDB discovery results"):
+                film = self._film_from_payload(item, genres_by_id=genres_by_id)
+                if film.tmdb_id is not None and film.tmdb_id not in seen:
+                    seen.add(film.tmdb_id)
+                    films.append(film)
+        return films
+
+    def _genre_names(self) -> dict[int, str]:
+        if self._genres_by_id is not None:
+            return self._genres_by_id
+        payload = self._get_json("/genre/movie/list", {})
+        genres: dict[int, str] = {}
+        for item in _list_of_mappings(payload.get("genres"), "TMDB genres"):
+            genre_id = _required_int(item, "id")
+            name = _required_string(item, "name")
+            genres[genre_id] = name
+        self._genres_by_id = genres
+        return genres
+
+    def _film_from_payload(
+        self,
+        payload: Mapping[str, object],
+        *,
+        genres_by_id: dict[int, str] | None = None,
+    ) -> FilmMetadata:
+        release_date = _parse_release_date(payload.get("release_date"))
+        genre_names: list[str] = []
+        raw_genres = payload.get("genres")
+        if isinstance(raw_genres, list):
+            for raw_genre in cast(list[object], raw_genres):
+                if isinstance(raw_genre, Mapping):
+                    genre = cast(Mapping[object, object], raw_genre)
+                    name = genre.get("name")
+                    if isinstance(name, str):
+                        genre_names.append(name)
+        raw_genre_ids = payload.get("genre_ids")
+        if isinstance(raw_genre_ids, list):
+            names = genres_by_id if genres_by_id is not None else self._genre_names()
+            for raw_id in cast(list[object], raw_genre_ids):
+                if isinstance(raw_id, int) and raw_id in names:
+                    genre_names.append(names[raw_id])
+        poster_path = payload.get("poster_path")
+        poster_url = (
+            f"{_POSTER_BASE_URL}{poster_path}"
+            if isinstance(poster_path, str) and poster_path.startswith("/")
+            else None
+        )
+        return FilmMetadata(
+            tmdb_id=_required_int(payload, "id"),
+            title=_required_string(payload, "title"),
+            original_title=_optional_string(payload.get("original_title")),
+            year=release_date.year if release_date is not None else None,
+            release_date=release_date,
+            poster_url=poster_url,
+            overview=_optional_string(payload.get("overview")) or "",
+            genres=genre_names,
+            vote_average=_optional_float(payload.get("vote_average")),
+            popularity=_optional_float(payload.get("popularity")),
+        )
+
+    def _get_json(
+        self, path: str, params: Mapping[str, str | int]
+    ) -> Mapping[str, object]:
+        request_params: dict[str, str | int] = {"language": self._language, **params}
+        cache_key = hashlib.sha256(
+            json.dumps(
+                [path, sorted(request_params.items())],
+                ensure_ascii=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest()
+        cache_path = self._cache_dir / f"{cache_key}.json"
+        if cache_path.is_file():
+            return _load_mapping(cache_path.read_text(encoding="utf-8"), "cached TMDB response")
+
+        try:
+            response = self._client.get(path.lstrip("/"), params=request_params)
+            response.raise_for_status()
+        except httpx.HTTPError as error:
+            raise CatalogError(f"TMDB request failed for {path}: {error}") from error
+        payload = _load_mapping(response.text, "TMDB response")
+        self._cache_dir.mkdir(parents=True, exist_ok=True)
+        temporary_path = cache_path.with_suffix(".tmp")
+        temporary_path.write_text(
+            json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        temporary_path.replace(cache_path)
+        return payload
+
+
+def _load_mapping(raw_json: str, label: str) -> Mapping[str, object]:
+    try:
+        value: object = json.loads(raw_json)
+    except json.JSONDecodeError as error:
+        raise CatalogError(f"{label} is not valid JSON") from error
+    if not isinstance(value, dict):
+        raise CatalogError(f"{label} must be a JSON object")
+    return cast(dict[str, object], value)
+
+
+def _list_of_mappings(value: object, label: str) -> list[Mapping[str, object]]:
+    if not isinstance(value, list):
+        raise CatalogError(f"{label} must be an array")
+    result: list[Mapping[str, object]] = []
+    for item in cast(list[object], value):
+        if not isinstance(item, dict):
+            raise CatalogError(f"{label} contains a non-object value")
+        result.append(cast(dict[str, object], item))
+    return result
+
+
+def _required_int(payload: Mapping[str, object], key: str) -> int:
+    value = payload.get(key)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise CatalogError(f"TMDB field {key!r} must be an integer")
+    return value
+
+
+def _required_string(payload: Mapping[str, object], key: str) -> str:
+    value = payload.get(key)
+    if not isinstance(value, str) or not value.strip():
+        raise CatalogError(f"TMDB field {key!r} must be a non-empty string")
+    return value.strip()
+
+
+def _optional_string(value: object) -> str | None:
+    return value.strip() if isinstance(value, str) and value.strip() else None
+
+
+def _optional_float(value: object) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return float(value)
+
+
+def _parse_release_date(value: object) -> date | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None
