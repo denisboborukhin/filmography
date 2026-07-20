@@ -7,6 +7,9 @@ watchlist, token-free discoveries, and the latest successful AI recommendation s
 The browser never needs a TMDB or AI key. Importing, catalog lookups, and recommendation requests
 happen only on your computer; GitHub Pages serves the committed static snapshot.
 
+Discovery covers TMDB's movie catalog. The updater does not crawl arbitrary review or streaming
+sites.
+
 ## How it works
 
 ```text
@@ -48,7 +51,7 @@ credentials for syntax-only checks.
 ```bash
 export TMDB_ACCESS_TOKEN="your-tmdb-read-access-token"
 export FILMOGRAPHY_AI_API_KEY="your-provider-key"       # optional
-export FILMOGRAPHY_AI_BASE_URL="https://api.openai.com/v1" # optional
+export FILMOGRAPHY_AI_BASE_URL="https://api.openai.com/v1" # optional; this is the default
 export FILMOGRAPHY_AI_MODEL="your-model-name"           # optional
 ```
 
@@ -78,8 +81,12 @@ uv run filmography recommend \
   --prompt "Something quiet, humane, and under two hours"
 ```
 
-`recommend` requires all four provider/TMDB variables shown above. A failed AI request does not
-replace the previous successful AI recommendations in the committed snapshot.
+`recommend` requires the TMDB token, AI key, and model. The base URL defaults to OpenAI's compatible
+endpoint. If the AI request fails, the updater retains the still-valid subset of the previous
+verified AI set while continuing to refresh the journal and token-free discoveries.
+
+Alternative providers must implement `POST /chat/completions` and support strict JSON Schema through
+the `response_format` request field.
 
 ## Obsidian input
 
@@ -99,7 +106,11 @@ duplicate handling.
 | `filmography recommend` | TMDB + AI | Yes | Build input and publish a new verified AI recommendation set. |
 
 Run `uv run filmography <command> --help` for all flags. The default output is
-`public/data/filmography.json`.
+`public/data/filmography.json`. `build` and `recommend` accept `--output`, `--cache-dir`, and
+`--deterministic-limit`; `recommend` additionally accepts `--count` (1–20) and `--prompt`.
+
+`build` can import notes without a TMDB token, but catalog metadata and deterministic discoveries are
+available only when `TMDB_ACCESS_TOKEN` is set.
 
 ## Quality checks
 
@@ -116,9 +127,9 @@ leaves the computer during local updates.
 
 ## Deployment boundary
 
-The Pages workflow installs locked npm dependencies, verifies that the generated snapshot exists,
-and builds the frontend with the correct repository base path. It never runs the Python updater and
-has no TMDB or AI credentials. Pushing is deliberately left to the repository owner.
+The Pages workflow installs locked npm dependencies, validates the committed snapshot through the
+frontend contract tests, and builds with the correct repository base path. It never runs the Python
+updater and has no TMDB or AI credentials. Pushing is deliberately left to the repository owner.
 
 Film metadata and artwork are provided by TMDB. This product uses the TMDB API but is not endorsed or
 certified by TMDB.
