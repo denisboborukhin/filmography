@@ -1,0 +1,124 @@
+# Filmography
+
+Filmography turns personal Obsidian notes into a read-only film journal for GitHub Pages. The
+published site contains the last snapshot you generated: watched films and reviews, a scored
+watchlist, token-free discoveries, and the latest successful AI recommendation set.
+
+The browser never needs a TMDB or AI key. Importing, catalog lookups, and recommendation requests
+happen only on your computer; GitHub Pages serves the committed static snapshot.
+
+## How it works
+
+```text
+Obsidian review notes + one watchlist note
+                  │
+                  ▼
+       local Python updater ─── TMDB
+                  │             optional AI provider
+                  ▼
+      public/data/filmography.json
+                  │
+                  ▼
+        Vite build → GitHub Pages
+```
+
+The site is installable and keeps the last successfully loaded snapshot available offline. Obsidian
+remains the source of truth; the deployed UI is intentionally read-only.
+
+## Requirements
+
+- Python 3.12 or newer
+- [uv](https://docs.astral.sh/uv/)
+- Node.js 24 or newer and npm
+- A [TMDB API read access token](https://developer.themoviedb.org/docs/getting-started)
+- Optional: an API key for an OpenAI-compatible chat-completions provider
+
+## Quick start
+
+Install the locked Python and frontend dependencies:
+
+```bash
+uv sync --dev
+npm ci
+```
+
+Keep credentials in the process environment. `.env.example` is a reference; the CLI does not need
+credentials for syntax-only checks.
+
+```bash
+export TMDB_ACCESS_TOKEN="your-tmdb-read-access-token"
+export FILMOGRAPHY_AI_API_KEY="your-provider-key"       # optional
+export FILMOGRAPHY_AI_BASE_URL="https://api.openai.com/v1" # optional
+export FILMOGRAPHY_AI_MODEL="your-model-name"           # optional
+```
+
+Validate notes without writing output:
+
+```bash
+uv run filmography check \
+  --reviews "/absolute/path/to/vault/Reviews" \
+  --watchlist "/absolute/path/to/vault/Watchlist.md"
+```
+
+Generate the public snapshot, then run the site locally:
+
+```bash
+uv run filmography build \
+  --reviews "/absolute/path/to/vault/Reviews" \
+  --watchlist "/absolute/path/to/vault/Watchlist.md"
+npm run dev
+```
+
+Refresh AI recommendations explicitly:
+
+```bash
+uv run filmography recommend \
+  --reviews "/absolute/path/to/vault/Reviews" \
+  --watchlist "/absolute/path/to/vault/Watchlist.md" \
+  --prompt "Something quiet, humane, and under two hours"
+```
+
+`recommend` requires all four provider/TMDB variables shown above. A failed AI request does not
+replace the previous successful AI recommendations in the committed snapshot.
+
+## Obsidian input
+
+Each watched film is one Markdown file in the reviews directory. The note body is the public review;
+supported YAML frontmatter supplies title, year, score, watched date, tags, and an optional TMDB ID.
+The watchlist is one Markdown note with one film per bullet or non-empty plain line.
+
+See [Obsidian input format](docs/obsidian-format.md) for the exact fields, examples, score rules, and
+duplicate handling.
+
+## Commands
+
+| Command | Network | Writes snapshot | Purpose |
+| --- | --- | --- | --- |
+| `filmography check` | No | No | Parse and validate notes, scores, and duplicates. |
+| `filmography build` | TMDB when configured | Yes | Import notes, enrich films, and generate token-free discoveries. |
+| `filmography recommend` | TMDB + AI | Yes | Build input and publish a new verified AI recommendation set. |
+
+Run `uv run filmography <command> --help` for all flags. The default output is
+`public/data/filmography.json`.
+
+## Quality checks
+
+```bash
+make check
+make test
+make web-build
+```
+
+Before committing generated data, read [Updating and deployment](docs/updating-and-deploying.md).
+It includes a public-data review checklist, GitHub Pages setup, offline verification, and recovery
+steps. [Privacy and security](docs/privacy-and-security.md) explains exactly what is public and what
+leaves the computer during local updates.
+
+## Deployment boundary
+
+The Pages workflow installs locked npm dependencies, verifies that the generated snapshot exists,
+and builds the frontend with the correct repository base path. It never runs the Python updater and
+has no TMDB or AI credentials. Pushing is deliberately left to the repository owner.
+
+Film metadata and artwork are provided by TMDB. This product uses the TMDB API but is not endorsed or
+certified by TMDB.
