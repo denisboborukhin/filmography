@@ -140,3 +140,54 @@ def test_wraps_http_and_invalid_json_errors_without_exposing_token(tmp_path: Pat
         http_client.close()
 
     assert "token" not in str(raised.value)
+
+
+def test_wraps_invalid_json_success_response(tmp_path: Path) -> None:
+    catalog, http_client = _client(
+        tmp_path,
+        lambda _request: httpx.Response(200, text="not json"),
+    )
+    try:
+        with pytest.raises(CatalogError, match="not valid JSON"):
+            catalog.match_movie("Arrival", 2016)
+    finally:
+        http_client.close()
+
+    assert list((tmp_path / "cache").glob("*.json")) == []
+
+
+def test_rejects_invalid_success_payload_without_poisoning_cache(tmp_path: Path) -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        invalid = _movie(1, "Broken", 2020)
+        invalid["vote_average"] = 99
+        return httpx.Response(200, json={"results": [invalid]})
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        with pytest.raises(CatalogError, match="metadata is invalid"):
+            catalog.match_movie("Broken", 2020)
+    finally:
+        http_client.close()
+
+    assert list((tmp_path / "cache").glob("*.json")) == []
+
+
+def test_discards_corrupt_cache_and_refetches_valid_payload(tmp_path: Path) -> None:
+    request_count = 0
+
+    def handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal request_count
+        request_count += 1
+        return httpx.Response(200, json={"results": [_movie(1, "Arrival", 2016)]})
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        assert catalog.match_movie("Arrival", 2016).status == "matched"
+        cache_file = next((tmp_path / "cache").glob("*.json"))
+        cache_file.write_text("not json", encoding="utf-8")
+        assert catalog.match_movie("Arrival", 2016).status == "matched"
+    finally:
+        http_client.close()
+
+    assert request_count == 2
+    assert json.loads(cache_file.read_text(encoding="utf-8"))["results"][0]["id"] == 1

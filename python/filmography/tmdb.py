@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Literal, cast
 
 import httpx
+from pydantic import ValidationError
 
 from filmography.models import FilmMetadata, film_identity
 
@@ -73,7 +74,11 @@ class TMDBClient:
 
         if tmdb_id < 1:
             raise ValueError("TMDB ID must be positive")
-        payload = self._get_json(f"/movie/{tmdb_id}", {})
+        payload = self._get_json(
+            f"/movie/{tmdb_id}",
+            {},
+            validator=lambda value: self._film_from_payload(value),
+        )
         return self._film_from_payload(payload)
 
     def match_movie(self, title: str, year: int | None = None) -> CatalogMatch:
@@ -82,7 +87,11 @@ class TMDBClient:
         params: dict[str, str | int] = {"query": title, "include_adult": "false", "page": 1}
         if year is not None:
             params["year"] = year
-        payload = self._get_json("/search/movie", params)
+        payload = self._get_json(
+            "/search/movie",
+            params,
+            validator=self._validate_search_payload,
+        )
         raw_results = _list_of_mappings(payload.get("results"), "TMDB search results")
         candidates = tuple(self._film_from_payload(item) for item in raw_results[:20])
         requested_title = film_identity(title, None)[0]
@@ -138,7 +147,11 @@ class TMDBClient:
             }
             if genre_ids:
                 params["with_genres"] = "|".join(str(item) for item in genre_ids[:4])
-            payload = self._get_json("/discover/movie", params)
+            payload = self._get_json(
+                "/discover/movie",
+                params,
+                validator=lambda value: self._validate_discovery_payload(value, genres_by_id),
+            )
             for item in _list_of_mappings(payload.get("results"), "TMDB discovery results"):
                 film = self._film_from_payload(item, genres_by_id=genres_by_id)
                 if film.tmdb_id is not None and film.tmdb_id not in seen:
@@ -149,7 +162,11 @@ class TMDBClient:
     def _genre_names(self) -> dict[int, str]:
         if self._genres_by_id is not None:
             return self._genres_by_id
-        payload = self._get_json("/genre/movie/list", {})
+        payload = self._get_json(
+            "/genre/movie/list",
+            {},
+            validator=self._validate_genre_payload,
+        )
         genres: dict[int, str] = {}
         for item in _list_of_mappings(payload.get("genres"), "TMDB genres"):
             genre_id = _required_int(item, "id")
@@ -186,21 +203,47 @@ class TMDBClient:
             if isinstance(poster_path, str) and poster_path.startswith("/")
             else None
         )
-        return FilmMetadata(
-            tmdb_id=_required_int(payload, "id"),
-            title=_required_string(payload, "title"),
-            original_title=_optional_string(payload.get("original_title")),
-            year=release_date.year if release_date is not None else None,
-            release_date=release_date,
-            poster_url=poster_url,
-            overview=_optional_string(payload.get("overview")) or "",
-            genres=genre_names,
-            vote_average=_optional_float(payload.get("vote_average")),
-            popularity=_optional_float(payload.get("popularity")),
-        )
+        try:
+            return FilmMetadata(
+                tmdb_id=_required_int(payload, "id"),
+                title=_required_string(payload, "title"),
+                original_title=_optional_string(payload.get("original_title")),
+                year=release_date.year if release_date is not None else None,
+                release_date=release_date,
+                poster_url=poster_url,
+                overview=_optional_string(payload.get("overview")) or "",
+                genres=genre_names,
+                vote_average=_optional_float(payload.get("vote_average")),
+                popularity=_optional_float(payload.get("popularity")),
+            )
+        except ValidationError as error:
+            message = error.errors()[0]["msg"]
+            raise CatalogError(f"TMDB movie metadata is invalid: {message}") from error
+
+    def _validate_search_payload(self, payload: Mapping[str, object]) -> None:
+        for item in _list_of_mappings(payload.get("results"), "TMDB search results"):
+            self._film_from_payload(item)
+
+    def _validate_discovery_payload(
+        self,
+        payload: Mapping[str, object],
+        genres_by_id: dict[int, str],
+    ) -> None:
+        for item in _list_of_mappings(payload.get("results"), "TMDB discovery results"):
+            self._film_from_payload(item, genres_by_id=genres_by_id)
+
+    @staticmethod
+    def _validate_genre_payload(payload: Mapping[str, object]) -> None:
+        for item in _list_of_mappings(payload.get("genres"), "TMDB genres"):
+            _required_int(item, "id")
+            _required_string(item, "name")
 
     def _get_json(
-        self, path: str, params: Mapping[str, str | int]
+        self,
+        path: str,
+        params: Mapping[str, str | int],
+        *,
+        validator: Callable[[Mapping[str, object]], object] | None = None,
     ) -> Mapping[str, object]:
         request_params: dict[str, str | int] = {"language": self._language, **params}
         cache_key = hashlib.sha256(
@@ -212,7 +255,15 @@ class TMDBClient:
         ).hexdigest()
         cache_path = self._cache_dir / f"{cache_key}.json"
         if cache_path.is_file():
-            return _load_mapping(cache_path.read_text(encoding="utf-8"), "cached TMDB response")
+            try:
+                cached = _load_mapping(
+                    cache_path.read_text(encoding="utf-8"), "cached TMDB response"
+                )
+                if validator is not None:
+                    validator(cached)
+                return cached
+            except (CatalogError, OSError):
+                cache_path.unlink(missing_ok=True)
 
         try:
             response = self._client.get(path.lstrip("/"), params=request_params)
@@ -220,6 +271,8 @@ class TMDBClient:
         except httpx.HTTPError as error:
             raise CatalogError(f"TMDB request failed for {path}: {error}") from error
         payload = _load_mapping(response.text, "TMDB response")
+        if validator is not None:
+            validator(payload)
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         temporary_path = cache_path.with_suffix(".tmp")
         temporary_path.write_text(
