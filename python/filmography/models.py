@@ -5,11 +5,16 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import date, datetime
 from typing import Annotated, Literal, Self
+from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic.alias_generators import to_camel
 
-Score = Annotated[float, Field(ge=0, le=10, multiple_of=0.5)]
+Score = Annotated[float, Field(strict=True, ge=0, le=10, multiple_of=0.5)]
+PositiveId = Annotated[int, Field(strict=True, ge=1)]
+FilmYear = Annotated[int, Field(strict=True, ge=1878, le=2200)]
+CatalogScore = Annotated[float, Field(strict=True, ge=0, le=10)]
+Popularity = Annotated[float, Field(strict=True, ge=0)]
 
 
 class PublicModel(BaseModel):
@@ -27,16 +32,16 @@ class PublicModel(BaseModel):
 class FilmMetadata(PublicModel):
     """Catalog metadata embedded into all public film records."""
 
-    tmdb_id: int | None = Field(default=None, ge=1)
+    tmdb_id: PositiveId | None = None
     title: str = Field(min_length=1)
     original_title: str | None = None
-    year: int | None = Field(default=None, ge=1878, le=2200)
+    year: FilmYear | None = None
     release_date: date | None = None
     poster_url: str | None = None
     overview: str = ""
     genres: list[str] = Field(default_factory=list)
-    vote_average: float | None = Field(default=None, ge=0, le=10)
-    popularity: float | None = Field(default=None, ge=0)
+    vote_average: CatalogScore | None = None
+    popularity: Popularity | None = None
 
     @field_validator("original_title", "poster_url", mode="after")
     @classmethod
@@ -71,8 +76,24 @@ class WatchedFilm(FilmMetadata):
 
     @field_validator("source_url", mode="after")
     @classmethod
-    def empty_source_is_none(cls, value: str | None) -> str | None:
-        return value or None
+    def validate_public_source_url(cls, value: str | None) -> str | None:
+        if not value:
+            return None
+        try:
+            parsed = urlsplit(value)
+            hostname = parsed.hostname
+        except ValueError as error:
+            raise ValueError("source URL must be an absolute public HTTP(S) URL") from error
+        if (
+            parsed.scheme.casefold() not in {"http", "https"}
+            or not hostname
+            or parsed.username is not None
+            or parsed.password is not None
+        ):
+            raise ValueError(
+                "source URL must be an absolute public HTTP(S) URL without credentials"
+            )
+        return value
 
 
 class WatchlistFilm(FilmMetadata):
@@ -92,7 +113,7 @@ class WatchlistFilm(FilmMetadata):
 class Recommendation(FilmMetadata):
     """A TMDB-verified deterministic or AI recommendation."""
 
-    tmdb_id: int = Field(ge=1)  # pyright: ignore[reportIncompatibleVariableOverride, reportGeneralTypeIssues]
+    tmdb_id: PositiveId  # pyright: ignore[reportIncompatibleVariableOverride, reportGeneralTypeIssues]
     predicted_rating: Score
     rationale: str = Field(min_length=1)
     source: Literal["deterministic", "ai"]
@@ -100,11 +121,16 @@ class Recommendation(FilmMetadata):
     provider: str | None = None
     model: str | None = None
 
+    @field_validator("generated_at", mode="after")
+    @classmethod
+    def generated_at_has_timezone(cls, value: datetime) -> datetime:
+        return _timezone_aware(value)
+
     @model_validator(mode="after")
     def provider_is_consistent_with_source(self) -> Self:
         if self.source == "deterministic":
-            object.__setattr__(self, "provider", None)
-            object.__setattr__(self, "model", None)
+            if self.provider is not None or self.model is not None:
+                raise ValueError("deterministic recommendations cannot include provider or model")
         elif not self.provider or not self.model:
             raise ValueError("AI recommendations require provider and model")
         return self
@@ -116,31 +142,35 @@ class Snapshot(PublicModel):
     schema_version: Literal[1] = 1
     generated_at: datetime
     recommendations_generated_at: datetime | None = None
-    watched: list[WatchedFilm] = []
-    watchlist: list[WatchlistFilm] = []
-    deterministic_discoveries: list[Recommendation] = []
-    ai_discoveries: list[Recommendation] = []
+    watched: list[WatchedFilm] = Field(default_factory=lambda: list[WatchedFilm]())
+    watchlist: list[WatchlistFilm] = Field(default_factory=lambda: list[WatchlistFilm]())
+    deterministic_discoveries: list[Recommendation] = Field(
+        default_factory=lambda: list[Recommendation]()
+    )
+    ai_discoveries: list[Recommendation] = Field(default_factory=lambda: list[Recommendation]())
+
+    @field_validator("generated_at", "recommendations_generated_at", mode="after")
+    @classmethod
+    def generated_dates_have_timezone(cls, value: datetime | None) -> datetime | None:
+        return _timezone_aware(value) if value is not None else None
 
     @model_validator(mode="after")
     def validate_collections(self) -> Self:
         _ensure_unique_films(self.watched, "watched")
         _ensure_unique_films(self.watchlist, "watchlist")
-        _ensure_unique_recommendations(
-            [*self.deterministic_discoveries, *self.ai_discoveries]
-        )
-        excluded_ids = {
-            film.tmdb_id
-            for film in [*self.watched, *self.watchlist]
-            if film.tmdb_id is not None
-        }
-        excluded_titles = {
-            film_identity(film.title, film.year)
-            for film in [*self.watched, *self.watchlist]
-        }
+        for film in self.watchlist:
+            if film_matches_any(film, self.watched):
+                raise ValueError(f"film appears in watched and watchlist: {film.title}")
+        _ensure_unique_recommendations([*self.deterministic_discoveries, *self.ai_discoveries])
+        for recommendation in self.deterministic_discoveries:
+            if recommendation.source != "deterministic":
+                raise ValueError("deterministic discoveries must use deterministic source")
+        for recommendation in self.ai_discoveries:
+            if recommendation.source != "ai":
+                raise ValueError("AI discoveries must use AI source")
+        excluded = [*self.watched, *self.watchlist]
         for recommendation in [*self.deterministic_discoveries, *self.ai_discoveries]:
-            if recommendation.tmdb_id in excluded_ids or film_identity(
-                recommendation.title, recommendation.year
-            ) in excluded_titles:
+            if film_matches_any(recommendation, excluded):
                 raise ValueError(
                     f"recommendation is already watched or watchlisted: {recommendation.title}"
                 )
@@ -156,6 +186,35 @@ def film_identity(title: str, year: int | None) -> tuple[str, int | None]:
     return normalized, year
 
 
+def film_titles_overlap(
+    left_title: str,
+    left_year: int | None,
+    right_title: str,
+    right_year: int | None,
+) -> bool:
+    """Match normalized titles, treating a missing year as an unknown wildcard."""
+
+    left_key = film_identity(left_title, left_year)
+    right_key = film_identity(right_title, right_year)
+    return left_key[0] == right_key[0] and (
+        left_year is None or right_year is None or left_year == right_year
+    )
+
+
+def films_match(left: FilmMetadata, right: FilmMetadata) -> bool:
+    """Match catalog IDs when available and always check the human title identity."""
+
+    return (
+        left.tmdb_id is not None and right.tmdb_id is not None and left.tmdb_id == right.tmdb_id
+    ) or film_titles_overlap(left.title, left.year, right.title, right.year)
+
+
+def film_matches_any(film: FilmMetadata, existing: Sequence[FilmMetadata]) -> bool:
+    """Return whether a film overlaps any watched, watchlisted, or recommended record."""
+
+    return any(films_match(film, item) for item in existing)
+
+
 def _unique_nonempty(values: list[str]) -> list[str]:
     result: list[str] = []
     seen: set[str] = set()
@@ -169,20 +228,22 @@ def _unique_nonempty(values: list[str]) -> list[str]:
 
 
 def _ensure_unique_films(films: Sequence[FilmMetadata], collection: str) -> None:
-    seen: set[tuple[str, int | None] | tuple[str, int]] = set()
+    seen: list[FilmMetadata] = []
     for film in films:
-        key: tuple[str, int | None] | tuple[str, int]
-        key = ("tmdb", film.tmdb_id) if film.tmdb_id is not None else film_identity(
-            film.title, film.year
-        )
-        if key in seen:
+        if film_matches_any(film, seen):
             raise ValueError(f"duplicate film in {collection}: {film.title}")
-        seen.add(key)
+        seen.append(film)
 
 
 def _ensure_unique_recommendations(recommendations: list[Recommendation]) -> None:
-    seen: set[int] = set()
+    seen: list[Recommendation] = []
     for recommendation in recommendations:
-        if recommendation.tmdb_id in seen:
+        if film_matches_any(recommendation, seen):
             raise ValueError(f"duplicate recommendation: {recommendation.title}")
-        seen.add(recommendation.tmdb_id)
+        seen.append(recommendation)
+
+
+def _timezone_aware(value: datetime) -> datetime:
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise ValueError("timestamp must include a timezone offset")
+    return value

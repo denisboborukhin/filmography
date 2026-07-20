@@ -32,16 +32,36 @@
     },
     "deterministicDiscoveries": {
       "type": "array",
-      "items": { "$ref": "#/$defs/recommendation" }
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/recommendation" },
+          { "properties": { "source": { "const": "deterministic" } } }
+        ]
+      }
     },
     "aiDiscoveries": {
       "type": "array",
-      "items": { "$ref": "#/$defs/recommendation" }
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/recommendation" },
+          { "properties": { "source": { "const": "ai" } } }
+        ]
+      }
     }
   },
   "$defs": {
     "nullableString": {
       "anyOf": [{ "type": "string" }, { "type": "null" }]
+    },
+    "nullablePublicUrl": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://(?![^/?#]*@)"
+        },
+        { "type": "null" }
+      ]
     },
     "nullableNumber": {
       "anyOf": [{ "type": "number" }, { "type": "null" }]
@@ -131,7 +151,7 @@
         "watchedAt": { "$ref": "#/$defs/nullableDate" },
         "tags": { "type": "array", "items": { "type": "string" } },
         "review": { "type": "string" },
-        "sourceUrl": { "$ref": "#/$defs/nullableString" }
+        "sourceUrl": { "$ref": "#/$defs/nullablePublicUrl" }
       }
     },
     "watchlistFilm": {
@@ -175,6 +195,23 @@
     "recommendation": {
       "type": "object",
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "source": { "const": "deterministic" } } },
+          "then": {
+            "properties": {
+              "provider": { "type": "null" },
+              "model": { "type": "null" }
+            }
+          },
+          "else": {
+            "properties": {
+              "provider": { "type": "string", "minLength": 1 },
+              "model": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      ],
       "required": [
         "tmdbId",
         "title",

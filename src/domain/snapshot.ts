@@ -4,6 +4,13 @@ const yearSchema = z.number().int().min(1878).max(2200).nullable()
 const scoreSchema = z.number().min(0).max(10).multipleOf(0.5)
 const optionalScoreSchema = scoreSchema.nullable()
 const nullableTextSchema = z.string().trim().nullable()
+const nullablePublicUrlSchema = z
+  .url()
+  .refine((value) => {
+    const url = new URL(value)
+    return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password
+  }, 'Source URL must be a public HTTP(S) URL without credentials')
+  .nullable()
 const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable()
 const dateTimeSchema = z.string().datetime({ offset: true })
 const stringListSchema = z
@@ -34,7 +41,7 @@ export const watchedFilmSchema = filmSchema
     watchedAt: dateSchema,
     tags: stringListSchema,
     review: z.string().trim(),
-    sourceUrl: nullableTextSchema,
+    sourceUrl: nullablePublicUrlSchema,
   })
   .strict()
 
@@ -57,6 +64,7 @@ export const recommendationSchema = filmSchema
     model: nullableTextSchema,
     generatedAt: dateTimeSchema,
   })
+
   .strict()
   .superRefine((recommendation, context) => {
     if (
@@ -78,6 +86,33 @@ export const recommendationSchema = filmSchema
     }
   })
 
+interface FilmIdentityInput {
+  tmdbId: number | null
+  title: string
+  year: number | null
+}
+
+function normalizedTitle(title: string): string {
+  return title
+    .toLocaleLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
+}
+
+function filmsMatch(left: FilmIdentityInput, right: FilmIdentityInput): boolean {
+  const catalogMatch =
+    left.tmdbId !== null && right.tmdbId !== null && left.tmdbId === right.tmdbId
+  const titleMatch =
+    normalizedTitle(left.title) === normalizedTitle(right.title) &&
+    (left.year === null || right.year === null || left.year === right.year)
+  return catalogMatch || titleMatch
+}
+
+function duplicateIndex(films: FilmIdentityInput[], index: number): number {
+  return films.findIndex((film, candidate) => candidate < index && filmsMatch(film, films[index]))
+}
+
 export const snapshotSchema = z
   .object({
     schemaVersion: z.literal(1),
@@ -90,6 +125,59 @@ export const snapshotSchema = z
   })
   .strict()
   .superRefine((snapshot, context) => {
+    snapshot.watched.forEach((film, index) => {
+      if (duplicateIndex(snapshot.watched, index) >= 0) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate watched film: ${film.title}`,
+          path: ['watched', index],
+        })
+      }
+    })
+
+    snapshot.watchlist.forEach((film, index) => {
+      if (duplicateIndex(snapshot.watchlist, index) >= 0) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate watchlist film: ${film.title}`,
+          path: ['watchlist', index],
+        })
+      }
+      if (snapshot.watched.some((watched) => filmsMatch(film, watched))) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Film appears in watched and watchlist: ${film.title}`,
+          path: ['watchlist', index],
+        })
+      }
+    })
+
+    const discoveries = [
+      ...snapshot.deterministicDiscoveries,
+      ...snapshot.aiDiscoveries,
+    ]
+    const existing = [...snapshot.watched, ...snapshot.watchlist]
+    discoveries.forEach((film, index) => {
+      const path =
+        index < snapshot.deterministicDiscoveries.length
+          ? ['deterministicDiscoveries', index]
+          : ['aiDiscoveries', index - snapshot.deterministicDiscoveries.length]
+      if (duplicateIndex(discoveries, index) >= 0) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate recommendation: ${film.title}`,
+          path,
+        })
+      }
+      if (existing.some((entry) => filmsMatch(film, entry))) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Recommendation is already watched or watchlisted: ${film.title}`,
+          path,
+        })
+      }
+    })
+
     snapshot.deterministicDiscoveries.forEach((recommendation, index) => {
       if (recommendation.source !== 'deterministic') {
         context.addIssue({
