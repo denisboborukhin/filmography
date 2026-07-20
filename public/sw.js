@@ -4,6 +4,7 @@ const CACHE_PREFIX = 'filmography-'
 const SHELL_CACHE = `${CACHE_PREFIX}shell-v1`
 const POSTER_CACHE = `${CACHE_PREFIX}posters-v1`
 const MAX_POSTERS = 80
+const NETWORK_TIMEOUT_MS = 4000
 const scopeUrl = new URL(self.registration.scope)
 
 function scopedUrl(path) {
@@ -103,10 +104,21 @@ async function cacheFirst(request, cacheName) {
   return response
 }
 
+async function fetchWithTimeout(request, timeoutMs = NETWORK_TIMEOUT_MS) {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), timeoutMs)
+
+  try {
+    return await fetch(request, { signal: controller.signal })
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
 async function networkFirst(request, fallbackUrl) {
   const cache = await caches.open(SHELL_CACHE)
   try {
-    const response = await fetch(request)
+    const response = await fetchWithTimeout(request)
     if (response.ok) {
       await storeResponse(cache, request, response)
       return response
@@ -130,13 +142,22 @@ async function networkFirst(request, fallbackUrl) {
   }
 }
 
+async function cachedShell(request) {
+  const cache = await caches.open(SHELL_CACHE)
+  const matchOptions = { ignoreVary: true }
+  const cached =
+    (await cache.match(request, matchOptions)) ??
+    (await cache.match(scopeUrl, matchOptions))
+  return cached ?? networkFirst(request, scopeUrl)
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET') return
 
   const url = new URL(request.url)
   if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request, scopeUrl))
+    event.respondWith(cachedShell(request))
     return
   }
 
@@ -145,12 +166,12 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  if (request.destination === 'image') {
-    event.respondWith(cacheFirst(request, POSTER_CACHE))
+  if (url.origin === scopeUrl.origin && url.pathname.startsWith(scopeUrl.pathname)) {
+    event.respondWith(cacheFirst(request, SHELL_CACHE))
     return
   }
 
-  if (url.origin === scopeUrl.origin && url.pathname.startsWith(scopeUrl.pathname)) {
-    event.respondWith(cacheFirst(request, SHELL_CACHE))
+  if (request.destination === 'image') {
+    event.respondWith(cacheFirst(request, POSTER_CACHE))
   }
 })
