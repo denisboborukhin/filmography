@@ -53,9 +53,7 @@ def test_deterministic_ranking_excludes_existing_and_explains_matches() -> None:
         ),
     ]
 
-    recommendations = rank_deterministic(
-        watched, watchlist, candidates, generated_at=now, limit=10
-    )
+    recommendations = rank_deterministic(watched, watchlist, candidates, generated_at=now, limit=10)
 
     assert [item.tmdb_id for item in recommendations] == [3, 4]
     assert recommendations[0].predicted_rating > recommendations[1].predicted_rating
@@ -75,3 +73,34 @@ def test_deterministic_ranking_is_stable_without_history() -> None:
 
     assert [item.tmdb_id for item in first] == [1, 2]
     assert first == second
+
+
+def test_deterministic_ranking_excludes_unknown_year_title_match() -> None:
+    now = datetime(2026, 7, 20, tzinfo=UTC)
+    recommendations = rank_deterministic(
+        [WatchedFilm(title="Crash", rating=8)],
+        [],
+        [FilmMetadata(tmdb_id=884, title="Crash", year=1996, vote_average=6.5)],
+        generated_at=now,
+    )
+
+    assert recommendations == []
+
+
+def test_personal_tags_match_catalog_descriptions() -> None:
+    now = datetime(2026, 7, 20, tzinfo=UTC)
+    watched = [WatchedFilm(title="Loved", rating=10, tags=["lunar isolation"])]
+    candidates = [
+        FilmMetadata(
+            tmdb_id=1,
+            title="Matching",
+            overview="A study of lunar isolation and memory.",
+            vote_average=7,
+        ),
+        FilmMetadata(tmdb_id=2, title="Unrelated", vote_average=9),
+    ]
+
+    recommendations = rank_deterministic(watched, [], candidates, generated_at=now)
+
+    assert [item.tmdb_id for item in recommendations] == [1, 2]
+    assert "lunar isolation" in recommendations[0].rationale

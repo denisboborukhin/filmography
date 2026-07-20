@@ -201,7 +201,7 @@ def test_resolver_verifies_tmdb_and_excludes_seen_ambiguous_and_duplicate_films(
         result = resolve_ai_suggestions(
             batch,
             catalog,
-            [WatchedFilm(tmdb_id=10, title="Seen", year=2020, rating=8)],
+            [WatchedFilm(tmdb_id=10, title="Seen", rating=8)],
             [],
             generated_at=datetime(2026, 7, 20, tzinfo=UTC),
             provider="openai-compatible",

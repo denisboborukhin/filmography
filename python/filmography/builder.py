@@ -16,7 +16,7 @@ from filmography.models import (
     Snapshot,
     WatchedFilm,
     WatchlistFilm,
-    film_identity,
+    film_matches_any,
 )
 from filmography.obsidian import Diagnostic, ImportValidationError, import_obsidian
 from filmography.recommendations import preferred_genres, rank_deterministic
@@ -49,18 +49,13 @@ def build_snapshot(
     watched = imported.watched
     watchlist = imported.watchlist
     if catalog is not None:
-        watched = [
-            _enrich_watched(film, catalog, diagnostics)
-            for film in imported.watched
-        ]
-        watchlist = [
-            _enrich_watchlist(film, catalog, diagnostics)
-            for film in imported.watchlist
-        ]
+        watched = [_enrich_watched(film, catalog, diagnostics) for film in imported.watched]
+        watchlist = [_enrich_watchlist(film, catalog, diagnostics) for film in imported.watchlist]
 
     now = _utc_datetime(generated_at)
     retained_ai = _retain_valid_ai(previous.ai_discoveries if previous else [], watched, watchlist)
     deterministic: list[Recommendation] = []
+    deterministic_refreshed = False
     if catalog is not None:
         try:
             candidates = catalog.discover_movies(preferred_genres(watched))
@@ -71,10 +66,9 @@ def build_snapshot(
                 generated_at=now,
                 limit=deterministic_limit,
             )
+            deterministic_refreshed = True
         except CatalogError as error:
-            diagnostics.append(
-                Diagnostic("warning", "catalog-discovery-failed", str(error))
-            )
+            diagnostics.append(Diagnostic("warning", "catalog-discovery-failed", str(error)))
     retained_ids = {item.tmdb_id for item in retained_ai}
     deterministic = [item for item in deterministic if item.tmdb_id not in retained_ids]
     watched.sort(
@@ -96,7 +90,9 @@ def build_snapshot(
     )
     snapshot = Snapshot(
         generated_at=now,
-        recommendations_generated_at=previous_recommendation_time,
+        recommendations_generated_at=now
+        if deterministic_refreshed
+        else previous_recommendation_time,
         watched=watched,
         watchlist=watchlist,
         deterministic_discoveries=deterministic,
@@ -143,8 +139,7 @@ def refresh_ai_recommendations(
     # model_copy does not rerun model validators, so explicitly validate the serialized result.
     updated = Snapshot.model_validate(updated.model_dump())
     diagnostics = tuple(
-        Diagnostic("warning", "ai-suggestion-rejected", warning)
-        for warning in resolved.warnings
+        Diagnostic("warning", "ai-suggestion-rejected", warning) for warning in resolved.warnings
     )
     return BuildResult(updated, diagnostics)
 
@@ -249,20 +244,11 @@ def _retain_valid_ai(
     watched: list[WatchedFilm],
     watchlist: list[WatchlistFilm],
 ) -> list[Recommendation]:
-    excluded_ids = {
-        film.tmdb_id for film in [*watched, *watchlist] if film.tmdb_id is not None
-    }
-    excluded_titles = {
-        film_identity(film.title, film.year) for film in [*watched, *watchlist]
-    }
+    excluded = [*watched, *watchlist]
     retained: list[Recommendation] = []
     seen: set[int] = set()
     for item in recommendations:
-        if (
-            item.tmdb_id in excluded_ids
-            or item.tmdb_id in seen
-            or film_identity(item.title, item.year) in excluded_titles
-        ):
+        if item.tmdb_id in seen or film_matches_any(item, excluded):
             continue
         seen.add(item.tmdb_id)
         retained.append(item)

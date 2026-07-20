@@ -10,7 +10,7 @@ from filmography.models import (
     Recommendation,
     WatchedFilm,
     WatchlistFilm,
-    film_identity,
+    film_matches_any,
 )
 
 
@@ -46,31 +46,20 @@ def rank_deterministic(
 
     if limit < 0:
         raise ValueError("limit cannot be negative")
-    excluded_ids = {
-        film.tmdb_id for film in [*watched, *watchlist] if film.tmdb_id is not None
-    }
-    excluded_titles = {
-        film_identity(film.title, film.year) for film in [*watched, *watchlist]
-    }
+    excluded = [*watched, *watchlist]
     preferences = _preference_weights(watched)
+    preference_names = _preference_names(watched)
     baseline = sum(film.rating for film in watched) / len(watched) if watched else 6.0
 
     ranked: list[tuple[float, float, float, str, FilmMetadata, list[str]]] = []
     seen_ids: set[int] = set()
     for film in candidates:
-        if film.tmdb_id is None or film.tmdb_id in seen_ids or film.tmdb_id in excluded_ids:
+        if film.tmdb_id is None or film.tmdb_id in seen_ids:
             continue
-        if film_identity(film.title, film.year) in excluded_titles:
+        if film_matches_any(film, excluded):
             continue
         seen_ids.add(film.tmdb_id)
-        matches = sorted(
-            (
-                (preferences.get(_normalize_label(genre), 0.0), genre)
-                for genre in film.genres
-                if preferences.get(_normalize_label(genre), 0.0) > 0
-            ),
-            key=lambda item: (-item[0], item[1].casefold()),
-        )
+        matches = _candidate_matches(preferences, preference_names, film)
         affinity = sum(weight for weight, _ in matches[:3])
         catalog_score = film.vote_average if film.vote_average is not None else 5.0
         ranking_score = affinity * 2 + catalog_score * 0.25
@@ -120,6 +109,37 @@ def _preference_weights(watched: list[WatchedFilm]) -> dict[str, float]:
                 totals[normalized] += signal
                 counts[normalized] += 1
     return {label: totals[label] / counts[label] for label in totals}
+
+
+def _preference_names(watched: list[WatchedFilm]) -> dict[str, str]:
+    names: dict[str, str] = {}
+    for film in watched:
+        for label in [*film.genres, *film.tags]:
+            normalized = _normalize_label(label)
+            if normalized and normalized not in names:
+                names[normalized] = label.strip()
+    return names
+
+
+def _candidate_matches(
+    preferences: dict[str, float],
+    preference_names: dict[str, str],
+    film: FilmMetadata,
+) -> list[tuple[float, str]]:
+    matches: dict[str, tuple[float, str]] = {}
+    for genre in film.genres:
+        normalized = _normalize_label(genre)
+        weight = preferences.get(normalized, 0.0)
+        if weight > 0:
+            matches[normalized] = (weight, genre)
+
+    searchable = (
+        f" {_normalize_label(' '.join((film.title, film.original_title or '', film.overview)))} "
+    )
+    for normalized, weight in preferences.items():
+        if weight > 0 and normalized not in matches and f" {normalized} " in searchable:
+            matches[normalized] = (weight, preference_names.get(normalized, normalized))
+    return sorted(matches.values(), key=lambda item: (-item[0], item[1].casefold()))
 
 
 def _normalize_label(value: str) -> str:

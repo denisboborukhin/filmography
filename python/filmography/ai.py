@@ -15,7 +15,8 @@ from filmography.models import (
     Recommendation,
     WatchedFilm,
     WatchlistFilm,
-    film_identity,
+    film_matches_any,
+    film_titles_overlap,
 )
 from filmography.tmdb import CatalogError, TMDBClient
 
@@ -182,19 +183,17 @@ def resolve_ai_suggestions(
 ) -> AIResolution:
     """Reconcile proposed titles with TMDB and exclude all existing state."""
 
-    excluded_ids = {
-        film.tmdb_id for film in [*watched, *watchlist] if film.tmdb_id is not None
-    }
-    excluded_titles = {
-        film_identity(film.title, film.year) for film in [*watched, *watchlist]
-    }
+    excluded = [*watched, *watchlist]
     seen_ids: set[int] = set()
     recommendations: list[Recommendation] = []
     warnings: list[str] = []
     for suggestion in batch.recommendations:
         if len(recommendations) >= limit:
             break
-        if film_identity(suggestion.title, suggestion.year) in excluded_titles:
+        if any(
+            film_titles_overlap(suggestion.title, suggestion.year, film.title, film.year)
+            for film in excluded
+        ):
             warnings.append(f"excluded existing film: {suggestion.title} ({suggestion.year})")
             continue
         try:
@@ -205,10 +204,10 @@ def resolve_ai_suggestions(
         if match.status != "matched" or match.film is None or match.film.tmdb_id is None:
             warnings.append(f"{match.status} TMDB title: {suggestion.title} ({suggestion.year})")
             continue
-        if match.film.tmdb_id in excluded_ids or match.film.tmdb_id in seen_ids:
+        if match.film.tmdb_id in seen_ids:
             warnings.append(f"excluded duplicate film: {suggestion.title} ({suggestion.year})")
             continue
-        if film_identity(match.film.title, match.film.year) in excluded_titles:
+        if film_matches_any(match.film, excluded):
             warnings.append(f"excluded existing film: {suggestion.title} ({suggestion.year})")
             continue
         seen_ids.add(match.film.tmdb_id)

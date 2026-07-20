@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from contextlib import ExitStack
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -77,7 +78,7 @@ def test_builder_is_deterministic_with_injected_time_and_preserves_previous_ai(
 
 def test_builder_drops_previous_recommendation_that_is_now_watchlisted(tmp_path: Path) -> None:
     reviews, watchlist = _sources(tmp_path)
-    watchlist.write_text("- Previous Pick (2000)\n", encoding="utf-8")
+    watchlist.write_text("- Previous Pick\n", encoding="utf-8")
 
     snapshot = build_snapshot(
         reviews,
@@ -88,6 +89,49 @@ def test_builder_drops_previous_recommendation_that_is_now_watchlisted(tmp_path:
 
     assert snapshot.ai_discoveries == []
     assert snapshot.recommendations_generated_at is None
+
+
+def test_successful_local_recommendation_run_records_generation_time(tmp_path: Path) -> None:
+    reviews = tmp_path / "reviews"
+    reviews.mkdir()
+    watchlist = tmp_path / "Watchlist.md"
+    watchlist.write_text("", encoding="utf-8")
+    now = datetime(2026, 7, 20, 10, tzinfo=UTC)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/3/genre/movie/list":
+            return httpx.Response(200, json={"genres": []})
+        return httpx.Response(
+            200,
+            json={
+                "results": [
+                    {
+                        "id": 1,
+                        "title": "Discovery",
+                        "release_date": "2020-01-01",
+                        "vote_average": 8,
+                    }
+                ]
+            },
+        )
+
+    http_client = httpx.Client(
+        base_url="https://catalog.test/3/",
+        transport=httpx.MockTransport(handler),
+    )
+    catalog = TMDBClient("token", tmp_path / "cache", http_client=http_client)
+    try:
+        snapshot = build_snapshot(
+            reviews,
+            watchlist,
+            catalog=catalog,
+            generated_at=now,
+        ).snapshot
+    finally:
+        http_client.close()
+
+    assert [item.title for item in snapshot.deterministic_discoveries] == ["Discovery"]
+    assert snapshot.recommendations_generated_at == now
 
 
 def test_snapshot_write_is_atomic_round_trip_and_contains_no_credentials(tmp_path: Path) -> None:
@@ -132,6 +176,61 @@ def test_failed_ai_refresh_leaves_existing_snapshot_unchanged(tmp_path: Path) ->
     assert original.ai_discoveries[0].model == "old-model"
 
 
+def test_recommend_cli_failure_preserves_previous_verified_ai_set(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    reviews = tmp_path / "reviews"
+    reviews.mkdir()
+    watchlist = tmp_path / "Watchlist.md"
+    watchlist.write_text("", encoding="utf-8")
+    output = tmp_path / "filmography.json"
+    write_snapshot(_previous_snapshot(), output)
+
+    class EmptyCatalog:
+        def __init__(self, *_args: object, **_kwargs: object) -> None:
+            pass
+
+        def __enter__(self) -> EmptyCatalog:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            pass
+
+        def discover_movies(self, _genres: list[str]) -> list[object]:
+            return []
+
+    class FailingAI:
+        def suggest(self, *_args: object, **_kwargs: object) -> None:
+            raise AIError("provider unavailable")
+
+    def failing_ai_factory(_stack: ExitStack) -> FailingAI:
+        return FailingAI()
+
+    monkeypatch.setenv("TMDB_ACCESS_TOKEN", "catalog-token")
+    monkeypatch.setattr("filmography.cli.TMDBClient", EmptyCatalog)
+    monkeypatch.setattr("filmography.cli._create_ai_client", failing_ai_factory)
+
+    result = main(
+        [
+            "recommend",
+            "--reviews",
+            str(reviews),
+            "--watchlist",
+            str(watchlist),
+            "--output",
+            str(output),
+        ]
+    )
+
+    saved = load_snapshot(output)
+    assert result == 1
+    assert saved is not None
+    assert [item.tmdb_id for item in saved.ai_discoveries] == [100]
+    assert saved.ai_discoveries[0].generated_at == datetime(2026, 7, 19, tzinfo=UTC)
+    assert saved.ai_discoveries[0].model == "old-model"
+
+
 def test_successful_ai_refresh_replaces_previous_set_and_removes_local_duplicate(
     tmp_path: Path,
 ) -> None:
@@ -162,11 +261,7 @@ def test_successful_ai_refresh_replaces_previous_set_and_removes_local_duplicate
         transport=httpx.MockTransport(
             lambda _request: httpx.Response(
                 200,
-                json={
-                    "choices": [
-                        {"message": {"content": json.dumps(provider_result)}}
-                    ]
-                },
+                json={"choices": [{"message": {"content": json.dumps(provider_result)}}]},
             )
         ),
     )
