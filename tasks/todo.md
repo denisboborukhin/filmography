@@ -7,7 +7,7 @@
 - [x] Generate deterministic and optional AI recommendations.
 - [x] Build the responsive read-only journal UI.
 - [x] Cache the last published snapshot for offline use.
-- [ ] Configure GitHub Pages without runtime secrets.
+- [x] Configure GitHub Pages without runtime secrets.
 - [ ] Complete automated and browser verification.
 - [ ] Document local generation and publishing workflows.
 
