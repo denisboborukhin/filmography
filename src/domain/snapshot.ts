@@ -3,9 +3,15 @@ import { z } from 'zod'
 const yearSchema = z.number().int().min(1878).max(2200).nullable()
 const scoreSchema = z.number().min(0).max(10).multipleOf(0.5)
 const optionalScoreSchema = scoreSchema.nullable()
-const nullableTextSchema = z.string().nullable()
+const nullableTextSchema = z.string().trim().nullable()
 const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable()
 const dateTimeSchema = z.string().datetime({ offset: true })
+const stringListSchema = z
+  .array(z.string().trim().min(1))
+  .refine(
+    (values) => new Set(values.map((value) => value.toLocaleLowerCase())).size === values.length,
+    'Values must be unique',
+  )
 
 export const filmSchema = z
   .object({
@@ -15,8 +21,8 @@ export const filmSchema = z
     year: yearSchema,
     releaseDate: dateSchema,
     posterUrl: nullableTextSchema,
-    overview: z.string(),
-    genres: z.array(z.string().trim().min(1)),
+    overview: z.string().trim(),
+    genres: stringListSchema,
     voteAverage: z.number().min(0).max(10).nullable(),
     popularity: z.number().min(0).nullable(),
   })
@@ -26,8 +32,8 @@ export const watchedFilmSchema = filmSchema
   .extend({
     rating: scoreSchema,
     watchedAt: dateSchema,
-    tags: z.array(z.string().trim().min(1)),
-    review: z.string(),
+    tags: stringListSchema,
+    review: z.string().trim(),
     sourceUrl: nullableTextSchema,
   })
   .strict()
@@ -35,8 +41,8 @@ export const watchedFilmSchema = filmSchema
 export const watchlistFilmSchema = filmSchema
   .extend({
     interest: optionalScoreSchema,
-    notes: z.string(),
-    tags: z.array(z.string().trim().min(1)),
+    notes: z.string().trim(),
+    tags: stringListSchema,
     dismissed: z.boolean(),
   })
   .strict()
@@ -52,6 +58,25 @@ export const recommendationSchema = filmSchema
     generatedAt: dateTimeSchema,
   })
   .strict()
+  .superRefine((recommendation, context) => {
+    if (
+      recommendation.source === 'deterministic' &&
+      (recommendation.provider !== null || recommendation.model !== null)
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Deterministic recommendations cannot include an AI provider or model',
+        path: ['provider'],
+      })
+    }
+    if (recommendation.source === 'ai' && (!recommendation.provider || !recommendation.model)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'AI recommendations require a provider and model',
+        path: ['provider'],
+      })
+    }
+  })
 
 export const snapshotSchema = z
   .object({
