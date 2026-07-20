@@ -1,7 +1,7 @@
 # Filmography implementation
 
-- [ ] Scaffold React/TypeScript and Python projects.
-- [ ] Define shared snapshot models and demo data.
+- [x] Scaffold React/TypeScript and Python projects.
+- [x] Define shared snapshot models and demo data.
 - [ ] Parse Obsidian reviews and watchlist notes.
 - [ ] Enrich films through a cached TMDB client.
 - [ ] Generate deterministic and optional AI recommendations.

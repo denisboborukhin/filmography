@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://filmography.local/schemas/snapshot.schema.json",
+  "title": "Filmography snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "recommendationsGeneratedAt",
+    "watched",
+    "watchlist",
+    "deterministicDiscoveries",
+    "aiDiscoveries"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "recommendationsGeneratedAt": {
+      "anyOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "watched": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/watchedFilm" }
+    },
+    "watchlist": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/watchlistFilm" }
+    },
+    "deterministicDiscoveries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/recommendation" }
+    },
+    "aiDiscoveries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/recommendation" }
+    }
+  },
+  "$defs": {
+    "nullableString": {
+      "anyOf": [{ "type": "string" }, { "type": "null" }]
+    },
+    "nullableNumber": {
+      "anyOf": [{ "type": "number" }, { "type": "null" }]
+    },
+    "nullableDate": {
+      "anyOf": [
+        { "type": "string", "format": "date" },
+        { "type": "null" }
+      ]
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10,
+      "multipleOf": 0.5
+    },
+    "filmMetadataProperties": {
+      "type": "object",
+      "properties": {
+        "tmdbId": {
+          "anyOf": [
+            { "type": "integer", "minimum": 1 },
+            { "type": "null" }
+          ]
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "originalTitle": { "$ref": "#/$defs/nullableString" },
+        "year": {
+          "anyOf": [
+            { "type": "integer", "minimum": 1878, "maximum": 2200 },
+            { "type": "null" }
+          ]
+        },
+        "releaseDate": { "$ref": "#/$defs/nullableDate" },
+        "posterUrl": { "$ref": "#/$defs/nullableString" },
+        "overview": { "type": "string" },
+        "genres": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "voteAverage": {
+          "anyOf": [
+            { "type": "number", "minimum": 0, "maximum": 10 },
+            { "type": "null" }
+          ]
+        },
+        "popularity": {
+          "anyOf": [
+            { "type": "number", "minimum": 0 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "watchedFilm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tmdbId",
+        "title",
+        "originalTitle",
+        "year",
+        "releaseDate",
+        "posterUrl",
+        "overview",
+        "genres",
+        "voteAverage",
+        "popularity",
+        "rating",
+        "watchedAt",
+        "tags",
+        "review",
+        "sourceUrl"
+      ],
+      "properties": {
+        "tmdbId": { "$ref": "#/$defs/filmMetadataProperties/properties/tmdbId" },
+        "title": { "$ref": "#/$defs/filmMetadataProperties/properties/title" },
+        "originalTitle": { "$ref": "#/$defs/nullableString" },
+        "year": { "$ref": "#/$defs/filmMetadataProperties/properties/year" },
+        "releaseDate": { "$ref": "#/$defs/nullableDate" },
+        "posterUrl": { "$ref": "#/$defs/nullableString" },
+        "overview": { "type": "string" },
+        "genres": { "type": "array", "items": { "type": "string" } },
+        "voteAverage": { "$ref": "#/$defs/filmMetadataProperties/properties/voteAverage" },
+        "popularity": { "$ref": "#/$defs/filmMetadataProperties/properties/popularity" },
+        "rating": { "$ref": "#/$defs/score" },
+        "watchedAt": { "$ref": "#/$defs/nullableDate" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "review": { "type": "string" },
+        "sourceUrl": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "watchlistFilm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tmdbId",
+        "title",
+        "originalTitle",
+        "year",
+        "releaseDate",
+        "posterUrl",
+        "overview",
+        "genres",
+        "voteAverage",
+        "popularity",
+        "interest",
+        "notes",
+        "tags",
+        "dismissed"
+      ],
+      "properties": {
+        "tmdbId": { "$ref": "#/$defs/filmMetadataProperties/properties/tmdbId" },
+        "title": { "$ref": "#/$defs/filmMetadataProperties/properties/title" },
+        "originalTitle": { "$ref": "#/$defs/nullableString" },
+        "year": { "$ref": "#/$defs/filmMetadataProperties/properties/year" },
+        "releaseDate": { "$ref": "#/$defs/nullableDate" },
+        "posterUrl": { "$ref": "#/$defs/nullableString" },
+        "overview": { "type": "string" },
+        "genres": { "type": "array", "items": { "type": "string" } },
+        "voteAverage": { "$ref": "#/$defs/filmMetadataProperties/properties/voteAverage" },
+        "popularity": { "$ref": "#/$defs/filmMetadataProperties/properties/popularity" },
+        "interest": {
+          "anyOf": [{ "$ref": "#/$defs/score" }, { "type": "null" }]
+        },
+        "notes": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "dismissed": { "type": "boolean" }
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tmdbId",
+        "title",
+        "originalTitle",
+        "year",
+        "releaseDate",
+        "posterUrl",
+        "overview",
+        "genres",
+        "voteAverage",
+        "popularity",
+        "predictedRating",
+        "rationale",
+        "source",
+        "generatedAt",
+        "provider",
+        "model"
+      ],
+      "properties": {
+        "tmdbId": { "type": "integer", "minimum": 1 },
+        "title": { "$ref": "#/$defs/filmMetadataProperties/properties/title" },
+        "originalTitle": { "$ref": "#/$defs/nullableString" },
+        "year": { "$ref": "#/$defs/filmMetadataProperties/properties/year" },
+        "releaseDate": { "$ref": "#/$defs/nullableDate" },
+        "posterUrl": { "$ref": "#/$defs/nullableString" },
+        "overview": { "type": "string" },
+        "genres": { "type": "array", "items": { "type": "string" } },
+        "voteAverage": { "$ref": "#/$defs/filmMetadataProperties/properties/voteAverage" },
+        "popularity": { "$ref": "#/$defs/filmMetadataProperties/properties/popularity" },
+        "predictedRating": { "$ref": "#/$defs/score" },
+        "rationale": { "type": "string", "minLength": 1 },
+        "source": { "enum": ["deterministic", "ai"] },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "provider": { "$ref": "#/$defs/nullableString" },
+        "model": { "$ref": "#/$defs/nullableString" }
+      }
+    }
+  }
+}
