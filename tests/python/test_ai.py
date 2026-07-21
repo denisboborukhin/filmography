@@ -70,6 +70,183 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     assert "A complete review." in serialized_body
     assert "super-secret" not in serialized_body
     assert cast(dict[str, object], request_body["response_format"])["type"] == "json_schema"
+    messages = cast(list[dict[str, str]], request_body["messages"])
+    assert "Do not use Markdown" in messages[0]["content"]
+
+
+def test_ai_client_extracts_fenced_json_from_compat_provider() -> None:
+    result = {
+        "recommendations": [
+            {
+                "title": "Moneyball",
+                "year": 2011,
+                "predictedRating": 8,
+                "rationale": "Data-driven sports drama fits the profile.",
+            }
+        ]
+    }
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": f"```json\n{json.dumps(result)}\n```"}}]},
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.suggest([], [], count=1)
+    finally:
+        http_client.close()
+
+    assert batch.recommendations[0].title == "Moneyball"
+
+
+def test_ai_client_normalizes_provider_score_aliases() -> None:
+    result = {
+        "recommendations": [
+            {
+                "title": "Dumb Money",
+                "year": 2023,
+                "score": 7.5,
+                "rationale": "Crowd-driven finance story fits the profile.",
+            }
+        ]
+    }
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.suggest([], [], count=1)
+    finally:
+        http_client.close()
+
+    assert batch.recommendations[0].title == "Dumb Money"
+    assert batch.recommendations[0].predicted_rating == 7.5
+
+
+def test_ai_client_drops_provider_suggestions_without_year() -> None:
+    result = {
+        "recommendations": [
+            {
+                "title": "Ted lesso",
+                "year": None,
+                "rating": 6.5,
+                "rationale": "Not a verifiable film recommendation.",
+            },
+            {
+                "title": "The Menu",
+                "year": 2022,
+                "rating": 7.7,
+                "rationale": "Satirical pressure fits the profile.",
+            },
+        ]
+    }
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.suggest([], [], count=2)
+    finally:
+        http_client.close()
+
+    assert [item.title for item in batch.recommendations] == ["The Menu"]
+    assert batch.recommendations[0].predicted_rating == 7.7
+
+
+def test_ai_client_accepts_top_level_recommendation_array() -> None:
+    result = [
+        {
+            "title": "The Menu",
+            "year": 2022,
+            "rating": 8,
+            "rationale": "Satirical tension matches the profile.",
+        }
+    ]
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.suggest([], [], count=1)
+    finally:
+        http_client.close()
+
+    assert batch.recommendations[0].title == "The Menu"
+    assert batch.recommendations[0].predicted_rating == 8
+
+
+def test_ai_client_drops_unrecoverable_items_from_provider_json() -> None:
+    result = {
+        "recommendations": [
+            {
+                "title": "Dumb Money",
+                "year": 2023,
+                "rating": 8.0,
+                "rationale": "Echoes entrepreneurial optimism.",
+            },
+            {
+                "title": "Ted lesso",
+                "year": None,
+                "rating": 6.5,
+                "rationale": "This is a series and has no film year.",
+            },
+            {
+                "title": "The Menu",
+                "year": 2022,
+                "rating": 7.5,
+                "extraProviderField": "ignored",
+                "rationale": "A sharp satirical take.",
+            },
+        ]
+    }
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.suggest([], [], count=3)
+    finally:
+        http_client.close()
+
+    assert [item.title for item in batch.recommendations] == ["Dumb Money", "The Menu"]
+    assert [item.predicted_rating for item in batch.recommendations] == [8, 7.5]
+
+
+def test_ai_client_parses_openrouter_markdown_recommendations() -> None:
+    markdown = """**Dumb Money (2023)** - predicted rating: 8/10.
+Matches your interest in finance, systems, and recent crowd-driven stories.
+
+**The Social Network (2010)** - Strong fit for your business and tech preferences.
+"""
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": markdown}}]},
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.suggest([], [], count=2)
+    finally:
+        http_client.close()
+
+    assert [item.title for item in batch.recommendations] == ["Dumb Money", "The Social Network"]
+    assert batch.recommendations[0].predicted_rating == 8
+    assert batch.recommendations[1].predicted_rating == 7.5
+    assert "business and tech" in batch.recommendations[1].rationale
 
 
 @pytest.mark.parametrize(
@@ -87,7 +264,7 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
                                     {
                                         "title": "Film",
                                         "year": 2020,
-                                        "predictedRating": 8.2,
+                                        "predictedRating": 8.25,
                                         "rationale": "Invalid step",
                                     }
                                 ]

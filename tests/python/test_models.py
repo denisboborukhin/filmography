@@ -15,7 +15,8 @@ def test_public_models_reject_unknown_fields_and_invalid_score_steps() -> None:
     with pytest.raises(ValidationError, match="extra_forbidden"):
         WatchedFilm.model_validate({"title": "Arrival", "rating": 9, "localNotesPath": "/secret"})
     with pytest.raises(ValidationError, match="multiple_of"):
-        WatchedFilm(title="Arrival", rating=9.2)
+        WatchedFilm(title="Arrival", rating=9.25)
+    assert WatchedFilm(title="Arrival", rating=9.2).rating == 9.2
 
 
 def test_release_date_supplies_year_without_assignment_recursion() -> None:

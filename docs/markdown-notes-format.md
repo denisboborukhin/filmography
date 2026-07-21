@@ -73,12 +73,12 @@ filename still becomes the public title.
 
 ### Score rules
 
-- The published scale is 0–10 in increments of 0.5.
+- The published scale is 0–10 in increments of 0.1.
 - A bare `rating` or `score` value is already on the 0–10 scale, including values from 0–5.
 - Five-point values are doubled only when explicit: use `rating: 4/5`, add `ratingScale: 5`, use the
   `stars` field, or write star characters such as `★★★★☆`.
 - Explicit ten-point forms such as `rating: 8.5/10` are also accepted.
-- Values outside 0–10, non-numeric values, and values that cannot normalize to a half-step are
+- Values outside 0–10, non-numeric values, and values that cannot normalize to a tenth-step are
   validation errors.
 
 This avoids guessing about ambiguous values: bare `rating: 5` means five out of ten, while
@@ -130,7 +130,7 @@ Each line contains:
 
 An unlabelled segment after the title is appended to the notes, so `| quiet evening` is valid.
 
-Interest uses the 0–10 half-step scale and is not inferred as a five-point score. If interest is
+Interest uses the 0–10 tenth-step scale and is not inferred as a five-point score. If interest is
 omitted, it remains unset so the UI does not invent a preference. `dismissed` accepts `true`, `yes`,
 `1`, `false`, `no`, or `0`. Dismissed films stay in the snapshot as a record of that choice but are
 excluded from recommendations. Markdown task markers such as `- [ ]` are accepted as list syntax;

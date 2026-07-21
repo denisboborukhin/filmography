@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 const yearSchema = z.number().int().min(1878).max(2200).nullable()
-const scoreSchema = z.number().min(0).max(10).multipleOf(0.5)
+const scoreSchema = z.number().min(0).max(10).multipleOf(0.1)
 const optionalScoreSchema = scoreSchema.nullable()
 const nullableTextSchema = z.string().trim().nullable()
 const nullablePublicUrlSchema = z

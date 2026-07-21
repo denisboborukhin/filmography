@@ -146,13 +146,13 @@ def _normalize_label(value: str) -> str:
     return " ".join("".join(char.casefold() if char.isalnum() else " " for char in value).split())
 
 
-def _half_step(value: float) -> float:
-    return round(value * 2) / 2
+def _tenth_step(value: float) -> float:
+    return round(value * 10) / 10
 
 
 def _predicted_score(baseline: float, affinity: float, catalog_score: float) -> float:
     raw_score = baseline + min(affinity * 0.35, 2.0) + (catalog_score - 5) * 0.15
-    return _half_step(_clamp(raw_score))
+    return _tenth_step(_clamp(raw_score))
 
 
 def _clamp(value: float) -> float:

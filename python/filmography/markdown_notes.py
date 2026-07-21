@@ -211,7 +211,7 @@ def normalize_score(
     *,
     scale: int | None = None,
 ) -> float:
-    """Normalize a 5- or 10-point score and enforce half-point output steps."""
+    """Normalize a 5- or 10-point score and enforce tenth-point output steps."""
 
     if isinstance(raw_value, bool):
         raise ValueError("score must be a number")
@@ -242,8 +242,8 @@ def normalize_score(
     elif not 0 <= score <= 10:
         raise ValueError("score must be between 0 and 10")
 
-    if abs(score * 2 - round(score * 2)) > 1e-9:
-        raise ValueError("score must use 0.5 increments")
+    if abs(score * 10 - round(score * 10)) > 1e-9:
+        raise ValueError("score must use 0.1 increments")
     return score
 
 

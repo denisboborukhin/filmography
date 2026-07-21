@@ -76,7 +76,7 @@
       "type": "number",
       "minimum": 0,
       "maximum": 10,
-      "multipleOf": 0.5
+      "multipleOf": 0.1
     },
     "filmMetadataProperties": {
       "type": "object",

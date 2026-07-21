@@ -48,7 +48,7 @@ The final scene **changes** everything.
         ("rating: 4\nratingScale: 5", 8),
         ("stars: 4", 8),
         ('rating: "★★★★☆"', 8),
-        ("rating: 8/10", 8),
+        ("rating: 8.2/10", 8.2),
     ],
 )
 def test_review_normalizes_only_explicit_five_point_scores(
@@ -62,7 +62,7 @@ def test_review_normalizes_only_explicit_five_point_scores(
     assert parse_review_note(note).rating == expected
 
 
-@pytest.mark.parametrize("value", ["7.2", "11", "bad", True])
+@pytest.mark.parametrize("value", ["7.25", "11", "bad", True])
 def test_score_rejects_invalid_values(value: object) -> None:
     with pytest.raises(ValueError):
         normalize_score(value)
@@ -221,7 +221,7 @@ def test_watchlist_reports_bad_lines_and_duplicates_without_stopping(tmp_path: P
     note = _write(
         tmp_path / "Watchlist.md",
         """- Good Film (2020) — interest: 7
-- Bad Score (2021) — interest: 7.2
+- Bad Score (2021) — interest: 7.25
 - Good Film (2020)
 - Another Film (2022) — dismissed: perhaps
 """,

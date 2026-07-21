@@ -21,9 +21,13 @@ describe('snapshot schema', () => {
     ).toThrow()
   })
 
-  it('rejects scores that are not half-step values', () => {
+  it('rejects scores that are not tenth-step values', () => {
+    const valid = structuredClone(snapshotFixture)
+    valid.watched[0].rating = 9.2
+    expect(snapshotSchema.parse(valid).watched[0].rating).toBe(9.2)
+
     const invalid = structuredClone(snapshotFixture)
-    invalid.watched[0].rating = 9.2
+    invalid.watched[0].rating = 9.25
 
     expect(() => snapshotSchema.parse(invalid)).toThrow()
   })

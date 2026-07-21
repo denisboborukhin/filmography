@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from typing import cast
@@ -32,7 +33,7 @@ class AISuggestion(BaseModel):
 
     title: str = Field(min_length=1)
     year: int = Field(ge=1878, le=2200)
-    predicted_rating: float = Field(alias="predictedRating", ge=0, le=10, multiple_of=0.5)
+    predicted_rating: float = Field(alias="predictedRating", ge=0, le=10, multiple_of=0.1)
     rationale: str = Field(min_length=1, max_length=500)
 
 
@@ -137,7 +138,9 @@ class OpenAICompatibleClient:
                         "You recommend feature films for one person. Infer taste from their "
                         "ratings and review text. Return only unseen films and make each "
                         "rationale specific "
-                        "to the supplied history. Scores must use 0.5 increments on a 0-10 scale."
+                        "to the supplied history. Scores must use 0.1 increments on a 0-10 scale. "
+                        "If your provider does not support response_format, still return only one "
+                        "valid JSON object with a recommendations array. Do not use Markdown."
                     ),
                 },
                 {
@@ -164,12 +167,7 @@ class OpenAICompatibleClient:
             raise AIError(f"AI recommendation request failed: {error}") from error
         payload = _json_object(response.text)
         content = _extract_message_content(payload)
-        try:
-            return AISuggestionBatch.model_validate_json(content)
-        except ValidationError as error:
-            raise AIError(
-                f"AI response does not match the recommendation schema: {error}"
-            ) from error
+        return _parse_suggestion_content(content)
 
 
 def resolve_ai_suggestions(
@@ -253,6 +251,156 @@ def _extract_message_content(payload: dict[str, object]) -> str:
     if not isinstance(content, str) or not content.strip():
         raise AIError("AI provider message has no textual content")
     return content
+
+
+def _parse_suggestion_content(content: str) -> AISuggestionBatch:
+    try:
+        return AISuggestionBatch.model_validate_json(content)
+    except ValidationError as original_error:
+        normalized = _normalize_provider_json(content)
+        if normalized is not None:
+            try:
+                return AISuggestionBatch.model_validate(normalized)
+            except ValidationError:
+                pass
+        extracted_json = _extract_json_object(content)
+        if extracted_json is not None:
+            normalized = _normalize_provider_json(extracted_json)
+            if normalized is not None:
+                try:
+                    return AISuggestionBatch.model_validate(normalized)
+                except ValidationError:
+                    pass
+            try:
+                return AISuggestionBatch.model_validate_json(extracted_json)
+            except ValidationError:
+                pass
+        markdown_batch = _parse_markdown_suggestions(content)
+        if markdown_batch is not None:
+            return markdown_batch
+        raise AIError(
+            f"AI response does not match the recommendation schema: {original_error}"
+        ) from original_error
+
+
+def _extract_json_object(content: str) -> str | None:
+    stripped = content.strip()
+    fenced = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", stripped, flags=re.DOTALL)
+    if fenced is not None:
+        return fenced.group(1)
+    start = stripped.find("{")
+    end = stripped.rfind("}")
+    if start == -1 or end <= start:
+        return None
+    return stripped[start : end + 1]
+
+
+def _normalize_provider_json(content: str) -> dict[str, object] | None:
+    try:
+        raw: object = json.loads(content)
+    except json.JSONDecodeError:
+        return None
+    if isinstance(raw, list):
+        raw = {"recommendations": cast(list[object], raw)}
+    if not isinstance(raw, dict):
+        return None
+    payload = cast(dict[str, object], raw)
+    recommendations = payload.get("recommendations")
+    if not isinstance(recommendations, list):
+        return payload
+    recommendation_items = cast(list[object], recommendations)
+    normalized: list[object] = []
+    for item in recommendation_items:
+        if not isinstance(item, dict):
+            continue
+        suggestion = dict(cast(dict[str, object], item))
+        normalized_suggestion = _normalize_provider_suggestion(suggestion)
+        if normalized_suggestion is not None:
+            normalized.append(normalized_suggestion)
+    if not normalized:
+        return None
+    return {**payload, "recommendations": normalized}
+
+
+def _normalize_provider_suggestion(suggestion: dict[str, object]) -> dict[str, object] | None:
+    title = suggestion.get("title")
+    year = suggestion.get("year")
+    rationale = suggestion.get("rationale")
+    predicted_rating = suggestion.get("predictedRating")
+    if predicted_rating is None:
+        for alias in ("predicted_rating", "score", "rating"):
+            if alias in suggestion:
+                predicted_rating = suggestion[alias]
+                break
+    if not isinstance(title, str) or not title.strip():
+        return None
+    if isinstance(year, bool) or not isinstance(year, int):
+        return None
+    if isinstance(predicted_rating, bool) or not isinstance(predicted_rating, (int, float)):
+        return None
+    rating = float(predicted_rating)
+    if not 0 <= rating <= 10 or abs(rating * 10 - round(rating * 10)) > 1e-9:
+        return None
+    if not isinstance(rationale, str) or not rationale.strip():
+        rationale = "Suggested by the configured AI model."
+    return {
+        "title": title,
+        "year": year,
+        "predictedRating": rating,
+        "rationale": rationale,
+    }
+
+
+def _parse_markdown_suggestions(content: str) -> AISuggestionBatch | None:
+    matches = list(
+        re.finditer(
+            r"(?m)^\s*(?:[-*]|\d+[.)])?\s*\*\*(?P<title>[^*\n]+?)\s*\((?P<year>\d{4})\)\*\*",
+            content,
+        )
+    )
+    if not matches:
+        return None
+    recommendations: list[dict[str, object]] = []
+    for index, match in enumerate(matches[:20]):
+        start = match.end()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
+        body = content[start:end].strip(" \n:-")
+        rating = _extract_markdown_rating(body)
+        rationale = _clean_markdown_rationale(body)
+        recommendations.append(
+            {
+                "title": match.group("title").strip(),
+                "year": int(match.group("year")),
+                "predictedRating": rating,
+                "rationale": rationale or "Suggested by the configured AI model.",
+            }
+        )
+    try:
+        return AISuggestionBatch.model_validate({"recommendations": recommendations})
+    except ValidationError:
+        return None
+
+
+def _extract_markdown_rating(value: str) -> float:
+    match = re.search(
+        r"(?i)(?:predicted\s+)?(?:rating|score)\s*[:=-]\s*(?P<score>\d+(?:\.\d+)?)",
+        value,
+    )
+    if match is None:
+        return 7.5
+    score = float(match.group("score"))
+    return round(max(0.0, min(10.0, score)) * 10) / 10
+
+
+def _clean_markdown_rationale(value: str) -> str:
+    text = re.sub(
+        r"(?i)(?:predicted\s+)?(?:rating|score)\s*[:=-]\s*\d+(?:\.\d+)?(?:/10)?",
+        "",
+        value,
+    )
+    text = re.sub(r"[*_`#>-]+", " ", text)
+    text = re.sub(r"\s+", " ", text).strip(" .:-")
+    return text[:500]
 
 
 def _http_error_message(response: httpx.Response) -> str:

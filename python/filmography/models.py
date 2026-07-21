@@ -10,7 +10,7 @@ from urllib.parse import urlsplit
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic.alias_generators import to_camel
 
-Score = Annotated[float, Field(strict=True, ge=0, le=10, multiple_of=0.5)]
+Score = Annotated[float, Field(strict=True, ge=0, le=10, multiple_of=0.1)]
 PositiveId = Annotated[int, Field(strict=True, ge=1)]
 FilmYear = Annotated[int, Field(strict=True, ge=1878, le=2200)]
 CatalogScore = Annotated[float, Field(strict=True, ge=0, le=10)]

@@ -86,7 +86,11 @@ endpoint. If the AI request fails, the updater retains the still-valid subset of
 verified AI set while continuing to refresh the journal and token-free discoveries.
 
 Alternative providers must implement `POST /chat/completions` and support strict JSON Schema through
-the `response_format` request field.
+the `response_format` request field. For OpenRouter, set `FILMOGRAPHY_AI_BASE_URL` to
+`https://openrouter.ai/api/v1` and use the OpenRouter model ID, for example
+`cohere/north-mini-code:free`. Some free models ignore structured-output settings; Filmography will
+try to recover common JSON-in-Markdown or bold-title Markdown recommendation lists, then still verify
+each title through TMDB before publishing.
 
 ## Markdown notes input
 
