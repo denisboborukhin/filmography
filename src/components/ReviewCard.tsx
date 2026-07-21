@@ -23,7 +23,7 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
           </div>
           <div className="compact-card__footer">
             <ScorePair
-              primaryLabel="Personal rating"
+              primaryLabel="Personal score"
               primaryValue={film.rating}
               secondaryValue={film.voteAverage}
             />
@@ -39,7 +39,7 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
       <div className="review-card__poster-column">
         <Poster path={film.posterUrl} size="medium" title={film.title} />
         <ScorePair
-          primaryLabel="Personal rating"
+          primaryLabel="Personal score"
           primaryValue={film.rating}
           secondaryValue={film.voteAverage}
         />

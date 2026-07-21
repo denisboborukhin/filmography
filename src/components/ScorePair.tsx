@@ -10,7 +10,7 @@ interface ScorePairProps {
 export function ScorePair({
   primaryLabel,
   primaryValue,
-  secondaryLabel = 'TMDB audience rating',
+  secondaryLabel = 'TMDB audience score',
   secondaryValue,
 }: ScorePairProps) {
   return (

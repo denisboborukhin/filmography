@@ -1,23 +1,22 @@
 import { useMemo, useState } from 'react'
 import type { WatchlistFilm } from '../domain/snapshot'
 import { EmptyState } from '../components/EmptyState'
-import { FilterBar } from '../components/FilterBar'
+import { FilmListControls } from '../components/FilmListControls'
 import { PageHeader } from '../components/PageHeader'
 import { RatingLegend } from '../components/RatingLegend'
 import { WatchlistCard } from '../components/WatchlistCard'
+import { compareFilmListItems, type FilmListSort } from '../lib/filmList'
 import { searchFilm } from '../lib/format'
 
 interface WatchlistViewProps {
   films: WatchlistFilm[]
 }
 
-type WatchlistSort = 'interest' | 'title' | 'year'
-
 export function WatchlistView({ films }: WatchlistViewProps) {
   const activeFilms = useMemo(() => films.filter((film) => !film.dismissed), [films])
   const [query, setQuery] = useState('')
   const [genre, setGenre] = useState('all')
-  const [sort, setSort] = useState<WatchlistSort>('interest')
+  const [sort, setSort] = useState<FilmListSort>('title')
   const genres = useMemo(
     () => [...new Set(activeFilms.flatMap((film) => film.genres))].sort(),
     [activeFilms],
@@ -31,11 +30,7 @@ export function WatchlistView({ films }: WatchlistViewProps) {
             searchFilm(film, query, [...film.tags, film.notes]) &&
             (genre === 'all' || film.genres.includes(genre)),
         )
-        .sort((left, right) => {
-          if (sort === 'title') return left.title.localeCompare(right.title)
-          if (sort === 'year') return (right.year ?? 0) - (left.year ?? 0)
-          return (right.interest ?? -1) - (left.interest ?? -1) || left.title.localeCompare(right.title)
-        }),
+        .sort((left, right) => compareFilmListItems(left, right, sort, (film) => film.interest)),
     [activeFilms, genre, query, sort],
   )
 
@@ -44,35 +39,20 @@ export function WatchlistView({ films }: WatchlistViewProps) {
       <PageHeader count={activeFilms.length} eyebrow="For another evening" title="Watchlist">
         A considered queue, ordered by how strongly each film is calling right now.
       </PageHeader>
-      <RatingLegend label="Watchlist rating legend" primaryLabel="Personal expected rating" />
-      <FilterBar
-        label="Search the watchlist"
+      <RatingLegend label="Watchlist score legend" primaryLabel="Personal expected score" />
+      <FilmListControls
+        genre={genre}
+        genreId="watchlist-genre"
+        genres={genres}
+        onGenreChange={setGenre}
         onQueryChange={setQuery}
+        onSortChange={setSort}
+        personalSortLabel="Highest expected personal score"
         query={query}
         resultCount={visibleFilms.length}
-        selects={[
-          {
-            id: 'watchlist-genre',
-            label: 'Genre',
-            options: [
-              { label: 'All genres', value: 'all' },
-              ...genres.map((item) => ({ label: item, value: item })),
-            ],
-            value: genre,
-            onChange: setGenre,
-          },
-          {
-            id: 'watchlist-sort',
-            label: 'Sort',
-            options: [
-              { label: 'Highest expected rating', value: 'interest' },
-              { label: 'Title A–Z', value: 'title' },
-              { label: 'Newest release', value: 'year' },
-            ],
-            value: sort,
-            onChange: (value) => setSort(value as WatchlistSort),
-          },
-        ]}
+        searchLabel="Search the watchlist"
+        sort={sort}
+        sortId="watchlist-sort"
       />
       {visibleFilms.length > 0 ? (
         <div className="watchlist-grid">

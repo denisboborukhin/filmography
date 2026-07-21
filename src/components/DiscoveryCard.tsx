@@ -36,7 +36,7 @@ export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProp
             {isAi ? 'AI pick' : 'Taste match'}
           </span>
           <ScorePair
-            primaryLabel="Your predicted rating"
+            primaryLabel="Personal expected score"
             primaryValue={discovery.predictedRating}
             secondaryValue={discovery.voteAverage}
           />

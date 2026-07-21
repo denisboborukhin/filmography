@@ -36,19 +36,19 @@ describe('journal views', () => {
   it('shows personal and TMDB ratings in the watched archive', () => {
     render(<WatchedView films={snapshotFixture.watched} />)
 
-    expect(screen.getByLabelText('Watched rating legend')).toHaveTextContent('Personal rating')
-    expect(screen.getByLabelText('Personal rating: 9.5 out of 10')).toBeInTheDocument()
-    expect(screen.getByLabelText('Personal rating: 8.0 out of 10')).toBeInTheDocument()
-    expect(screen.getByLabelText('TMDB audience rating: 8.5 out of 10')).toBeInTheDocument()
+    expect(screen.getByLabelText('Watched score legend')).toHaveTextContent('Personal score')
+    expect(screen.getByLabelText('Personal score: 9.5 out of 10')).toBeInTheDocument()
+    expect(screen.getByLabelText('Personal score: 8.0 out of 10')).toBeInTheDocument()
+    expect(screen.getByLabelText('TMDB audience score: 8.5 out of 10')).toBeInTheDocument()
   })
 
   it('shows expected and TMDB ratings in the watchlist', () => {
     render(<WatchlistView films={snapshotFixture.watchlist} />)
 
-    expect(screen.getByLabelText('Watchlist rating legend')).toHaveTextContent('Personal expected rating')
-    expect(screen.getByLabelText('Personal expected rating: 9.0 out of 10')).toBeInTheDocument()
-    expect(screen.getByLabelText('TMDB audience rating: 8.4 out of 10')).toBeInTheDocument()
-    expect(screen.getByRole('option', { name: 'Highest expected rating' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Watchlist score legend')).toHaveTextContent('Personal expected score')
+    expect(screen.getByLabelText('Personal expected score: 9.0 out of 10')).toBeInTheDocument()
+    expect(screen.getByLabelText('TMDB audience score: 8.4 out of 10')).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Highest expected personal score' })).toBeInTheDocument()
   })
 
   it('uses the same compact card structure for dashboard reviews and watchlist entries', () => {
@@ -71,10 +71,11 @@ describe('journal views', () => {
     expect(screen.getByRole('heading', { name: 'Up' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'My Neighbor Totoro' })).toBeInTheDocument()
     expect(screen.getAllByRole('article').length).toBeGreaterThanOrEqual(7)
-    expect(screen.getByLabelText('Source')).toBeInTheDocument()
+    expect(screen.getByLabelText('Genre')).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Highest TMDB score' })).toBeInTheDocument()
   })
 
-  it('filters discoveries by source', async () => {
+  it('filters discoveries by genre', async () => {
     const user = userEvent.setup()
     render(
       <DiscoveriesView
@@ -84,11 +85,11 @@ describe('journal views', () => {
       />,
     )
 
-    await user.selectOptions(screen.getByLabelText('Source'), 'deterministic')
+    await user.selectOptions(screen.getByLabelText('Genre'), 'Drama')
 
     expect(screen.queryByRole('heading', { name: 'Up' })).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'My Neighbor Totoro' })).toBeInTheDocument()
-    expect(screen.getByText('Two sisters encounter gentle forest spirits.')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Grave of the Fireflies' })).toBeInTheDocument()
+    expect(screen.getByText('Two siblings struggle to survive near the end of war.')).toBeInTheDocument()
     expect(
       screen.queryByText('Your highly rated dreamlike animation suggests a strong match.'),
     ).not.toBeInTheDocument()
@@ -103,12 +104,12 @@ describe('journal views', () => {
       />,
     )
 
-    expect(screen.getAllByLabelText('Your predicted rating: 8.5 out of 10').length).toBeGreaterThan(0)
-    expect(screen.getAllByLabelText('TMDB audience rating: 8.0 out of 10').length).toBeGreaterThan(0)
-    expect(screen.getByLabelText('Discovery rating legend')).toHaveTextContent(
-      'Personal expected rating',
+    expect(screen.getAllByLabelText('Personal expected score: 8.5 out of 10').length).toBeGreaterThan(0)
+    expect(screen.getAllByLabelText('TMDB audience score: 8.0 out of 10').length).toBeGreaterThan(0)
+    expect(screen.getByLabelText('Discovery score legend')).toHaveTextContent(
+      'Personal expected score',
     )
-    expect(screen.getByLabelText('Discovery rating legend')).toHaveTextContent(
+    expect(screen.getByLabelText('Discovery score legend')).toHaveTextContent(
       'TMDB audience score',
     )
     expect(screen.getByText('An old man and a young scout travel by flying house.')).toBeInTheDocument()

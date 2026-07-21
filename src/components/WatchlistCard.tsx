@@ -20,7 +20,7 @@ export function WatchlistCard({ film, compact = false }: WatchlistCardProps) {
           </div>
           <div className="compact-card__footer">
             <ScorePair
-              primaryLabel="Personal expected rating"
+              primaryLabel="Personal expected score"
               primaryValue={film.interest}
               secondaryValue={film.voteAverage}
             />
@@ -46,7 +46,7 @@ export function WatchlistCard({ film, compact = false }: WatchlistCardProps) {
             />
           </div>
           <ScorePair
-            primaryLabel="Personal expected rating"
+            primaryLabel="Personal expected score"
             primaryValue={film.interest}
             secondaryValue={film.voteAverage}
           />
