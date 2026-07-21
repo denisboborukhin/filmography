@@ -94,6 +94,18 @@ def rank_deterministic(
     return recommendations
 
 
+def predict_personal_rating(watched: list[WatchedFilm], film: FilmMetadata) -> float:
+    """Estimate a personal rating for a known TMDB record without adding it as a discovery."""
+
+    preferences = _preference_weights(watched)
+    preference_names = _preference_names(watched)
+    baseline = sum(item.rating for item in watched) / len(watched) if watched else 6.0
+    matches = _candidate_matches(preferences, preference_names, film)
+    affinity = sum(preferences.get(_normalize_label(genre), 0.0) for _, genre in matches[:2])
+    catalog_score = film.vote_average if film.vote_average is not None else 5.0
+    return _predicted_score(baseline, affinity, catalog_score)
+
+
 def _preference_weights(watched: list[WatchedFilm]) -> dict[str, float]:
     totals: defaultdict[str, float] = defaultdict(float)
     counts: defaultdict[str, int] = defaultdict(int)

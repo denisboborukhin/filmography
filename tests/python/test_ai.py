@@ -130,6 +130,40 @@ def test_ai_client_normalizes_provider_score_aliases() -> None:
     assert batch.recommendations[0].predicted_rating == 7.5
 
 
+def test_ai_client_normalizes_extra_fields_and_long_rationales() -> None:
+    long_rationale = "Hidden Figures explores resilience and institutional barriers. " * 20
+    result = {
+        "providerNote": "ignored",
+        "recommendations": [
+            {
+                "title": "Hidden Figures",
+                "year": 2016,
+                "rating": 8.0,
+                "genres": ["Drama", "Biography"],
+                "tags": ["films resumes", "lifestyle"],
+                "review": "The true story of three mathematicians and their success.",
+                "rationale": long_rationale,
+            }
+        ],
+    }
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.suggest([], [], count=1)
+    finally:
+        http_client.close()
+
+    suggestion = batch.recommendations[0]
+    assert suggestion.title == "Hidden Figures"
+    assert suggestion.predicted_rating == 8
+    assert len(suggestion.rationale) == 500
+
+
 def test_ai_client_drops_provider_suggestions_without_year() -> None:
     result = {
         "recommendations": [

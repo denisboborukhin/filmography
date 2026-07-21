@@ -227,6 +227,92 @@ def test_watchlist_without_year_enriches_with_popular_catalog_match(tmp_path: Pa
 
     assert snapshot.watchlist[0].title == "The Menu"
     assert snapshot.watchlist[0].tmdb_id == 593643
+    assert snapshot.watchlist[0].interest == 6.0
+
+
+def test_watchlist_expected_rating_is_predicted_when_missing_and_preserves_manual(
+    tmp_path: Path,
+) -> None:
+    reviews = tmp_path / "reviews"
+    reviews.mkdir()
+    (reviews / "Arrival (2016).md").write_text(
+        "---\nrating: 9\n---\nThoughtful science fiction.",
+        encoding="utf-8",
+    )
+    watchlist = tmp_path / "Watchlist.md"
+    watchlist.write_text(
+        "Moon (2009)\nManual Pick (2020) — interest: 4.5\n",
+        encoding="utf-8",
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/3/search/movie":
+            query = request.url.params["query"]
+            if query == "Arrival":
+                return httpx.Response(
+                    200,
+                    json={
+                        "results": [
+                            {
+                                "id": 1,
+                                "title": "Arrival",
+                                "release_date": "2016-01-01",
+                                "genre_ids": [878],
+                                "vote_average": 8,
+                            }
+                        ]
+                    },
+                )
+            if query == "Moon":
+                return httpx.Response(
+                    200,
+                    json={
+                        "results": [
+                            {
+                                "id": 17431,
+                                "title": "Moon",
+                                "release_date": "2009-01-01",
+                                "genre_ids": [878],
+                                "overview": "A lunar worker nears the end of his contract.",
+                                "vote_average": 7.6,
+                            }
+                        ]
+                    },
+                )
+            return httpx.Response(
+                200,
+                json={
+                    "results": [
+                        {
+                            "id": 2,
+                            "title": "Manual Pick",
+                            "release_date": "2020-01-01",
+                            "vote_average": 9,
+                        }
+                    ]
+                },
+            )
+        if request.url.path in {"/3/search/tv", "/3/discover/movie"}:
+            return httpx.Response(200, json={"results": []})
+        if request.url.path in {"/3/genre/movie/list", "/3/genre/tv/list"}:
+            return httpx.Response(200, json={"genres": [{"id": 878, "name": "Science Fiction"}]})
+        raise AssertionError(f"unexpected path: {request.url.path}")
+
+    http_client = httpx.Client(
+        base_url="https://catalog.test/3/",
+        transport=httpx.MockTransport(handler),
+    )
+    catalog = TMDBClient("token", tmp_path / "cache", http_client=http_client)
+    try:
+        snapshot = build_snapshot(reviews, watchlist, catalog=catalog).snapshot
+    finally:
+        http_client.close()
+
+    moon = next(item for item in snapshot.watchlist if item.title == "Moon")
+    manual = next(item for item in snapshot.watchlist if item.title == "Manual Pick")
+    assert moon.interest is not None
+    assert moon.interest > 9
+    assert manual.interest == 4.5
 
 
 def test_snapshot_write_is_atomic_round_trip_and_contains_no_credentials(tmp_path: Path) -> None:

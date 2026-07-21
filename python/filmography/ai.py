@@ -328,7 +328,7 @@ def _normalize_provider_json(content: str) -> dict[str, object] | None:
             normalized.append(normalized_suggestion)
     if not normalized:
         return None
-    return {**payload, "recommendations": normalized}
+    return {"recommendations": normalized}
 
 
 def _normalize_provider_suggestion(suggestion: dict[str, object]) -> dict[str, object] | None:
@@ -352,6 +352,7 @@ def _normalize_provider_suggestion(suggestion: dict[str, object]) -> dict[str, o
         return None
     if not isinstance(rationale, str) or not rationale.strip():
         rationale = "No specific rationale supplied."
+    rationale = " ".join(rationale.split())[:500]
     return {
         "title": title,
         "year": year,

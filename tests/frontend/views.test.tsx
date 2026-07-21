@@ -36,8 +36,8 @@ describe('journal views', () => {
   it('shows personal and TMDB ratings in the watched archive', () => {
     render(<WatchedView films={snapshotFixture.watched} />)
 
-    expect(screen.getByLabelText('Watched rating legend')).toHaveTextContent('Personal expected rating')
-    expect(screen.getByLabelText('Personal expected rating: 9.5 out of 10')).toBeInTheDocument()
+    expect(screen.getByLabelText('Watched rating legend')).toHaveTextContent('Personal rating')
+    expect(screen.getByLabelText('Personal rating: 9.5 out of 10')).toBeInTheDocument()
     expect(screen.getByLabelText('TMDB audience rating: 8.5 out of 10')).toBeInTheDocument()
   })
 

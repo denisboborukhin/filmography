@@ -19,7 +19,11 @@ from filmography.models import (
     WatchlistFilm,
     film_matches_any,
 )
-from filmography.recommendations import preferred_genres, rank_deterministic
+from filmography.recommendations import (
+    predict_personal_rating,
+    preferred_genres,
+    rank_deterministic,
+)
 from filmography.tmdb import CatalogError, CatalogMatch, TMDBClient
 
 
@@ -50,7 +54,10 @@ def build_snapshot(
     watchlist = imported.watchlist
     if catalog is not None:
         watched = [_enrich_watched(film, catalog, diagnostics) for film in imported.watched]
-        watchlist = [_enrich_watchlist(film, catalog, diagnostics) for film in imported.watchlist]
+        watchlist = [
+            _enrich_watchlist(film, catalog, diagnostics, watched=watched)
+            for film in imported.watchlist
+        ]
 
     now = _utc_datetime(generated_at)
     retained_ai = _retain_valid_ai(previous.ai_discoveries if previous else [], watched, watchlist)
@@ -201,13 +208,17 @@ def _enrich_watchlist(
     film: WatchlistFilm,
     catalog: TMDBClient,
     diagnostics: list[Diagnostic],
+    *,
+    watched: list[WatchedFilm],
 ) -> WatchlistFilm:
     metadata = _catalog_metadata(film, catalog, diagnostics, allow_popular_without_year=True)
     if metadata is None:
         return film
     return WatchlistFilm(
         **metadata.model_dump(),
-        interest=film.interest,
+        interest=film.interest
+        if film.interest is not None
+        else predict_personal_rating(watched, metadata),
         notes=film.notes,
         tags=film.tags,
         dismissed=film.dismissed,
