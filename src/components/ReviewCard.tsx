@@ -4,7 +4,7 @@ import type { WatchedFilm } from '../domain/snapshot'
 import { formatDate } from '../lib/format'
 import { FilmMeta } from './FilmMeta'
 import { Poster } from './Poster'
-import { Score } from './Score'
+import { ScorePair } from './ScorePair'
 
 interface ReviewCardProps {
   film: WatchedFilm
@@ -14,15 +14,19 @@ interface ReviewCardProps {
 export function ReviewCard({ film, compact = false }: ReviewCardProps) {
   if (compact) {
     return (
-      <article className="review-card review-card--compact">
+      <article className="compact-card review-card review-card--compact">
         <Poster path={film.posterUrl} size="small" title={film.title} />
-        <div className="review-card__compact-body">
-          <div>
+        <div className="compact-card__body">
+          <div className="compact-card__heading">
             <h3>{film.title}</h3>
             <FilmMeta genres={film.genres} limit={1} mediaType={film.mediaType} year={film.year} />
           </div>
-          <div className="review-card__compact-bottom">
-            <Score label="Rating" value={film.rating} />
+          <div className="compact-card__footer">
+            <ScorePair
+              primaryLabel="Personal expected rating"
+              primaryValue={film.rating}
+              secondaryValue={film.voteAverage}
+            />
             <span>{formatDate(film.watchedAt)}</span>
           </div>
         </div>
@@ -34,7 +38,11 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
     <article className="review-card">
       <div className="review-card__poster-column">
         <Poster path={film.posterUrl} size="medium" title={film.title} />
-        <Score label="Rating" value={film.rating} />
+        <ScorePair
+          primaryLabel="Personal expected rating"
+          primaryValue={film.rating}
+          secondaryValue={film.voteAverage}
+        />
       </div>
       <div className="review-card__body">
         <header className="review-card__header">

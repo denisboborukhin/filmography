@@ -3,6 +3,7 @@ import type { WatchlistFilm } from '../domain/snapshot'
 import { EmptyState } from '../components/EmptyState'
 import { FilterBar } from '../components/FilterBar'
 import { PageHeader } from '../components/PageHeader'
+import { RatingLegend } from '../components/RatingLegend'
 import { WatchlistCard } from '../components/WatchlistCard'
 import { searchFilm } from '../lib/format'
 
@@ -43,6 +44,7 @@ export function WatchlistView({ films }: WatchlistViewProps) {
       <PageHeader count={activeFilms.length} eyebrow="For another evening" title="Watchlist">
         A considered queue, ordered by how strongly each film is calling right now.
       </PageHeader>
+      <RatingLegend label="Watchlist rating legend" primaryLabel="Personal expected rating" />
       <FilterBar
         label="Search the watchlist"
         onQueryChange={setQuery}
@@ -75,7 +77,10 @@ export function WatchlistView({ films }: WatchlistViewProps) {
       {visibleFilms.length > 0 ? (
         <div className="watchlist-grid">
           {visibleFilms.map((film) => (
-            <WatchlistCard film={film} key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`} />
+            <WatchlistCard
+              film={film}
+              key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`}
+            />
           ))}
         </div>
       ) : (

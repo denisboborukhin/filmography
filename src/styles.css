@@ -593,11 +593,15 @@ h3 {
   margin-bottom: 1.2rem;
 }
 
-.discovery-card__scores {
+.score-pair {
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.55rem;
+}
+
+.score-pair .score {
+  flex-shrink: 0;
 }
 
 .source-label {
@@ -680,15 +684,14 @@ h3 {
   border-top: 1px solid var(--line);
 }
 
-.review-card--compact,
-.watchlist-card--compact {
+.compact-card {
   display: flex;
   gap: 1rem;
   padding: 1rem 0;
   border-bottom: 1px solid var(--line);
 }
 
-.review-card__compact-body,
+.compact-card__body,
 .watchlist-card__body {
   display: flex;
   flex: 1;
@@ -696,12 +699,16 @@ h3 {
   min-width: 0;
 }
 
-.review-card__compact-body {
+.compact-card__body {
   justify-content: space-between;
   padding: 0.25rem 0;
 }
 
-.review-card__compact-bottom {
+.compact-card__heading {
+  min-width: 0;
+}
+
+.compact-card__footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -710,8 +717,15 @@ h3 {
   font-size: 0.67rem;
 }
 
-.watchlist-card--compact .watchlist-card__body {
-  justify-content: center;
+.compact-card__footer .score-pair {
+  justify-content: flex-start;
+}
+
+.compact-card__note {
+  overflow: hidden;
+  max-width: 45%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .watchlist-card__heading {
@@ -719,6 +733,10 @@ h3 {
   align-items: start;
   justify-content: space-between;
   gap: 0.7rem;
+}
+
+.watchlist-card__heading .score-pair {
+  max-width: 9.5rem;
 }
 
 .watchlist-card__note {
@@ -878,6 +896,16 @@ h3 {
   width: 100%;
   min-height: 2.25rem;
   background: var(--accent-wash);
+}
+
+.review-card__poster-column .score-pair {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.review-card__poster-column .score-pair .score--quiet {
+  background: var(--green-wash);
 }
 
 .review-card__body {

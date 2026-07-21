@@ -3,7 +3,7 @@ import type { Recommendation } from '../domain/snapshot'
 import { formatDate } from '../lib/format'
 import { FilmMeta } from './FilmMeta'
 import { Poster } from './Poster'
-import { Score } from './Score'
+import { ScorePair } from './ScorePair'
 
 interface DiscoveryCardProps {
   discovery: Recommendation
@@ -31,10 +31,7 @@ export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProp
             )}
             {isAi ? 'AI pick' : 'Taste match'}
           </span>
-          <span className="discovery-card__scores">
-            <Score label="Your predicted rating" value={discovery.predictedRating} />
-            <Score label="TMDB audience rating" quiet value={discovery.voteAverage} />
-          </span>
+          <ScorePair primaryLabel="Your predicted rating" primaryValue={discovery.predictedRating} secondaryValue={discovery.voteAverage} />
         </div>
         <div>
           <h3>{discovery.title}</h3>

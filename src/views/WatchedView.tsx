@@ -3,6 +3,7 @@ import type { WatchedFilm } from '../domain/snapshot'
 import { EmptyState } from '../components/EmptyState'
 import { FilterBar } from '../components/FilterBar'
 import { PageHeader } from '../components/PageHeader'
+import { RatingLegend } from '../components/RatingLegend'
 import { ReviewCard } from '../components/ReviewCard'
 import { searchFilm } from '../lib/format'
 
@@ -43,6 +44,7 @@ export function WatchedView({ films }: WatchedViewProps) {
       <PageHeader count={films.length} eyebrow="The archive" title="Watched">
         Every score and note, from fleeting impressions to the films that refused to leave.
       </PageHeader>
+      <RatingLegend label="Watched rating legend" primaryLabel="Personal expected rating" />
       <FilterBar
         label="Search reviews, titles, or tags"
         onQueryChange={setQuery}
@@ -85,7 +87,10 @@ export function WatchedView({ films }: WatchedViewProps) {
       {visibleFilms.length > 0 ? (
         <div className="review-list">
           {visibleFilms.map((film) => (
-            <ReviewCard film={film} key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`} />
+            <ReviewCard
+              film={film}
+              key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`}
+            />
           ))}
         </div>
       ) : (
