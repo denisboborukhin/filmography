@@ -75,8 +75,7 @@
     "score": {
       "type": "number",
       "minimum": 0,
-      "maximum": 10,
-      "multipleOf": 0.1
+      "maximum": 10
     },
     "filmMetadataProperties": {
       "type": "object",

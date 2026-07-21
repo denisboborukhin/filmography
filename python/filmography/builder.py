@@ -113,7 +113,8 @@ def refresh_ai_recommendations(
     """Return a copy with a new verified AI set, or raise without altering the input."""
 
     now = _utc_datetime(generated_at)
-    batch = ai_client.suggest(snapshot.watched, snapshot.watchlist, prompt=prompt, count=limit)
+    requested = min(20, max(limit, limit * 3))
+    batch = ai_client.suggest(snapshot.watched, snapshot.watchlist, prompt=prompt, count=requested)
     resolved = resolve_ai_suggestions(
         batch,
         catalog,
@@ -125,7 +126,11 @@ def refresh_ai_recommendations(
         limit=limit,
     )
     if not resolved.recommendations:
-        raise AIError("AI returned no new recommendations that could be verified with TMDB")
+        detail = "; ".join(resolved.warnings[:5])
+        suffix = f": {detail}" if detail else ""
+        raise AIError(
+            f"AI returned no new recommendations that could be verified with TMDB{suffix}"
+        )
     ai_ids = {item.tmdb_id for item in resolved.recommendations}
     updated = snapshot.model_copy(
         update={

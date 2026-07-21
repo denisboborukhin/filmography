@@ -127,6 +127,9 @@ class OpenAICompatibleClient:
             ],
             "request": prompt.strip() if prompt and prompt.strip() else None,
             "count": count,
+            "exclusions": [
+                {"title": film.title, "year": film.year} for film in [*watched, *watchlist]
+            ],
         }
         response_schema = AISuggestionBatch.model_json_schema(by_alias=True)
         request_body = {
@@ -139,6 +142,9 @@ class OpenAICompatibleClient:
                         "ratings and review text. Return only unseen films and make each "
                         "rationale specific "
                         "to the supplied history. Scores must use 0.1 increments on a 0-10 scale. "
+                        "Never recommend any title from the watched, watchlist, or exclusions "
+                        "arrays, including translated versions of the same film. Prefer films, "
+                        "not TV series. "
                         "If your provider does not support response_format, still return only one "
                         "valid JSON object with a recommendations array. Do not use Markdown."
                     ),

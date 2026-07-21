@@ -4,6 +4,7 @@ import json
 from contextlib import ExitStack
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
 import httpx
 import pytest
@@ -15,7 +16,7 @@ from filmography.builder import (
     write_snapshot,
 )
 from filmography.cli import build_parser, main
-from filmography.models import Recommendation, Snapshot
+from filmography.models import Recommendation, Snapshot, WatchlistFilm
 from filmography.tmdb import TMDBClient
 
 
@@ -217,6 +218,68 @@ def test_failed_ai_refresh_leaves_existing_snapshot_unchanged(tmp_path: Path) ->
 
     assert original.model_dump_json() == before
     assert original.ai_discoveries[0].model == "old-model"
+
+
+def test_ai_refresh_requests_extra_candidates_and_reports_rejections(tmp_path: Path) -> None:
+    captured_count: int | None = None
+    snapshot = Snapshot(
+        generated_at=datetime(2026, 7, 20, tzinfo=UTC),
+        watchlist=[WatchlistFilm(title="Existing", year=2020)],
+    )
+
+    def provider_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal captured_count
+        body: object = json.loads(request.content)
+        assert isinstance(body, dict)
+        typed_body = cast(dict[str, object], body)
+        messages = typed_body["messages"]
+        assert isinstance(messages, list)
+        typed_messages = cast(list[object], messages)
+        user_message = typed_messages[1]
+        assert isinstance(user_message, dict)
+        typed_user_message = cast(dict[str, object], user_message)
+        profile: object = json.loads(str(typed_user_message["content"]))
+        assert isinstance(profile, dict)
+        typed_profile = cast(dict[str, object], profile)
+        raw_count = typed_profile["count"]
+        assert isinstance(raw_count, int)
+        captured_count = raw_count
+        result = {
+            "recommendations": [
+                {
+                    "title": "Existing",
+                    "year": 2020,
+                    "predictedRating": 8,
+                    "rationale": "Already in the watchlist.",
+                }
+            ]
+        }
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+
+    provider_http = httpx.Client(
+        base_url="https://provider.test/v1/",
+        transport=httpx.MockTransport(provider_handler),
+    )
+    catalog_http = httpx.Client(
+        base_url="https://catalog.test/3/",
+        transport=httpx.MockTransport(lambda _request: httpx.Response(500)),
+    )
+    ai_client = OpenAICompatibleClient(
+        "secret", "new-model", "https://provider.test/v1", http_client=provider_http
+    )
+    catalog = TMDBClient("token", tmp_path / "cache", http_client=catalog_http)
+    try:
+        with pytest.raises(AIError) as raised:
+            refresh_ai_recommendations(snapshot, ai_client, catalog, limit=2)
+    finally:
+        provider_http.close()
+        catalog_http.close()
+
+    assert captured_count == 6
+    assert "excluded existing film: Existing (2020)" in str(raised.value)
 
 
 def test_recommend_cli_failure_preserves_previous_verified_ai_set(

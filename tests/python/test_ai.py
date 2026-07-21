@@ -69,9 +69,11 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     serialized_body = json.dumps(request_body)
     assert "A complete review." in serialized_body
     assert "super-secret" not in serialized_body
+    assert "exclusions" in serialized_body
     assert cast(dict[str, object], request_body["response_format"])["type"] == "json_schema"
     messages = cast(list[dict[str, str]], request_body["messages"])
     assert "Do not use Markdown" in messages[0]["content"]
+    assert "Never recommend any title" in messages[0]["content"]
 
 
 def test_ai_client_extracts_fenced_json_from_compat_provider() -> None:
