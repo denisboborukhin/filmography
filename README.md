@@ -140,3 +140,7 @@ updater and has no TMDB or AI credentials. Pushing is deliberately left to the r
 
 Film metadata and artwork are provided by TMDB. This product uses the TMDB API but is not endorsed or
 certified by TMDB.
+
+## Project note
+
+This project was generated with AI assistance and reviewed before publication.
