@@ -133,7 +133,7 @@ Each line contains:
 An unlabelled segment after the title is appended to the notes, so `| quiet evening` is valid.
 
 Interest uses the 0–10 tenth-step scale and is not inferred as a five-point score. If interest is
-omitted and TMDB enrichment succeeds, the updater fills a personal expected rating from watched
+omitted and TMDB enrichment succeeds, the updater fills a personal expected score from watched
 ratings, genre/tag affinity, and TMDB score; an explicit `interest` value always wins. `dismissed`
 accepts `true`, `yes`, `1`, `false`, `no`, or `0`. Dismissed films stay in the snapshot as a record
 of that choice but are excluded from recommendations. Markdown task markers such as `- [ ]` are

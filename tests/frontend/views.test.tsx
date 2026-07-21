@@ -33,7 +33,7 @@ describe('journal views', () => {
     expect(screen.queryByText('Dismissed Film')).not.toBeInTheDocument()
   })
 
-  it('shows personal and TMDB ratings in the watched archive', () => {
+  it('shows personal and TMDB scores in the watched archive', () => {
     render(<WatchedView films={snapshotFixture.watched} />)
 
     expect(screen.getByLabelText('Watched score legend')).toHaveTextContent('Personal score')
@@ -42,7 +42,7 @@ describe('journal views', () => {
     expect(screen.getByLabelText('TMDB audience score: 8.5 out of 10')).toBeInTheDocument()
   })
 
-  it('shows expected and TMDB ratings in the watchlist', () => {
+  it('shows expected personal and TMDB scores in the watchlist', () => {
     render(<WatchlistView films={snapshotFixture.watchlist} />)
 
     expect(screen.getByLabelText('Watchlist score legend')).toHaveTextContent('Personal expected score')
@@ -95,7 +95,7 @@ describe('journal views', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('labels personal and TMDB ratings separately in discoveries', () => {
+  it('labels personal and TMDB scores separately in discoveries', () => {
     render(
       <DiscoveriesView
         ai={snapshotFixture.aiDiscoveries}
