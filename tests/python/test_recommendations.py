@@ -40,6 +40,7 @@ def test_deterministic_ranking_excludes_existing_and_explains_matches() -> None:
             title="Strong Match",
             year=2022,
             genres=["Science Fiction"],
+            overview="An astronaut returns to a changed Earth after a quiet mission.",
             vote_average=8,
             popularity=10,
         ),
@@ -57,8 +58,9 @@ def test_deterministic_ranking_excludes_existing_and_explains_matches() -> None:
 
     assert [item.tmdb_id for item in recommendations] == [3, 4]
     assert recommendations[0].predicted_rating > recommendations[1].predicted_rating
+    assert "astronaut returns" in recommendations[0].rationale
     assert "Science Fiction" in recommendations[0].rationale
-    assert "Seen" in recommendations[0].rationale
+    assert "Personal match" not in recommendations[0].rationale
     assert "TMDB audience score" not in recommendations[0].rationale
     assert recommendations[0].provider is None
 
@@ -106,6 +108,7 @@ def test_personal_tags_match_catalog_descriptions() -> None:
 
     assert [item.tmdb_id for item in recommendations] == [1, 2]
     assert "lunar isolation" in recommendations[0].rationale
+    assert "A study of lunar isolation and memory." in recommendations[0].rationale
 
 
 def test_deterministic_rationale_reports_catalog_rating_for_variety_pick() -> None:
@@ -118,6 +121,7 @@ def test_deterministic_rationale_reports_catalog_rating_for_variety_pick() -> No
                 tmdb_id=1,
                 title="Catalog Pick",
                 genres=["Drama", "Thriller"],
+                overview="A journalist follows a dangerous lead through a corrupt city.",
                 vote_average=8.3,
             )
         ],
@@ -125,5 +129,5 @@ def test_deterministic_rationale_reports_catalog_rating_for_variety_pick() -> No
     )
 
     assert recommendations[0].rationale == (
-        "Catalog-led pick with a Drama and Thriller profile adds variety to your discoveries."
+        "A journalist follows a dangerous lead through a corrupt city."
     )

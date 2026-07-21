@@ -1,6 +1,5 @@
 import { Bot, BrainCircuit } from 'lucide-react'
 import type { Recommendation } from '../domain/snapshot'
-import { formatDate } from '../lib/format'
 import { FilmMeta } from './FilmMeta'
 import { Poster } from './Poster'
 import { ScorePair } from './ScorePair'
@@ -12,6 +11,9 @@ interface DiscoveryCardProps {
 
 export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProps) {
   const isAi = discovery.source === 'ai'
+  const shouldShowOverview =
+    discovery.overview &&
+    normalizeText(discovery.overview) !== normalizeText(discovery.rationale)
 
   return (
     <article className={`discovery-card ${featured ? 'discovery-card--featured' : ''}`}>
@@ -42,16 +44,14 @@ export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProp
           />
         </div>
         <p className="discovery-card__reason">{discovery.rationale}</p>
-        {featured && discovery.overview ? (
+        {shouldShowOverview ? (
           <p className="discovery-card__overview">{discovery.overview}</p>
-        ) : null}
-        {isAi && (discovery.model || discovery.generatedAt) ? (
-          <p className="discovery-card__provenance">
-            {discovery.model ? `Suggested by ${discovery.model}` : 'AI suggestion'}
-            {discovery.generatedAt ? ` · ${formatDate(discovery.generatedAt)}` : ''}
-          </p>
         ) : null}
       </div>
     </article>
   )
+}
+
+function normalizeText(value: string): string {
+  return value.toLocaleLowerCase().replace(/\s+/g, ' ').trim()
 }

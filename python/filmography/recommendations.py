@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from datetime import datetime
 
@@ -49,7 +50,6 @@ def rank_deterministic(
     excluded = [*watched, *watchlist]
     preferences = _preference_weights(watched)
     preference_names = _preference_names(watched)
-    preference_examples = _preference_examples(watched)
     baseline = sum(film.rating for film in watched) / len(watched) if watched else 6.0
 
     ranked: list[tuple[float, float, float, str, FilmMetadata, list[str]]] = []
@@ -81,7 +81,7 @@ def rank_deterministic(
         catalog_score = film.vote_average if film.vote_average is not None else 5.0
         affinity = sum(preferences.get(_normalize_label(genre), 0.0) for genre in matches)
         predicted = _predicted_score(baseline, affinity, catalog_score)
-        rationale = _rationale(film, matches, preference_examples, catalog_score)
+        rationale = _rationale(film, matches)
         recommendations.append(
             Recommendation(
                 **film.model_dump(),
@@ -118,22 +118,6 @@ def _preference_names(watched: list[WatchedFilm]) -> dict[str, str]:
     return names
 
 
-def _preference_examples(watched: list[WatchedFilm]) -> dict[str, WatchedFilm]:
-    examples: dict[str, WatchedFilm] = {}
-    for film in watched:
-        for label in [*film.genres, *film.tags]:
-            normalized = _normalize_label(label)
-            if not normalized:
-                continue
-            current = examples.get(normalized)
-            if current is None or (film.rating, film.title.casefold()) > (
-                current.rating,
-                current.title.casefold(),
-            ):
-                examples[normalized] = film
-    return examples
-
-
 def _candidate_matches(
     preferences: dict[str, float],
     preference_names: dict[str, str],
@@ -168,28 +152,20 @@ def _predicted_score(baseline: float, affinity: float, catalog_score: float) -> 
     return _tenth_step(_clamp(raw_score))
 
 
-def _rationale(
-    film: FilmMetadata,
-    matches: list[str],
-    preference_examples: dict[str, WatchedFilm],
-    _catalog_score: float,
-) -> str:
-    if not matches:
-        if film.genres:
-            return (
-                "Catalog-led pick with a "
-                f"{_join_labels(film.genres[:2])} profile adds variety to your discoveries."
-            )
-        return "Catalog-led pick outside your usual genre signals."
-
-    labels = _join_labels(matches[:2])
-    examples = _example_titles(matches[:2], preference_examples)
-    if examples:
+def _rationale(film: FilmMetadata, matches: list[str]) -> str:
+    description = _short_description(film.overview)
+    if description and matches:
+        return f"{description} The {_join_labels(matches[:2])} angle is the clearest fit."
+    if description:
+        return description
+    if matches:
+        return f"A {_join_labels(matches[:2])} pick with enough catalog strength to investigate."
+    if film.genres:
         return (
-            f"Personal match for {labels}, a signal from your high-rated {examples}. "
-            "Use it as a taste-based next step."
+            f"A {_join_labels(film.genres[:2])} discovery with enough catalog strength "
+            "to investigate."
         )
-    return f"Personal match for {labels}."
+    return "A catalog discovery worth checking before it goes onto the watchlist."
 
 
 def _clamp(value: float) -> float:
@@ -202,10 +178,11 @@ def _join_labels(values: list[str]) -> str:
     return " and ".join(values)
 
 
-def _example_titles(labels: list[str], examples: dict[str, WatchedFilm]) -> str:
-    titles: list[str] = []
-    for label in labels:
-        example = examples.get(_normalize_label(label))
-        if example is not None and example.title not in titles:
-            titles.append(example.title)
-    return _join_labels(titles)
+def _short_description(value: str) -> str:
+    text = " ".join(value.split())
+    if not text:
+        return ""
+    first_sentence = re.split(r"(?<=[.!?])\s+", text, maxsplit=1)[0].strip()
+    if len(first_sentence) <= 180:
+        return first_sentence
+    return f"{first_sentence[:177].rstrip()}..."

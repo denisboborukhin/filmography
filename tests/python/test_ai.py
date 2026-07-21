@@ -74,6 +74,7 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     messages = cast(list[dict[str, str]], request_body["messages"])
     assert "Do not use Markdown" in messages[0]["content"]
     assert "Never recommend any title" in messages[0]["content"]
+    assert "Do not say it was suggested by the model" in messages[0]["content"]
 
 
 def test_ai_client_extracts_fenced_json_from_compat_provider() -> None:
@@ -394,3 +395,55 @@ def test_resolver_verifies_tmdb_and_excludes_seen_ambiguous_and_duplicate_films(
     assert [item.tmdb_id for item in result.recommendations] == [17431]
     assert result.recommendations[0].source == "ai"
     assert len(result.warnings) == 3
+
+
+def test_resolver_replaces_generic_ai_rationale_with_catalog_description(tmp_path: Path) -> None:
+    batch = AISuggestionBatch.model_validate(
+        {
+            "recommendations": [
+                {
+                    "title": "Moon",
+                    "year": 2009,
+                    "predictedRating": 8.5,
+                    "rationale": "Suggested by the configured AI model.",
+                }
+            ]
+        }
+    )
+
+    http_client = httpx.Client(
+        base_url="https://catalog.test/3/",
+        transport=httpx.MockTransport(
+            lambda _request: httpx.Response(
+                200,
+                json={
+                    "results": [
+                        {
+                            "id": 17431,
+                            "title": "Moon",
+                            "original_title": "Moon",
+                            "release_date": "2009-06-12",
+                            "overview": "A lunar worker nears the end of his contract.",
+                            "vote_average": 7.6,
+                            "popularity": 20,
+                        }
+                    ]
+                },
+            )
+        ),
+    )
+    catalog = TMDBClient("token", tmp_path / "cache", http_client=http_client)
+    try:
+        result = resolve_ai_suggestions(
+            batch,
+            catalog,
+            [],
+            [],
+            generated_at=datetime(2026, 7, 20, tzinfo=UTC),
+            provider="openai-compatible",
+            model="test-model",
+        )
+    finally:
+        http_client.close()
+
+    assert result.recommendations[0].rationale == ("A lunar worker nears the end of his contract.")

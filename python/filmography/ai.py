@@ -140,8 +140,11 @@ class OpenAICompatibleClient:
                     "content": (
                         "You recommend feature films for one person. Infer taste from their "
                         "ratings and review text. Return only unseen films and make each "
-                        "rationale specific "
-                        "to the supplied history. Scores must use 0.1 increments on a 0-10 scale. "
+                        "rationale specific to the film and the supplied history. Each rationale "
+                        "must name a concrete theme, premise, mood, craft element, or comparison. "
+                        "Do not say it was suggested by the model, fits the profile, matches "
+                        "preferences, or is recommended without explaining why. Scores must use "
+                        "0.1 increments on a 0-10 scale. "
                         "Never recommend any title from the watched, watchlist, or exclusions "
                         "arrays, including translated versions of the same film. Prefer films, "
                         "not TV series. "
@@ -221,7 +224,7 @@ def resolve_ai_suggestions(
             Recommendation(
                 **match.film.model_dump(),
                 predicted_rating=suggestion.predicted_rating,
-                rationale=suggestion.rationale,
+                rationale=_publication_rationale(suggestion.rationale, match.film.overview),
                 source="ai",
                 generated_at=generated_at,
                 provider=provider,
@@ -348,7 +351,7 @@ def _normalize_provider_suggestion(suggestion: dict[str, object]) -> dict[str, o
     if not 0 <= rating <= 10 or abs(rating * 10 - round(rating * 10)) > 1e-9:
         return None
     if not isinstance(rationale, str) or not rationale.strip():
-        rationale = "Suggested by the configured AI model."
+        rationale = "No specific rationale supplied."
     return {
         "title": title,
         "year": year,
@@ -378,7 +381,7 @@ def _parse_markdown_suggestions(content: str) -> AISuggestionBatch | None:
                 "title": match.group("title").strip(),
                 "year": int(match.group("year")),
                 "predictedRating": rating,
-                "rationale": rationale or "Suggested by the configured AI model.",
+                "rationale": rationale or "No specific rationale supplied.",
             }
         )
     try:
@@ -407,6 +410,39 @@ def _clean_markdown_rationale(value: str) -> str:
     text = re.sub(r"[*_`#>-]+", " ", text)
     text = re.sub(r"\s+", " ", text).strip(" .:-")
     return text[:500]
+
+
+def _publication_rationale(raw_rationale: str, film_overview: str) -> str:
+    rationale = " ".join(raw_rationale.split())
+    if _is_generic_rationale(rationale):
+        description = _short_description(film_overview)
+        return description or "Review the premise before adding it to the watchlist."
+    return rationale
+
+
+def _is_generic_rationale(value: str) -> bool:
+    normalized = value.casefold()
+    generic_phrases = (
+        "suggested by",
+        "configured ai model",
+        "fits the profile",
+        "matches your profile",
+        "matches your preferences",
+        "recommended because",
+        "worth watching because",
+        "no specific rationale supplied",
+    )
+    return not value.strip() or any(phrase in normalized for phrase in generic_phrases)
+
+
+def _short_description(value: str) -> str:
+    text = " ".join(value.split())
+    if not text:
+        return ""
+    first_sentence = re.split(r"(?<=[.!?])\s+", text, maxsplit=1)[0].strip()
+    if len(first_sentence) <= 220:
+        return first_sentence
+    return f"{first_sentence[:217].rstrip()}..."
 
 
 def _http_error_message(response: httpx.Response) -> str:

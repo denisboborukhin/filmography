@@ -90,5 +90,7 @@ describe('journal views', () => {
     expect(screen.getByLabelText('Discovery rating legend')).toHaveTextContent(
       'TMDB audience score',
     )
+    expect(screen.getByText('An old man and a young scout travel by flying house.')).toBeInTheDocument()
+    expect(screen.queryByText(/Suggested by example-model/i)).not.toBeInTheDocument()
   })
 })
