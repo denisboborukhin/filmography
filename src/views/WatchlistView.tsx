@@ -81,7 +81,7 @@ export function WatchlistView({ films }: WatchlistViewProps) {
       ) : (
         <EmptyState title={activeFilms.length === 0 ? 'The watchlist is clear' : 'No films found'}>
           {activeFilms.length === 0
-            ? 'Add titles to the Obsidian watchlist and rebuild the journal.'
+            ? 'Add titles to the Markdown watchlist and rebuild the journal.'
             : 'Try a different title or genre.'}
         </EmptyState>
       )}

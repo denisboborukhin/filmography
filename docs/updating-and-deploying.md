@@ -1,6 +1,6 @@
 # Updating and deployment
 
-The committed JSON snapshot is the publication boundary. Updating Obsidian does not change the site
+The committed JSON snapshot is the publication boundary. Editing source notes does not change the site
 until you deliberately regenerate, review, commit, and push that file.
 
 ## Generate an update
@@ -84,7 +84,7 @@ git add public/data/filmography.json
 git commit -m "feat(content): update journal and recommendations"
 ```
 
-Do not commit `.env`, API keys, vault paths, local caches, or provider response dumps.
+Do not commit `.env`, API keys, local note paths, local caches, or provider response dumps.
 
 ## Enable GitHub Pages later
 

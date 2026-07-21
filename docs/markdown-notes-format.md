@@ -1,4 +1,4 @@
-# Obsidian input format
+# Markdown notes input format
 
 Filmography reads two inputs: a directory containing one Markdown note per watched film, and one
 Markdown note containing the watchlist. Review files are found recursively; hidden Markdown files
@@ -40,7 +40,7 @@ Supported fields:
 | `rating` | number or score text | Yes | Personal score; aliases: `score`, `stars`. |
 | `ratingScale` | `5` or `10` | No | Makes an otherwise ambiguous numeric score explicit; aliases: `rating_scale`, `scale`. |
 | `watchedAt` | `YYYY-MM-DD` | No | Date watched. |
-| `tags` | YAML list or strings | No | Personal taste signals. Obsidian `#tags` in prose remain prose. |
+| `tags` | YAML list or strings | No | Personal taste signals. Markdown `#tags` in prose remain prose. |
 | `tmdbId` | positive integer | No | Canonical TMDB movie ID; avoids title matching. |
 | `sourceUrl` | URL | No | Optional public reference; aliases: `source_url`, `source`. |
 
@@ -99,7 +99,7 @@ Interest uses the 0–10 half-step scale and is not inferred as a five-point sco
 omitted, it remains unset so the UI does not invent a preference. `dismissed` accepts `true`, `yes`,
 `1`, `false`, `no`, or `0`. Dismissed films stay in the snapshot as a record of that choice but are
 excluded from recommendations. Markdown task markers such as `- [ ]` are accepted as list syntax;
-they do not change film status. Obsidian wiki links use their link target as the title; ordinary
+they do not change film status. Wiki-style links use their link target as the title; ordinary
 Markdown links use their visible label.
 
 Use a year or a TMDB-backed review entry whenever remakes share a title. Repeated watchlist entries,

@@ -13,7 +13,7 @@ from pydantic import ValidationError
 
 def test_public_models_reject_unknown_fields_and_invalid_score_steps() -> None:
     with pytest.raises(ValidationError, match="extra_forbidden"):
-        WatchedFilm.model_validate({"title": "Arrival", "rating": 9, "vaultPath": "/secret"})
+        WatchedFilm.model_validate({"title": "Arrival", "rating": 9, "localNotesPath": "/secret"})
     with pytest.raises(ValidationError, match="multiple_of"):
         WatchedFilm(title="Arrival", rating=9.2)
 

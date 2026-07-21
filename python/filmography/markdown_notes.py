@@ -1,4 +1,4 @@
-"""Import watched films and a watchlist from Obsidian Markdown notes."""
+"""Import watched films and a watchlist from local Markdown notes."""
 
 from __future__ import annotations
 
@@ -62,7 +62,7 @@ class ImportValidationError(ValueError):
         super().__init__("\n".join(str(item) for item in diagnostics))
 
 
-def import_obsidian(reviews_dir: Path, watchlist_path: Path) -> ImportResult:
+def import_markdown_notes(reviews_dir: Path, watchlist_path: Path) -> ImportResult:
     """Parse all source notes and report errors without stopping at the first one."""
 
     result = ImportResult()

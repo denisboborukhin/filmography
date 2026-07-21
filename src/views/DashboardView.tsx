@@ -111,7 +111,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
               ))}
             </div>
           ) : (
-            <EmptyState title="No reviews yet">Imported Obsidian reviews will appear here.</EmptyState>
+            <EmptyState title="No reviews yet">Imported Markdown reviews will appear here.</EmptyState>
           )}
         </section>
 
@@ -137,7 +137,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
             </div>
           ) : (
             <EmptyState title="The watchlist is clear">
-              Films from the Obsidian watchlist will appear here.
+              Films from the Markdown watchlist will appear here.
             </EmptyState>
           )}
         </section>

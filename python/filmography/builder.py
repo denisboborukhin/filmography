@@ -10,6 +10,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from filmography.ai import AIError, OpenAICompatibleClient, resolve_ai_suggestions
+from filmography.markdown_notes import Diagnostic, ImportValidationError, import_markdown_notes
 from filmography.models import (
     FilmMetadata,
     Recommendation,
@@ -18,7 +19,6 @@ from filmography.models import (
     WatchlistFilm,
     film_matches_any,
 )
-from filmography.obsidian import Diagnostic, ImportValidationError, import_obsidian
 from filmography.recommendations import preferred_genres, rank_deterministic
 from filmography.tmdb import CatalogError, TMDBClient
 
@@ -42,7 +42,7 @@ def build_snapshot(
 ) -> BuildResult:
     """Create a public snapshot, retaining the previous verified AI result set."""
 
-    imported = import_obsidian(reviews_dir, watchlist_path)
+    imported = import_markdown_notes(reviews_dir, watchlist_path)
     if imported.has_errors:
         raise ImportValidationError(imported.diagnostics)
     diagnostics = list(imported.diagnostics)

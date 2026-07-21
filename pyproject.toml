@@ -1,7 +1,7 @@
 [project]
 name = "filmography-journal"
 version = "0.1.0"
-description = "Generate a static film journal from Obsidian notes"
+description = "Generate a static film journal from Markdown notes"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

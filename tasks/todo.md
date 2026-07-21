@@ -2,7 +2,7 @@
 
 - [x] Scaffold React/TypeScript and Python projects.
 - [x] Define shared snapshot models and demo data.
-- [x] Parse Obsidian reviews and watchlist notes.
+- [x] Parse Markdown reviews and watchlist notes.
 - [x] Enrich films through a cached TMDB client.
 - [x] Generate deterministic and optional AI recommendations.
 - [x] Build the responsive read-only journal UI.
@@ -15,7 +15,7 @@
 
 Implemented the complete local-to-static workflow with strict matching Python/TypeScript/JSON
 contracts, conservative TMDB resolution, deterministic and optional AI recommendations, and a
-read-only responsive PWA. The generated snapshot contains no runtime credentials or vault paths.
+read-only responsive PWA. The generated snapshot contains no runtime credentials or local note paths.
 
 Verification completed:
 
@@ -26,3 +26,24 @@ Verification completed:
 - A persistent Chrome profile rendered the full journal after the preview server was stopped,
   proving offline shell and snapshot recovery.
 - No push, Pages activation, or deployment was performed.
+
+# General Markdown notes cleanup
+
+- [x] Replace app-specific notes wording with Markdown notes wording.
+- [x] Rename importer internals away from app-specific names where practical.
+- [x] Update tests and docs to match the broader Markdown positioning.
+- [x] Run focused and full verification.
+
+## Review
+
+Removed product-specific Markdown-app language from the UI, docs, package metadata, importer module
+names, and tests. The public input contract now describes generic Markdown review notes and a
+Markdown watchlist note.
+
+Verification completed:
+
+- No remaining matches for app-specific notes terminology, old importer imports, or old docs paths.
+- Focused Python importer/model tests passed.
+- Frontend snapshot schema tests passed.
+- `make check test` passed: TypeScript, ESLint, Ruff, Pyright, Vitest, and Pytest.
+- `VITE_BASE_PATH=/filmography/ npm run build` passed.

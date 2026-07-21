@@ -17,7 +17,7 @@ from filmography.builder import (
     refresh_ai_recommendations,
     write_snapshot,
 )
-from filmography.obsidian import ImportValidationError, import_obsidian
+from filmography.markdown_notes import ImportValidationError, import_markdown_notes
 from filmography.tmdb import TMDBClient
 
 _DEFAULT_OUTPUT = Path("public/data/filmography.json")
@@ -27,7 +27,7 @@ _DEFAULT_CACHE = Path(".filmography-cache/tmdb")
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="filmography",
-        description="Build a public film journal from local Obsidian notes.",
+        description="Build a public film journal from local Markdown notes.",
     )
     parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -56,7 +56,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     reviews = Path(args.reviews)
     watchlist = Path(args.watchlist)
     if args.command == "check":
-        result = import_obsidian(reviews, watchlist)
+        result = import_markdown_notes(reviews, watchlist)
         _print_diagnostics(result.diagnostics)
         if result.has_errors:
             return 1

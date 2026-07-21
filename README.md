@@ -1,6 +1,6 @@
 # Filmography
 
-Filmography turns personal Obsidian notes into a read-only film journal for GitHub Pages. The
+Filmography turns personal Markdown notes into a read-only film journal for GitHub Pages. The
 published site contains the last snapshot you generated: watched films and reviews, a scored
 watchlist, token-free discoveries, and the latest successful AI recommendation set.
 
@@ -13,7 +13,7 @@ sites.
 ## How it works
 
 ```text
-Obsidian review notes + one watchlist note
+Markdown review notes + one watchlist note
                   │
                   ▼
        local Python updater ─── TMDB
@@ -25,8 +25,8 @@ Obsidian review notes + one watchlist note
         Vite build → GitHub Pages
 ```
 
-The site is installable and keeps the last successfully loaded snapshot available offline. Obsidian
-remains the source of truth; the deployed UI is intentionally read-only.
+The site is installable and keeps the last successfully loaded snapshot available offline. Your
+Markdown notes remain the source of truth; the deployed UI is intentionally read-only.
 
 ## Requirements
 
@@ -59,16 +59,16 @@ Validate notes without writing output:
 
 ```bash
 uv run filmography check \
-  --reviews "/absolute/path/to/vault/Reviews" \
-  --watchlist "/absolute/path/to/vault/Watchlist.md"
+  --reviews "/absolute/path/to/notes/Reviews" \
+  --watchlist "/absolute/path/to/notes/Watchlist.md"
 ```
 
 Generate the public snapshot, then run the site locally:
 
 ```bash
 uv run filmography build \
-  --reviews "/absolute/path/to/vault/Reviews" \
-  --watchlist "/absolute/path/to/vault/Watchlist.md"
+  --reviews "/absolute/path/to/notes/Reviews" \
+  --watchlist "/absolute/path/to/notes/Watchlist.md"
 npm run dev
 ```
 
@@ -76,8 +76,8 @@ Refresh AI recommendations explicitly:
 
 ```bash
 uv run filmography recommend \
-  --reviews "/absolute/path/to/vault/Reviews" \
-  --watchlist "/absolute/path/to/vault/Watchlist.md" \
+  --reviews "/absolute/path/to/notes/Reviews" \
+  --watchlist "/absolute/path/to/notes/Watchlist.md" \
   --prompt "Something quiet, humane, and under two hours"
 ```
 
@@ -88,14 +88,14 @@ verified AI set while continuing to refresh the journal and token-free discoveri
 Alternative providers must implement `POST /chat/completions` and support strict JSON Schema through
 the `response_format` request field.
 
-## Obsidian input
+## Markdown notes input
 
 Each watched film is one Markdown file in the reviews directory. The note body is the public review;
 supported YAML frontmatter supplies title, year, score, watched date, tags, and an optional TMDB ID.
 The watchlist is one Markdown note with one film per bullet or non-empty plain line.
 
-See [Obsidian input format](docs/obsidian-format.md) for the exact fields, examples, score rules, and
-duplicate handling.
+See [Markdown notes input format](docs/markdown-notes-format.md) for the exact fields, examples,
+score rules, and duplicate handling.
 
 ## Commands
 

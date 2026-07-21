@@ -61,7 +61,7 @@ class FilmMetadata(PublicModel):
 
 
 class WatchedFilm(FilmMetadata):
-    """A watched film imported from one Obsidian review note."""
+    """A watched film imported from one Markdown review note."""
 
     rating: Score
     watched_at: date | None = None

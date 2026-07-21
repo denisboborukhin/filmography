@@ -16,7 +16,7 @@ describe('snapshot schema', () => {
     expect(() =>
       snapshotSchema.parse({
         ...snapshotFixture,
-        localVaultPath: '/private/film-notes',
+        localNotesPath: '/private/film-notes',
       }),
     ).toThrow()
   })

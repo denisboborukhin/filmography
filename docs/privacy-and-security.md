@@ -12,7 +12,7 @@ repository.
 | Watchlist title, interest, note, tags, dismissed state | Local updater and generated snapshot | Yes |
 | Recommendation title, score, rationale, model name, date | Generated snapshot | Yes |
 | TMDB IDs, metadata, and poster URLs | TMDB request and generated snapshot | Yes |
-| Obsidian vault path and source file path | Local updater only | No |
+| Local notes path and source file path | Local updater only | No |
 | TMDB token | Local updater process only | No |
 | AI key and endpoint credentials | Local updater process only | No |
 | Optional recommendation prompt | AI request only | No, unless reflected in rationale |
@@ -57,7 +57,7 @@ content, then follow GitHub's sensitive-data removal guidance for repository his
 ## Browser storage
 
 The service worker caches the static application, snapshot, and recent posters on each visitor's
-device. It stores no credentials and cannot edit Obsidian. A visitor can remove cached content by
+device. It stores no credentials and cannot edit local notes. A visitor can remove cached content by
 clearing site data or unregistering the service worker in browser settings.
 
 The app should be served over HTTPS. GitHub Pages supplies HTTPS for its standard domains; enforce

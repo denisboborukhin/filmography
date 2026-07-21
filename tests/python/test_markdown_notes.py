@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from filmography.obsidian import (
-    import_obsidian,
+from filmography.markdown_notes import (
+    import_markdown_notes,
     normalize_score,
     parse_review_note,
     parse_watchlist_note,
@@ -177,7 +177,7 @@ def test_import_collects_review_errors_and_cross_collection_duplicates(tmp_path:
     _write(reviews / "Broken.md", "---\ntitle: Broken\n---\nNo score")
     watchlist = _write(tmp_path / "Watchlist.md", "- Good Film (2020)\n")
 
-    result = import_obsidian(reviews, watchlist)
+    result = import_markdown_notes(reviews, watchlist)
 
     assert result.has_errors
     assert len(result.watched) == 1
@@ -188,7 +188,7 @@ def test_import_collects_review_errors_and_cross_collection_duplicates(tmp_path:
 
 
 def test_import_reports_missing_inputs(tmp_path: Path) -> None:
-    result = import_obsidian(tmp_path / "missing-reviews", tmp_path / "missing-list.md")
+    result = import_markdown_notes(tmp_path / "missing-reviews", tmp_path / "missing-list.md")
 
     assert result.has_errors
     assert [item.code for item in result.diagnostics] == [
@@ -202,7 +202,7 @@ def test_import_excludes_watchlist_note_when_it_is_inside_reviews_folder(tmp_pat
     _write(reviews / "Arrival (2016).md", "---\nrating: 9\n---\nReview")
     watchlist = _write(reviews / "Watchlist.md", "- Persona (1966)\n")
 
-    result = import_obsidian(reviews, watchlist)
+    result = import_markdown_notes(reviews, watchlist)
 
     assert not result.has_errors
     assert [film.title for film in result.watched] == ["Arrival"]
@@ -221,7 +221,7 @@ def test_import_detects_duplicate_reviews_with_mixed_catalog_identity(tmp_path: 
     )
     watchlist = _write(tmp_path / "Watchlist.md", "")
 
-    result = import_obsidian(reviews, watchlist)
+    result = import_markdown_notes(reviews, watchlist)
 
     assert result.has_errors
     assert any(item.code == "duplicate-review" for item in result.diagnostics)
