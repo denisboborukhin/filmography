@@ -86,6 +86,10 @@ describe('journal views', () => {
 
     expect(screen.queryByRole('heading', { name: 'Up' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'My Neighbor Totoro' })).toBeInTheDocument()
+    expect(screen.getByText('Two sisters encounter gentle forest spirits.')).toBeInTheDocument()
+    expect(
+      screen.queryByText('Your highly rated dreamlike animation suggests a strong match.'),
+    ).not.toBeInTheDocument()
   })
 
   it('labels personal and TMDB ratings separately in discoveries', () => {

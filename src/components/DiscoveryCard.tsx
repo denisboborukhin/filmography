@@ -11,7 +11,9 @@ interface DiscoveryCardProps {
 
 export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProps) {
   const isAi = discovery.source === 'ai'
+  const primaryText = isAi ? discovery.rationale : discovery.overview || discovery.rationale
   const shouldShowOverview =
+    isAi &&
     discovery.overview &&
     normalizeText(discovery.overview) !== normalizeText(discovery.rationale)
 
@@ -43,7 +45,7 @@ export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProp
             year={discovery.year}
           />
         </div>
-        <p className="discovery-card__reason">{discovery.rationale}</p>
+        <p className="discovery-card__reason">{primaryText}</p>
         {shouldShowOverview ? (
           <p className="discovery-card__overview">{discovery.overview}</p>
         ) : null}
