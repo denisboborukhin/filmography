@@ -587,6 +587,13 @@ h3 {
   margin-bottom: 1.2rem;
 }
 
+.discovery-card__scores {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
 .source-label {
   display: inline-flex;
   align-items: center;

@@ -137,6 +137,35 @@ class TMDBClient:
                 return CatalogMatch("matched", popular, candidates)
         return CatalogMatch("unresolved", None, candidates[:5])
 
+    def find_tv_titles(self, title: str, *, limit: int = 3) -> tuple[str, ...]:
+        """Return likely TMDB TV matches for diagnostics; does not enrich film records."""
+
+        if limit < 1:
+            return ()
+        payload = self._get_json(
+            "/search/tv",
+            {"query": title, "include_adult": "false", "page": 1},
+            validator=self._validate_tv_search_payload,
+        )
+        requested_title = film_identity(title, None)[0]
+        labels: list[str] = []
+        for item in _list_of_mappings(payload.get("results"), "TMDB TV search results")[:20]:
+            name = _optional_string(item.get("name"))
+            original_name = _optional_string(item.get("original_name"))
+            if name is None:
+                continue
+            identities = {
+                film_identity(name, None)[0],
+                film_identity(original_name or "", None)[0],
+            }
+            if requested_title not in identities:
+                continue
+            first_air_date = _parse_release_date(item.get("first_air_date"))
+            labels.append(f"{name} ({first_air_date.year if first_air_date else 'unknown'})")
+            if len(labels) >= limit:
+                break
+        return tuple(labels)
+
     def discover_movies(
         self,
         preferred_genres: list[str],
@@ -257,6 +286,12 @@ class TMDBClient:
     @staticmethod
     def _validate_genre_payload(payload: Mapping[str, object]) -> None:
         for item in _list_of_mappings(payload.get("genres"), "TMDB genres"):
+            _required_int(item, "id")
+            _required_string(item, "name")
+
+    @staticmethod
+    def _validate_tv_search_payload(payload: Mapping[str, object]) -> None:
+        for item in _list_of_mappings(payload.get("results"), "TMDB TV search results"):
             _required_int(item, "id")
             _required_string(item, "name")
 

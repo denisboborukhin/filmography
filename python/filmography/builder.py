@@ -240,14 +240,29 @@ def _catalog_metadata(
         f"{candidate.title} ({candidate.year or 'unknown'})" for candidate in match.candidates[:3]
     )
     detail = f"; candidates: {candidate_labels}" if candidate_labels else ""
+    tv_detail = _tv_diagnostic_detail(film.title, catalog)
     diagnostics.append(
         Diagnostic(
             "warning",
             f"catalog-{match.status}",
-            f"{match.status} TMDB match for {film.title} ({film.year or 'unknown'}){detail}",
+            f"{match.status} TMDB movie match for {film.title} "
+            f"({film.year or 'unknown'}){detail}{tv_detail}",
         )
     )
     return None
+
+
+def _tv_diagnostic_detail(title: str, catalog: TMDBClient) -> str:
+    try:
+        tv_titles = catalog.find_tv_titles(title)
+    except CatalogError:
+        return ""
+    if not tv_titles:
+        return ""
+    return (
+        f"; TMDB TV match: {', '.join(tv_titles)}. "
+        "Series are kept as plain watchlist text and are not enriched in this film-only snapshot."
+    )
 
 
 def _retain_valid_ai(

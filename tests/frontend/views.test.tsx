@@ -47,4 +47,17 @@ describe('journal views', () => {
     expect(screen.getByRole('heading', { name: 'My Neighbor Totoro' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Up' })).not.toBeInTheDocument()
   })
+
+  it('labels personal and TMDB ratings separately in discoveries', () => {
+    render(
+      <DiscoveriesView
+        ai={snapshotFixture.aiDiscoveries}
+        deterministic={snapshotFixture.deterministicDiscoveries}
+        generatedAt={snapshotFixture.recommendationsGeneratedAt}
+      />,
+    )
+
+    expect(screen.getByLabelText('Your predicted rating: 8.5 out of 10')).toBeInTheDocument()
+    expect(screen.getByLabelText('TMDB audience rating: 8 out of 10')).toBeInTheDocument()
+  })
 })

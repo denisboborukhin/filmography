@@ -49,6 +49,7 @@ def rank_deterministic(
     excluded = [*watched, *watchlist]
     preferences = _preference_weights(watched)
     preference_names = _preference_names(watched)
+    preference_examples = _preference_examples(watched)
     baseline = sum(film.rating for film in watched) / len(watched) if watched else 6.0
 
     ranked: list[tuple[float, float, float, str, FilmMetadata, list[str]]] = []
@@ -80,11 +81,7 @@ def rank_deterministic(
         catalog_score = film.vote_average if film.vote_average is not None else 5.0
         affinity = sum(preferences.get(_normalize_label(genre), 0.0) for genre in matches)
         predicted = _predicted_score(baseline, affinity, catalog_score)
-        rationale = (
-            f"Matches your strong preference for {_join_labels(matches)}."
-            if matches
-            else "A highly rated catalog discovery outside your usual genre signals."
-        )
+        rationale = _rationale(film, matches, preference_examples, catalog_score)
         recommendations.append(
             Recommendation(
                 **film.model_dump(),
@@ -121,6 +118,22 @@ def _preference_names(watched: list[WatchedFilm]) -> dict[str, str]:
     return names
 
 
+def _preference_examples(watched: list[WatchedFilm]) -> dict[str, WatchedFilm]:
+    examples: dict[str, WatchedFilm] = {}
+    for film in watched:
+        for label in [*film.genres, *film.tags]:
+            normalized = _normalize_label(label)
+            if not normalized:
+                continue
+            current = examples.get(normalized)
+            if current is None or (film.rating, film.title.casefold()) > (
+                current.rating,
+                current.title.casefold(),
+            ):
+                examples[normalized] = film
+    return examples
+
+
 def _candidate_matches(
     preferences: dict[str, float],
     preference_names: dict[str, str],
@@ -155,6 +168,33 @@ def _predicted_score(baseline: float, affinity: float, catalog_score: float) -> 
     return _tenth_step(_clamp(raw_score))
 
 
+def _rationale(
+    film: FilmMetadata,
+    matches: list[str],
+    preference_examples: dict[str, WatchedFilm],
+    catalog_score: float,
+) -> str:
+    score_text = f"{_tenth_step(catalog_score):g}/10"
+    if not matches:
+        if film.genres:
+            return (
+                f"Catalog-led pick: TMDB audiences rate it {score_text}, and its "
+                f"{_join_labels(film.genres[:2])} profile adds variety to your discoveries."
+            )
+        return (
+            f"Catalog-led pick: TMDB audiences rate it {score_text}, making it worth a closer look."
+        )
+
+    labels = _join_labels(matches[:2])
+    examples = _example_titles(matches[:2], preference_examples)
+    if examples:
+        return (
+            f"Personal match for {labels}, a signal from your high-rated {examples}. "
+            f"TMDB audience score: {score_text}."
+        )
+    return f"Personal match for {labels}. TMDB audience score: {score_text}."
+
+
 def _clamp(value: float) -> float:
     return min(10.0, max(0.0, value))
 
@@ -163,3 +203,12 @@ def _join_labels(values: list[str]) -> str:
     if len(values) == 1:
         return values[0]
     return " and ".join(values)
+
+
+def _example_titles(labels: list[str], examples: dict[str, WatchedFilm]) -> str:
+    titles: list[str] = []
+    for label in labels:
+        example = examples.get(_normalize_label(label))
+        if example is not None and example.title not in titles:
+            titles.append(example.title)
+    return _join_labels(titles)

@@ -152,6 +152,30 @@ def test_yearless_popularity_fallback_is_explicit(tmp_path: Path) -> None:
     assert popular.film.tmdb_id == 593643
 
 
+def test_finds_exact_tv_title_for_movie_miss_diagnostics(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/3/search/tv"
+        return httpx.Response(
+            200,
+            json={
+                "results": [
+                    {
+                        "id": 97546,
+                        "name": "Ted Lasso",
+                        "original_name": "Ted Lasso",
+                        "first_air_date": "2020-08-14",
+                    }
+                ]
+            },
+        )
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        assert catalog.find_tv_titles("Ted Lasso") == ("Ted Lasso (2020)",)
+    finally:
+        http_client.close()
+
+
 def test_fetches_details_and_maps_catalog_metadata(tmp_path: Path) -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.url.path == "/3/movie/603"

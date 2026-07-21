@@ -58,6 +58,8 @@ def test_deterministic_ranking_excludes_existing_and_explains_matches() -> None:
     assert [item.tmdb_id for item in recommendations] == [3, 4]
     assert recommendations[0].predicted_rating > recommendations[1].predicted_rating
     assert "Science Fiction" in recommendations[0].rationale
+    assert "Seen" in recommendations[0].rationale
+    assert "TMDB audience score: 8/10" in recommendations[0].rationale
     assert recommendations[0].provider is None
 
 
@@ -104,3 +106,25 @@ def test_personal_tags_match_catalog_descriptions() -> None:
 
     assert [item.tmdb_id for item in recommendations] == [1, 2]
     assert "lunar isolation" in recommendations[0].rationale
+
+
+def test_deterministic_rationale_reports_catalog_rating_for_variety_pick() -> None:
+    now = datetime(2026, 7, 20, tzinfo=UTC)
+    recommendations = rank_deterministic(
+        [],
+        [],
+        [
+            FilmMetadata(
+                tmdb_id=1,
+                title="Catalog Pick",
+                genres=["Drama", "Thriller"],
+                vote_average=8.3,
+            )
+        ],
+        generated_at=now,
+    )
+
+    assert recommendations[0].rationale == (
+        "Catalog-led pick: TMDB audiences rate it 8.3/10, and its Drama and Thriller "
+        "profile adds variety to your discoveries."
+    )

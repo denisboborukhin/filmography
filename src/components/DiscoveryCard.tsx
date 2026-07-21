@@ -31,7 +31,10 @@ export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProp
             )}
             {isAi ? 'AI pick' : 'Taste match'}
           </span>
-          <Score label="Predicted rating" value={discovery.predictedRating} />
+          <span className="discovery-card__scores">
+            <Score label="Your predicted rating" value={discovery.predictedRating} />
+            <Score label="TMDB audience rating" quiet value={discovery.voteAverage} />
+          </span>
         </div>
         <div>
           <h3>{discovery.title}</h3>

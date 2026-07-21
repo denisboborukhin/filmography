@@ -17,7 +17,7 @@ from filmography.builder import (
 )
 from filmography.cli import build_parser, main
 from filmography.models import Recommendation, Snapshot, WatchlistFilm
-from filmography.tmdb import TMDBClient
+from filmography.tmdb import CatalogMatch, TMDBClient
 
 
 def _sources(tmp_path: Path) -> tuple[Path, Path]:
@@ -90,6 +90,38 @@ def test_builder_drops_previous_recommendation_that_is_now_watchlisted(tmp_path:
 
     assert snapshot.ai_discoveries == []
     assert snapshot.recommendations_generated_at is None
+
+
+def test_builder_warns_when_unresolved_movie_title_is_a_series(tmp_path: Path) -> None:
+    reviews = tmp_path / "reviews"
+    reviews.mkdir()
+    watchlist = tmp_path / "Watchlist.md"
+    watchlist.write_text("Ted Lasso\n", encoding="utf-8")
+
+    class SeriesAwareCatalog:
+        def match_movie(
+            self,
+            _title: str,
+            _year: int | None = None,
+            *,
+            allow_popular_without_year: bool = False,
+        ) -> CatalogMatch:
+            assert allow_popular_without_year
+            return CatalogMatch("unresolved", None)
+
+        def find_tv_titles(self, title: str) -> tuple[str, ...]:
+            assert title == "Ted Lasso"
+            return ("Ted Lasso (2020)",)
+
+        def discover_movies(self, _genres: list[str]) -> list[object]:
+            return []
+
+    result = build_snapshot(reviews, watchlist, catalog=cast(TMDBClient, SeriesAwareCatalog()))
+
+    messages = [diagnostic.message for diagnostic in result.diagnostics]
+    assert any("unresolved TMDB movie match for Ted Lasso" in message for message in messages)
+    assert any("TMDB TV match: Ted Lasso (2020)" in message for message in messages)
+    assert any("film-only snapshot" in message for message in messages)
 
 
 def test_successful_local_recommendation_run_records_generation_time(tmp_path: Path) -> None:
