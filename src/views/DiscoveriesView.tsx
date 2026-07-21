@@ -8,33 +8,51 @@ import { RatingLegend } from '../components/RatingLegend'
 import { formatDate, searchFilm } from '../lib/format'
 
 interface DiscoveriesViewProps {
+  deterministic: Recommendation[]
   ai: Recommendation[]
   generatedAt: string | null
 }
 
+type DiscoverySource = 'all' | 'ai' | 'deterministic'
 type DiscoverySort = 'score' | 'title' | 'year'
 
-export function DiscoveriesView({ ai, generatedAt }: DiscoveriesViewProps) {
-  const films = useMemo(() => [...ai], [ai])
+export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesViewProps) {
+  const films = useMemo(
+    () =>
+      [...ai, ...deterministic].filter(
+        (film, index, all) =>
+          all.findIndex(
+            (candidate) =>
+              candidate.mediaType === film.mediaType && candidate.tmdbId === film.tmdbId,
+          ) === index,
+      ),
+    [ai, deterministic],
+  )
   const [query, setQuery] = useState('')
+  const [source, setSource] = useState<DiscoverySource>('all')
   const [sort, setSort] = useState<DiscoverySort>('score')
 
   const visibleFilms = useMemo(
     () =>
       films
-        .filter((film) => searchFilm(film, query, [film.rationale]))
+        .filter(
+          (film) =>
+            searchFilm(film, query, [film.rationale]) &&
+            (source === 'all' || film.source === source),
+        )
         .sort((left, right) => {
           if (sort === 'title') return left.title.localeCompare(right.title)
           if (sort === 'year') return (right.year ?? 0) - (left.year ?? 0)
+          if (left.source !== right.source) return left.source === 'ai' ? -1 : 1
           return right.predictedRating - left.predictedRating || left.title.localeCompare(right.title)
         }),
-    [films, query, sort],
+    [films, query, sort, source],
   )
 
   return (
     <div className="view">
       <PageHeader count={films.length} eyebrow="Beyond the queue" title="Discoveries">
-        AI recommendations verified against TMDB and filtered against the watched archive and watchlist.
+        AI picks first, then local taste matches from ratings, genres, tags, and TMDB metadata.
       </PageHeader>
       {generatedAt ? (
         <p className="recommendation-date">Last recommendation run: {formatDate(generatedAt, 'full')}</p>
@@ -46,6 +64,17 @@ export function DiscoveriesView({ ai, generatedAt }: DiscoveriesViewProps) {
         query={query}
         resultCount={visibleFilms.length}
         selects={[
+          {
+            id: 'discovery-source',
+            label: 'Source',
+            options: [
+              { label: 'All recommendations', value: 'all' },
+              { label: 'AI picks', value: 'ai' },
+              { label: 'Local taste matches', value: 'deterministic' },
+            ],
+            value: source,
+            onChange: (value) => setSource(value as DiscoverySource),
+          },
           {
             id: 'discovery-sort',
             label: 'Sort',
@@ -68,8 +97,8 @@ export function DiscoveriesView({ ai, generatedAt }: DiscoveriesViewProps) {
       ) : (
         <EmptyState title={films.length === 0 ? 'No discoveries published' : 'No films found'}>
           {films.length === 0
-            ? 'Run the AI recommendation command to publish verified suggestions.'
-            : 'Try another search.'}
+            ? 'Run the recommendation command to publish AI picks and local taste matches.'
+            : 'Try another search or recommendation source.'}
         </EmptyState>
       )}
     </div>

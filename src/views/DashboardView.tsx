@@ -21,7 +21,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
     .filter((film) => !film.dismissed)
     .sort((left, right) => (right.interest ?? -1) - (left.interest ?? -1))
     .slice(0, 4)
-  const discoveries = [...snapshot.aiDiscoveries].filter(
+  const discoveries = [...snapshot.aiDiscoveries, ...snapshot.deterministicDiscoveries].filter(
     (film, index, all) =>
       all.findIndex(
         (candidate) => candidate.mediaType === film.mediaType && candidate.tmdbId === film.tmdbId,
@@ -84,14 +84,14 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
             <h2 id="discovery-heading">A film worth considering</h2>
           </div>
           <a className="text-link" href="#discoveries">
-            All AI picks <ArrowRight aria-hidden="true" size={15} />
+            All discoveries <ArrowRight aria-hidden="true" size={15} />
           </a>
         </div>
         {discoveries.length > 0 ? (
           <DiscoveryCard discovery={discoveries[0]} featured />
         ) : (
           <EmptyState title="No discoveries yet">
-            Run the AI recommendation command to publish the first verified suggestions.
+            Run the recommendation command to publish AI picks and local taste matches.
           </EmptyState>
         )}
       </section>
@@ -160,7 +160,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
             <Compass aria-hidden="true" className="section-heading__icon" size={25} />
           </div>
           <div className="discovery-grid">
-            {discoveries.slice(1, 3).map((film) => (
+            {discoveries.slice(1, 5).map((film) => (
               <DiscoveryCard discovery={film} key={`${film.source}-${film.mediaType}-${film.tmdbId}`} />
             ))}
           </div>
