@@ -5,11 +5,10 @@ interface ScoreProps {
   label: string
   value: number | null
   quiet?: boolean
-  fixedDecimal?: boolean
 }
 
-export function Score({ label, value, quiet = false, fixedDecimal = false }: ScoreProps) {
-  const formattedValue = formatScore(value, fixedDecimal)
+export function Score({ label, value, quiet = false }: ScoreProps) {
+  const formattedValue = formatScore(value)
   return (
     <span
       aria-label={`${label}: ${value === null ? 'not scored' : `${formattedValue} out of 10`}`}

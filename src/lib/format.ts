@@ -19,10 +19,8 @@ export function formatDate(value: string | null, style: 'short' | 'full' = 'shor
   return (style === 'full' ? fullDateFormatter : shortDateFormatter).format(date)
 }
 
-export function formatScore(value: number | null, fixedDecimal = false): string {
-  if (value === null) return '—'
-  if (fixedDecimal) return value.toFixed(1)
-  return Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1)
+export function formatScore(value: number | null): string {
+  return value === null ? '—' : value.toFixed(1)
 }
 
 export function posterUrl(path: string | null): string | null {

@@ -46,7 +46,7 @@ describe('journal views', () => {
     render(<WatchlistView films={snapshotFixture.watchlist} />)
 
     expect(screen.getByLabelText('Watchlist rating legend')).toHaveTextContent('Personal expected rating')
-    expect(screen.getByLabelText('Personal expected rating: 9 out of 10')).toBeInTheDocument()
+    expect(screen.getByLabelText('Personal expected rating: 9.0 out of 10')).toBeInTheDocument()
     expect(screen.getByLabelText('TMDB audience rating: 8.4 out of 10')).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Highest expected rating' })).toBeInTheDocument()
   })

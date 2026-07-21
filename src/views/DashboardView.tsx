@@ -4,6 +4,7 @@ import { DiscoveryCard } from '../components/DiscoveryCard'
 import { EmptyState } from '../components/EmptyState'
 import { ReviewCard } from '../components/ReviewCard'
 import { WatchlistCard } from '../components/WatchlistCard'
+import { formatScore } from '../lib/format'
 
 interface DashboardViewProps {
   snapshot: FilmographySnapshot
@@ -72,7 +73,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
               <Star aria-hidden="true" size={17} />
               Average
             </dt>
-            <dd>{averageRating === null ? '—' : averageRating.toFixed(1)}</dd>
+            <dd>{formatScore(averageRating)}</dd>
           </div>
         </dl>
       </section>

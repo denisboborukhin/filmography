@@ -36,7 +36,6 @@ export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProp
             {isAi ? 'AI pick' : 'Taste match'}
           </span>
           <ScorePair
-            fixedDecimal
             primaryLabel="Your predicted rating"
             primaryValue={discovery.predictedRating}
             secondaryValue={discovery.voteAverage}
