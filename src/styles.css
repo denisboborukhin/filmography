@@ -672,7 +672,7 @@ h3 {
 
 .discovery-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -1231,14 +1231,6 @@ h3 {
     gap: 3rem;
   }
 
-  .discovery-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .discovery-grid .discovery-card:last-child:nth-child(odd) {
-    display: none;
-  }
-
   .watchlist-grid {
     grid-template-columns: 1fr;
   }
@@ -1436,10 +1428,6 @@ h3 {
 
   .discovery-grid {
     grid-template-columns: 1fr;
-  }
-
-  .discovery-grid .discovery-card:last-child:nth-child(odd) {
-    display: grid;
   }
 
   .filter-bar {

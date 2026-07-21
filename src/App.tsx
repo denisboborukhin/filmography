@@ -108,7 +108,6 @@ export function App() {
       return (
         <DiscoveriesView
           ai={snapshot.aiDiscoveries}
-          deterministic={snapshot.deterministicDiscoveries}
           generatedAt={snapshot.recommendationsGeneratedAt}
         />
       )

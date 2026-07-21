@@ -2,14 +2,14 @@
 
 Filmography turns personal Markdown notes into a read-only screen journal for GitHub Pages. The
 published site contains the last snapshot you generated: watched films and reviews, a scored
-watchlist, token-free discoveries, and the latest successful AI recommendation set.
+watchlist, and the latest successful AI recommendation set.
 
 The browser never needs a TMDB or AI key. Importing, catalog lookups, and recommendation requests
 happen only on your computer; GitHub Pages serves the committed static snapshot.
 
 Reviews and watchlist entries can be films or TV series when TMDB can verify them. Discovery
-recommendations still cover TMDB's movie catalog only. The updater does not crawl arbitrary review or
-streaming sites.
+recommendations shown in the UI come from the verified AI recommendation set and cover TMDB's movie
+catalog only. The updater does not crawl arbitrary review or streaming sites.
 
 ## How it works
 

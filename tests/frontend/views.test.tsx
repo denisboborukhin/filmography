@@ -57,27 +57,23 @@ describe('journal views', () => {
     expect(container.querySelectorAll('.compact-card .score-pair')).toHaveLength(3)
   })
 
-  it('filters discoveries by source', async () => {
-    const user = userEvent.setup()
+  it('shows only AI recommendations in discoveries', () => {
     render(
       <DiscoveriesView
         ai={snapshotFixture.aiDiscoveries}
-        deterministic={snapshotFixture.deterministicDiscoveries}
         generatedAt={snapshotFixture.recommendationsGeneratedAt}
       />,
     )
 
-    await user.selectOptions(screen.getByLabelText('Source'), 'deterministic')
-
-    expect(screen.getByRole('heading', { name: 'My Neighbor Totoro' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Up' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Up' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'My Neighbor Totoro' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Source')).not.toBeInTheDocument()
   })
 
   it('labels personal and TMDB ratings separately in discoveries', () => {
     render(
       <DiscoveriesView
         ai={snapshotFixture.aiDiscoveries}
-        deterministic={snapshotFixture.deterministicDiscoveries}
         generatedAt={snapshotFixture.recommendationsGeneratedAt}
       />,
     )

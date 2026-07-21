@@ -8,40 +8,33 @@ import { RatingLegend } from '../components/RatingLegend'
 import { formatDate, searchFilm } from '../lib/format'
 
 interface DiscoveriesViewProps {
-  deterministic: Recommendation[]
   ai: Recommendation[]
   generatedAt: string | null
 }
 
-type DiscoverySource = 'all' | 'ai' | 'deterministic'
 type DiscoverySort = 'score' | 'title' | 'year'
 
-export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesViewProps) {
-  const films = useMemo(() => [...ai, ...deterministic], [ai, deterministic])
+export function DiscoveriesView({ ai, generatedAt }: DiscoveriesViewProps) {
+  const films = useMemo(() => [...ai], [ai])
   const [query, setQuery] = useState('')
-  const [source, setSource] = useState<DiscoverySource>('all')
   const [sort, setSort] = useState<DiscoverySort>('score')
 
   const visibleFilms = useMemo(
     () =>
       films
-        .filter(
-          (film) =>
-            searchFilm(film, query, [film.rationale]) &&
-            (source === 'all' || film.source === source),
-        )
+        .filter((film) => searchFilm(film, query, [film.rationale]))
         .sort((left, right) => {
           if (sort === 'title') return left.title.localeCompare(right.title)
           if (sort === 'year') return (right.year ?? 0) - (left.year ?? 0)
           return right.predictedRating - left.predictedRating || left.title.localeCompare(right.title)
         }),
-    [films, query, sort, source],
+    [films, query, sort],
   )
 
   return (
     <div className="view">
       <PageHeader count={films.length} eyebrow="Beyond the queue" title="Discoveries">
-        New directions inferred from the scores, genres, and details that recur across the journal.
+        AI recommendations verified against TMDB and filtered against the watched archive and watchlist.
       </PageHeader>
       {generatedAt ? (
         <p className="recommendation-date">Last recommendation run: {formatDate(generatedAt, 'full')}</p>
@@ -53,17 +46,6 @@ export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesV
         query={query}
         resultCount={visibleFilms.length}
         selects={[
-          {
-            id: 'discovery-source',
-            label: 'Source',
-            options: [
-              { label: 'All suggestions', value: 'all' },
-              { label: 'AI picks', value: 'ai' },
-              { label: 'Taste matches', value: 'deterministic' },
-            ],
-            value: source,
-            onChange: (value) => setSource(value as DiscoverySource),
-          },
           {
             id: 'discovery-sort',
             label: 'Sort',
@@ -86,8 +68,8 @@ export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesV
       ) : (
         <EmptyState title={films.length === 0 ? 'No discoveries published' : 'No films found'}>
           {films.length === 0
-            ? 'Run the local recommendation command to create the first set.'
-            : 'Try another search or recommendation source.'}
+            ? 'Run the AI recommendation command to publish verified suggestions.'
+            : 'Try another search.'}
         </EmptyState>
       )}
     </div>
