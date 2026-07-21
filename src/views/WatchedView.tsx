@@ -44,7 +44,7 @@ export function WatchedView({ films }: WatchedViewProps) {
       <PageHeader count={films.length} eyebrow="The archive" title="Watched">
         Every score and note, from fleeting impressions to the films that refused to leave.
       </PageHeader>
-      <RatingLegend label="Watched rating legend" primaryLabel="Personal expected rating" />
+      <RatingLegend label="Watched rating legend" primaryLabel="Personal rating" />
       <FilterBar
         label="Search reviews, titles, or tags"
         onQueryChange={setQuery}

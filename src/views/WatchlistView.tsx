@@ -65,7 +65,7 @@ export function WatchlistView({ films }: WatchlistViewProps) {
             id: 'watchlist-sort',
             label: 'Sort',
             options: [
-              { label: 'Highest interest', value: 'interest' },
+              { label: 'Highest expected rating', value: 'interest' },
               { label: 'Title A–Z', value: 'title' },
               { label: 'Newest release', value: 'year' },
             ],

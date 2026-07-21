@@ -5,6 +5,7 @@ interface ScorePairProps {
   primaryValue: number | null
   secondaryLabel?: string
   secondaryValue: number | null
+  fixedDecimal?: boolean
 }
 
 export function ScorePair({
@@ -12,11 +13,12 @@ export function ScorePair({
   primaryValue,
   secondaryLabel = 'TMDB audience rating',
   secondaryValue,
+  fixedDecimal = false,
 }: ScorePairProps) {
   return (
     <span className="score-pair">
-      <Score label={primaryLabel} value={primaryValue} />
-      <Score label={secondaryLabel} quiet value={secondaryValue} />
+      <Score fixedDecimal={fixedDecimal} label={primaryLabel} value={primaryValue} />
+      <Score fixedDecimal={fixedDecimal} label={secondaryLabel} quiet value={secondaryValue} />
     </span>
   )
 }

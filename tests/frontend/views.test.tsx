@@ -47,6 +47,7 @@ describe('journal views', () => {
     expect(screen.getByLabelText('Watchlist rating legend')).toHaveTextContent('Personal expected rating')
     expect(screen.getByLabelText('Personal expected rating: 9 out of 10')).toBeInTheDocument()
     expect(screen.getByLabelText('TMDB audience rating: 8.4 out of 10')).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Highest expected rating' })).toBeInTheDocument()
   })
 
   it('uses the same compact card structure for dashboard reviews and watchlist entries', () => {
@@ -102,7 +103,7 @@ describe('journal views', () => {
     )
 
     expect(screen.getAllByLabelText('Your predicted rating: 8.5 out of 10').length).toBeGreaterThan(0)
-    expect(screen.getAllByLabelText('TMDB audience rating: 8 out of 10').length).toBeGreaterThan(0)
+    expect(screen.getAllByLabelText('TMDB audience rating: 8.0 out of 10').length).toBeGreaterThan(0)
     expect(screen.getByLabelText('Discovery rating legend')).toHaveTextContent(
       'Personal expected rating',
     )
