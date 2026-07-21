@@ -7,6 +7,7 @@ export const snapshotFixture: FilmographySnapshot = {
   watched: [
     {
       tmdbId: 129,
+      mediaType: 'movie',
       title: 'Spirited Away',
       originalTitle: '千と千尋の神隠し',
       year: 2001,
@@ -24,6 +25,7 @@ export const snapshotFixture: FilmographySnapshot = {
     },
     {
       tmdbId: 38,
+      mediaType: 'movie',
       title: 'Eternal Sunshine of the Spotless Mind',
       originalTitle: null,
       year: 2004,
@@ -43,6 +45,7 @@ export const snapshotFixture: FilmographySnapshot = {
   watchlist: [
     {
       tmdbId: 4935,
+      mediaType: 'movie',
       title: 'Howl’s Moving Castle',
       originalTitle: 'ハウルの動く城',
       year: 2004,
@@ -59,6 +62,7 @@ export const snapshotFixture: FilmographySnapshot = {
     },
     {
       tmdbId: 10,
+      mediaType: 'movie',
       title: 'Dismissed Film',
       originalTitle: null,
       year: 1990,
@@ -77,6 +81,7 @@ export const snapshotFixture: FilmographySnapshot = {
   deterministicDiscoveries: [
     {
       tmdbId: 8392,
+      mediaType: 'movie',
       title: 'My Neighbor Totoro',
       originalTitle: 'となりのトトロ',
       year: 1988,
@@ -97,6 +102,7 @@ export const snapshotFixture: FilmographySnapshot = {
   aiDiscoveries: [
     {
       tmdbId: 14160,
+      mediaType: 'movie',
       title: 'Up',
       originalTitle: null,
       year: 2009,

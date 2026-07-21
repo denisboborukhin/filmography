@@ -22,7 +22,10 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
     .sort((left, right) => (right.interest ?? -1) - (left.interest ?? -1))
     .slice(0, 4)
   const discoveries = [...snapshot.aiDiscoveries, ...snapshot.deterministicDiscoveries].filter(
-    (film, index, all) => all.findIndex((candidate) => candidate.tmdbId === film.tmdbId) === index,
+    (film, index, all) =>
+      all.findIndex(
+        (candidate) => candidate.mediaType === film.mediaType && candidate.tmdbId === film.tmdbId,
+      ) === index,
   )
   const averageRating =
     snapshot.watched.length === 0
@@ -107,7 +110,11 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
           {recentReviews.length > 0 ? (
             <div className="compact-list">
               {recentReviews.map((film) => (
-                <ReviewCard compact film={film} key={`${film.tmdbId ?? film.title}-${film.year}`} />
+                <ReviewCard
+                  compact
+                  film={film}
+                  key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`}
+                />
               ))}
             </div>
           ) : (
@@ -131,7 +138,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
                 <WatchlistCard
                   compact
                   film={film}
-                  key={`${film.tmdbId ?? film.title}-${film.year}`}
+                  key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`}
                 />
               ))}
             </div>
@@ -154,7 +161,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
           </div>
           <div className="discovery-grid">
             {discoveries.slice(1, 4).map((film) => (
-              <DiscoveryCard discovery={film} key={`${film.source}-${film.tmdbId}`} />
+              <DiscoveryCard discovery={film} key={`${film.source}-${film.mediaType}-${film.tmdbId}`} />
             ))}
           </div>
         </section>

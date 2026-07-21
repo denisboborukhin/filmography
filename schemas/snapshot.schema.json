@@ -86,6 +86,10 @@
             { "type": "null" }
           ]
         },
+        "mediaType": {
+          "enum": ["movie", "tv"],
+          "default": "movie"
+        },
         "title": { "type": "string", "minLength": 1 },
         "originalTitle": { "$ref": "#/$defs/nullableString" },
         "year": {
@@ -137,6 +141,7 @@
       ],
       "properties": {
         "tmdbId": { "$ref": "#/$defs/filmMetadataProperties/properties/tmdbId" },
+        "mediaType": { "$ref": "#/$defs/filmMetadataProperties/properties/mediaType" },
         "title": { "$ref": "#/$defs/filmMetadataProperties/properties/title" },
         "originalTitle": { "$ref": "#/$defs/nullableString" },
         "year": { "$ref": "#/$defs/filmMetadataProperties/properties/year" },
@@ -174,6 +179,7 @@
       ],
       "properties": {
         "tmdbId": { "$ref": "#/$defs/filmMetadataProperties/properties/tmdbId" },
+        "mediaType": { "$ref": "#/$defs/filmMetadataProperties/properties/mediaType" },
         "title": { "$ref": "#/$defs/filmMetadataProperties/properties/title" },
         "originalTitle": { "$ref": "#/$defs/nullableString" },
         "year": { "$ref": "#/$defs/filmMetadataProperties/properties/year" },
@@ -231,6 +237,7 @@
       ],
       "properties": {
         "tmdbId": { "type": "integer", "minimum": 1 },
+        "mediaType": { "const": "movie" },
         "title": { "$ref": "#/$defs/filmMetadataProperties/properties/title" },
         "originalTitle": { "$ref": "#/$defs/nullableString" },
         "year": { "$ref": "#/$defs/filmMetadataProperties/properties/year" },

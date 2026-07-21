@@ -521,6 +521,12 @@ h3 {
   content: "";
 }
 
+.film-meta__media {
+  color: var(--green);
+  font-weight: 760;
+  text-transform: uppercase;
+}
+
 .score {
   display: inline-flex;
   align-items: center;
@@ -726,7 +732,8 @@ h3 {
 }
 
 .page-header + .filter-bar,
-.recommendation-date + .filter-bar {
+.recommendation-date + .filter-bar,
+.rating-legend + .filter-bar {
   margin-top: 2rem;
 }
 
@@ -736,6 +743,39 @@ h3 {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.67rem;
   letter-spacing: 0.02em;
+}
+
+.rating-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1rem;
+  margin: 1rem 0 -0.75rem;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+}
+
+.recommendation-date + .rating-legend {
+  margin-top: 1.1rem;
+}
+
+.rating-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.rating-legend__swatch {
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 999px;
+}
+
+.rating-legend__swatch--personal {
+  background: var(--accent-dark);
+}
+
+.rating-legend__swatch--audience {
+  background: var(--green);
 }
 
 .filter-bar {

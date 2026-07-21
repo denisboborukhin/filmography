@@ -61,15 +61,16 @@ Supported fields:
 | `watchedAt` | `YYYY-MM-DD` | No | Date watched. |
 | `tags` | YAML list or strings | No | Personal taste signals. Markdown `#tags` in prose remain prose. |
 | `categories` | YAML list or strings | No | Alias for tags; wiki-style links such as `[[films resumes]]` become plain text. |
-| `tmdbId` | positive integer | No | Canonical TMDB movie ID; avoids title matching. |
+| `tmdbId` | positive integer | No | Canonical TMDB ID; avoids title matching. Defaults to a movie ID unless `mediaType: tv` is set. |
+| `mediaType` | `movie` or `tv` | No | Catalog namespace. Aliases: `media_type`, `type`; `film`, `series`, `serial`, and `show` are accepted. |
 | `sourceUrl` | URL | No | Optional public reference; aliases: `source_url`, `source`. |
 
 The parser also accepts `film` or `movie` for title, `watched`, `date`, or `watched_at` for the watched
-date, `genres` for tags, and `tmdb` or `tmdb_id` for the catalog ID. Tags and categories may be a YAML
-list or a comma/space-separated string; leading `#` characters and wiki-style link wrappers are
-removed. Unknown frontmatter is not copied. `sourceUrl` must be an absolute HTTP(S) URL without
-embedded credentials, so local paths and `file:` URLs are rejected. When `title` is absent, the
-filename still becomes the public title.
+date, `genres` for tags, `tmdb` or `tmdb_id` for the catalog ID, and `type` for media type. Tags and
+categories may be a YAML list or a comma/space-separated string; leading `#` characters and
+wiki-style link wrappers are removed. Unknown frontmatter is not copied. `sourceUrl` must be an
+absolute HTTP(S) URL without embedded credentials, so local paths and `file:` URLs are rejected. When
+`title` is absent, the filename still becomes the public title.
 
 ### Score rules
 
@@ -126,7 +127,8 @@ Each line contains:
 1. A title.
 2. An optional four-digit release year in parentheses.
 3. Optional named segments separated by an em dash (`—`), en dash (`–`), or pipe (`|`). Supported
-   keys are `interest`/`score`, `year`, `note`/`notes`, `tag`/`tags`, and `dismissed`.
+   keys are `interest`/`score`, `year`, `type`/`mediaType`, `note`/`notes`, `tag`/`tags`, and
+   `dismissed`.
 
 An unlabelled segment after the title is appended to the notes, so `| quiet evening` is valid.
 
@@ -140,7 +142,9 @@ Markdown links use their visible label.
 Use a year or a TMDB-backed review entry whenever remakes share a title. Repeated watchlist entries,
 and films already present in the watched collection, are validation errors. When a watchlist entry has
 no year, catalog enrichment picks the most popular unique TMDB candidate; if popularity cannot break a
-tie, the entry stays unresolved and is reported as a warning.
+tie, the entry stays unresolved and is reported as a warning. If movie matching fails but TMDB has an
+unambiguous TV-series match, the entry is enriched as `mediaType: tv`; set `type: series` explicitly
+when you already know the record is not a film.
 
 ## Validation workflow
 

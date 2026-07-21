@@ -45,6 +45,22 @@ export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesV
       {generatedAt ? (
         <p className="recommendation-date">Last recommendation run: {formatDate(generatedAt, 'full')}</p>
       ) : null}
+      <div aria-label="Discovery rating legend" className="rating-legend">
+        <span>
+          <span
+            aria-hidden="true"
+            className="rating-legend__swatch rating-legend__swatch--personal"
+          />
+          Personal expected rating
+        </span>
+        <span>
+          <span
+            aria-hidden="true"
+            className="rating-legend__swatch rating-legend__swatch--audience"
+          />
+          TMDB audience score
+        </span>
+      </div>
       <FilterBar
         label="Search discoveries"
         onQueryChange={setQuery}
@@ -78,7 +94,7 @@ export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesV
       {visibleFilms.length > 0 ? (
         <div className="discovery-grid discovery-grid--archive">
           {visibleFilms.map((film) => (
-            <DiscoveryCard discovery={film} key={`${film.source}-${film.tmdbId}`} />
+            <DiscoveryCard discovery={film} key={`${film.source}-${film.mediaType}-${film.tmdbId}`} />
           ))}
         </div>
       ) : (

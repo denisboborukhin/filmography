@@ -58,6 +58,7 @@ class TMDBClient:
             timeout=20.0,
         )
         self._genres_by_id: dict[int, str] | None = None
+        self._tv_genres_by_id: dict[int, str] | None = None
 
     def close(self) -> None:
         if self._owns_client:
@@ -80,6 +81,18 @@ class TMDBClient:
             validator=lambda value: self._film_from_payload(value),
         )
         return self._film_from_payload(payload)
+
+    def get_tv(self, tmdb_id: int) -> FilmMetadata:
+        """Fetch a TV series by canonical ID."""
+
+        if tmdb_id < 1:
+            raise ValueError("TMDB ID must be positive")
+        payload = self._get_json(
+            f"/tv/{tmdb_id}",
+            {},
+            validator=lambda value: self._tv_from_payload(value),
+        )
+        return self._tv_from_payload(payload)
 
     def match_movie(
         self,
@@ -137,34 +150,71 @@ class TMDBClient:
                 return CatalogMatch("matched", popular, candidates)
         return CatalogMatch("unresolved", None, candidates[:5])
 
+    def match_tv(
+        self,
+        title: str,
+        year: int | None = None,
+        *,
+        allow_popular_without_year: bool = False,
+    ) -> CatalogMatch:
+        """Match a TV series conservatively, using the same rules as movie matching."""
+
+        params: dict[str, str | int] = {"query": title, "include_adult": "false", "page": 1}
+        if year is not None:
+            params["first_air_date_year"] = year
+        payload = self._get_json(
+            "/search/tv",
+            params,
+            validator=self._validate_tv_search_payload,
+        )
+        raw_results = _list_of_mappings(payload.get("results"), "TMDB TV search results")
+        candidates = tuple(self._tv_from_payload(item) for item in raw_results[:20])
+        requested_title = film_identity(title, None)[0]
+        exact_title = tuple(
+            series
+            for series in candidates
+            if requested_title
+            in {
+                film_identity(series.title, None)[0],
+                film_identity(series.original_title or "", None)[0],
+            }
+        )
+        exact = (
+            tuple(series for series in exact_title if series.year == year)
+            if year is not None
+            else exact_title
+        )
+        if len(exact) == 1:
+            return CatalogMatch("matched", exact[0], exact)
+        if len(exact) > 1:
+            popular = _unique_popularity_winner(exact)
+            if popular is not None:
+                return CatalogMatch("matched", popular, exact)
+            return CatalogMatch("ambiguous", None, exact)
+        if year is not None and _contains_non_ascii(title):
+            same_year = tuple(series for series in candidates if series.year == year)
+            if len(same_year) == 1:
+                return CatalogMatch("matched", same_year[0], same_year)
+            if len(same_year) > 1:
+                popular = _unique_popularity_winner(same_year)
+                if popular is not None:
+                    return CatalogMatch("matched", popular, same_year)
+                return CatalogMatch("ambiguous", None, same_year)
+        if year is None and allow_popular_without_year and candidates:
+            popular = _unique_popularity_winner(candidates)
+            if popular is not None:
+                return CatalogMatch("matched", popular, candidates)
+        return CatalogMatch("unresolved", None, candidates[:5])
+
     def find_tv_titles(self, title: str, *, limit: int = 3) -> tuple[str, ...]:
         """Return likely TMDB TV matches for diagnostics; does not enrich film records."""
 
         if limit < 1:
             return ()
-        payload = self._get_json(
-            "/search/tv",
-            {"query": title, "include_adult": "false", "page": 1},
-            validator=self._validate_tv_search_payload,
+        match = self.match_tv(title, allow_popular_without_year=True)
+        return tuple(
+            f"{series.title} ({series.year or 'unknown'})" for series in match.candidates[:limit]
         )
-        requested_title = film_identity(title, None)[0]
-        labels: list[str] = []
-        for item in _list_of_mappings(payload.get("results"), "TMDB TV search results")[:20]:
-            name = _optional_string(item.get("name"))
-            original_name = _optional_string(item.get("original_name"))
-            if name is None:
-                continue
-            identities = {
-                film_identity(name, None)[0],
-                film_identity(original_name or "", None)[0],
-            }
-            if requested_title not in identities:
-                continue
-            first_air_date = _parse_release_date(item.get("first_air_date"))
-            labels.append(f"{name} ({first_air_date.year if first_air_date else 'unknown'})")
-            if len(labels) >= limit:
-                break
-        return tuple(labels)
 
     def discover_movies(
         self,
@@ -226,6 +276,22 @@ class TMDBClient:
         self._genres_by_id = genres
         return genres
 
+    def _tv_genre_names(self) -> dict[int, str]:
+        if self._tv_genres_by_id is not None:
+            return self._tv_genres_by_id
+        payload = self._get_json(
+            "/genre/tv/list",
+            {},
+            validator=self._validate_genre_payload,
+        )
+        genres: dict[int, str] = {}
+        for item in _list_of_mappings(payload.get("genres"), "TMDB TV genres"):
+            genre_id = _required_int(item, "id")
+            name = _required_string(item, "name")
+            genres[genre_id] = name
+        self._tv_genres_by_id = genres
+        return genres
+
     def _film_from_payload(
         self,
         payload: Mapping[str, object],
@@ -244,7 +310,7 @@ class TMDBClient:
                         genre_names.append(name)
         raw_genre_ids = payload.get("genre_ids")
         if isinstance(raw_genre_ids, list):
-            names = genres_by_id if genres_by_id is not None else self._genre_names()
+            names = genres_by_id if genres_by_id is not None else self._tv_genre_names()
             for raw_id in cast(list[object], raw_genre_ids):
                 if isinstance(raw_id, int) and raw_id in names:
                     genre_names.append(names[raw_id])
@@ -270,6 +336,52 @@ class TMDBClient:
         except ValidationError as error:
             message = error.errors()[0]["msg"]
             raise CatalogError(f"TMDB movie metadata is invalid: {message}") from error
+
+    def _tv_from_payload(
+        self,
+        payload: Mapping[str, object],
+        *,
+        genres_by_id: dict[int, str] | None = None,
+    ) -> FilmMetadata:
+        first_air_date = _parse_release_date(payload.get("first_air_date"))
+        genre_names: list[str] = []
+        raw_genres = payload.get("genres")
+        if isinstance(raw_genres, list):
+            for raw_genre in cast(list[object], raw_genres):
+                if isinstance(raw_genre, Mapping):
+                    genre = cast(Mapping[object, object], raw_genre)
+                    name = genre.get("name")
+                    if isinstance(name, str):
+                        genre_names.append(name)
+        raw_genre_ids = payload.get("genre_ids")
+        if isinstance(raw_genre_ids, list):
+            names = genres_by_id if genres_by_id is not None else self._tv_genre_names()
+            for raw_id in cast(list[object], raw_genre_ids):
+                if isinstance(raw_id, int) and raw_id in names:
+                    genre_names.append(names[raw_id])
+        poster_path = payload.get("poster_path")
+        poster_url = (
+            f"{_POSTER_BASE_URL}{poster_path}"
+            if isinstance(poster_path, str) and poster_path.startswith("/")
+            else None
+        )
+        try:
+            return FilmMetadata(
+                tmdb_id=_required_int(payload, "id"),
+                media_type="tv",
+                title=_required_string(payload, "name"),
+                original_title=_optional_string(payload.get("original_name")),
+                year=first_air_date.year if first_air_date is not None else None,
+                release_date=first_air_date,
+                poster_url=poster_url,
+                overview=_optional_string(payload.get("overview")) or "",
+                genres=genre_names,
+                vote_average=_optional_float(payload.get("vote_average")),
+                popularity=_optional_float(payload.get("popularity")),
+            )
+        except ValidationError as error:
+            message = error.errors()[0]["msg"]
+            raise CatalogError(f"TMDB TV metadata is invalid: {message}") from error
 
     def _validate_search_payload(self, payload: Mapping[str, object]) -> None:
         for item in _list_of_mappings(payload.get("results"), "TMDB search results"):

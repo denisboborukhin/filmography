@@ -16,7 +16,12 @@ export function WatchlistCard({ film, compact = false }: WatchlistCardProps) {
         <div className="watchlist-card__heading">
           <div>
             <h3>{film.title}</h3>
-            <FilmMeta genres={film.genres} limit={compact ? 1 : 2} year={film.year} />
+            <FilmMeta
+              genres={film.genres}
+              limit={compact ? 1 : 2}
+              mediaType={film.mediaType}
+              year={film.year}
+            />
           </div>
           <Score label="Interest" quiet value={film.interest} />
         </div>

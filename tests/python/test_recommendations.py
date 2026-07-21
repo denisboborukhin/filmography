@@ -59,7 +59,7 @@ def test_deterministic_ranking_excludes_existing_and_explains_matches() -> None:
     assert recommendations[0].predicted_rating > recommendations[1].predicted_rating
     assert "Science Fiction" in recommendations[0].rationale
     assert "Seen" in recommendations[0].rationale
-    assert "TMDB audience score: 8/10" in recommendations[0].rationale
+    assert "TMDB audience score" not in recommendations[0].rationale
     assert recommendations[0].provider is None
 
 
@@ -125,6 +125,5 @@ def test_deterministic_rationale_reports_catalog_rating_for_variety_pick() -> No
     )
 
     assert recommendations[0].rationale == (
-        "Catalog-led pick: TMDB audiences rate it 8.3/10, and its Drama and Thriller "
-        "profile adds variety to your discoveries."
+        "Catalog-led pick with a Drama and Thriller profile adds variety to your discoveries."
     )

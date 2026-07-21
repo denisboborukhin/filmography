@@ -20,7 +20,7 @@ from filmography.models import (
     film_matches_any,
 )
 from filmography.recommendations import preferred_genres, rank_deterministic
-from filmography.tmdb import CatalogError, TMDBClient
+from filmography.tmdb import CatalogError, CatalogMatch, TMDBClient
 
 
 @dataclass(frozen=True, slots=True)
@@ -223,11 +223,21 @@ def _catalog_metadata(
 ) -> FilmMetadata | None:
     try:
         if film.tmdb_id is not None:
+            if film.media_type == "tv":
+                return catalog.get_tv(film.tmdb_id)
             return catalog.get_movie(film.tmdb_id)
-        match = catalog.match_movie(
-            film.title,
-            film.year,
-            allow_popular_without_year=allow_popular_without_year,
+        match = (
+            catalog.match_tv(
+                film.title,
+                film.year,
+                allow_popular_without_year=allow_popular_without_year,
+            )
+            if film.media_type == "tv"
+            else catalog.match_movie(
+                film.title,
+                film.year,
+                allow_popular_without_year=allow_popular_without_year,
+            )
         )
     except CatalogError as error:
         diagnostics.append(
@@ -236,20 +246,40 @@ def _catalog_metadata(
         return None
     if match.status == "matched":
         return match.film
+    if film.media_type == "movie":
+        tv_match = _match_series(film, catalog, allow_popular_without_year)
+        if tv_match.status == "matched":
+            return tv_match.film
     candidate_labels = ", ".join(
         f"{candidate.title} ({candidate.year or 'unknown'})" for candidate in match.candidates[:3]
     )
     detail = f"; candidates: {candidate_labels}" if candidate_labels else ""
-    tv_detail = _tv_diagnostic_detail(film.title, catalog)
+    tv_detail = _tv_diagnostic_detail(film.title, catalog) if film.media_type == "movie" else ""
+    catalog_label = "TMDB TV" if film.media_type == "tv" else "TMDB movie"
     diagnostics.append(
         Diagnostic(
             "warning",
             f"catalog-{match.status}",
-            f"{match.status} TMDB movie match for {film.title} "
+            f"{match.status} {catalog_label} match for {film.title} "
             f"({film.year or 'unknown'}){detail}{tv_detail}",
         )
     )
     return None
+
+
+def _match_series(
+    film: FilmMetadata,
+    catalog: TMDBClient,
+    allow_popular_without_year: bool,
+) -> CatalogMatch:
+    try:
+        return catalog.match_tv(
+            film.title,
+            film.year,
+            allow_popular_without_year=allow_popular_without_year,
+        )
+    except CatalogError:
+        return CatalogMatch("unresolved", None)
 
 
 def _tv_diagnostic_detail(title: str, catalog: TMDBClient) -> str:

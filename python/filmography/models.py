@@ -15,6 +15,7 @@ PositiveId = Annotated[int, Field(strict=True, ge=1)]
 FilmYear = Annotated[int, Field(strict=True, ge=1878, le=2200)]
 CatalogScore = Annotated[float, Field(strict=True, ge=0, le=10)]
 Popularity = Annotated[float, Field(strict=True, ge=0)]
+MediaType = Literal["movie", "tv"]
 
 
 class PublicModel(BaseModel):
@@ -33,6 +34,7 @@ class FilmMetadata(PublicModel):
     """Catalog metadata embedded into all public film records."""
 
     tmdb_id: PositiveId | None = None
+    media_type: MediaType = "movie"
     title: str = Field(min_length=1)
     original_title: str | None = None
     year: FilmYear | None = None
@@ -128,6 +130,8 @@ class Recommendation(FilmMetadata):
 
     @model_validator(mode="after")
     def provider_is_consistent_with_source(self) -> Self:
+        if self.media_type != "movie":
+            raise ValueError("recommendations must be movies")
         if self.source == "deterministic":
             if self.provider is not None or self.model is not None:
                 raise ValueError("deterministic recommendations cannot include provider or model")
@@ -186,6 +190,12 @@ def film_identity(title: str, year: int | None) -> tuple[str, int | None]:
     return normalized, year
 
 
+def media_identity(film: FilmMetadata) -> MediaType:
+    """Return the catalog namespace for ID and title identity checks."""
+
+    return film.media_type
+
+
 def film_titles_overlap(
     left_title: str,
     left_year: int | None,
@@ -204,6 +214,8 @@ def film_titles_overlap(
 def films_match(left: FilmMetadata, right: FilmMetadata) -> bool:
     """Match catalog IDs when available and always check the human title identity."""
 
+    if media_identity(left) != media_identity(right):
+        return False
     return (
         left.tmdb_id is not None and right.tmdb_id is not None and left.tmdb_id == right.tmdb_id
     ) or film_titles_overlap(left.title, left.year, right.title, right.year)

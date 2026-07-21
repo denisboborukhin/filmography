@@ -19,7 +19,7 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
         <div className="review-card__compact-body">
           <div>
             <h3>{film.title}</h3>
-            <FilmMeta genres={film.genres} limit={1} year={film.year} />
+            <FilmMeta genres={film.genres} limit={1} mediaType={film.mediaType} year={film.year} />
           </div>
           <div className="review-card__compact-bottom">
             <Score label="Rating" value={film.rating} />
@@ -40,7 +40,7 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
         <header className="review-card__header">
           <div>
             <h2>{film.title}</h2>
-            <FilmMeta genres={film.genres} limit={3} year={film.year} />
+            <FilmMeta genres={film.genres} limit={3} mediaType={film.mediaType} year={film.year} />
           </div>
           <span className="watched-date">
             <CalendarCheck aria-hidden="true" size={16} />

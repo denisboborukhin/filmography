@@ -85,7 +85,7 @@ export function WatchedView({ films }: WatchedViewProps) {
       {visibleFilms.length > 0 ? (
         <div className="review-list">
           {visibleFilms.map((film) => (
-            <ReviewCard film={film} key={`${film.tmdbId ?? film.title}-${film.year}`} />
+            <ReviewCard film={film} key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`} />
           ))}
         </div>
       ) : (

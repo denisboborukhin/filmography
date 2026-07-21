@@ -16,7 +16,7 @@ from filmography.builder import (
     write_snapshot,
 )
 from filmography.cli import build_parser, main
-from filmography.models import Recommendation, Snapshot, WatchlistFilm
+from filmography.models import FilmMetadata, Recommendation, Snapshot, WatchlistFilm
 from filmography.tmdb import CatalogMatch, TMDBClient
 
 
@@ -92,7 +92,7 @@ def test_builder_drops_previous_recommendation_that_is_now_watchlisted(tmp_path:
     assert snapshot.recommendations_generated_at is None
 
 
-def test_builder_warns_when_unresolved_movie_title_is_a_series(tmp_path: Path) -> None:
+def test_builder_enriches_series_when_movie_lookup_is_unresolved(tmp_path: Path) -> None:
     reviews = tmp_path / "reviews"
     reviews.mkdir()
     watchlist = tmp_path / "Watchlist.md"
@@ -109,19 +109,38 @@ def test_builder_warns_when_unresolved_movie_title_is_a_series(tmp_path: Path) -
             assert allow_popular_without_year
             return CatalogMatch("unresolved", None)
 
-        def find_tv_titles(self, title: str) -> tuple[str, ...]:
+        def match_tv(
+            self,
+            title: str,
+            _year: int | None = None,
+            *,
+            allow_popular_without_year: bool = False,
+        ) -> CatalogMatch:
             assert title == "Ted Lasso"
-            return ("Ted Lasso (2020)",)
+            assert allow_popular_without_year
+            return CatalogMatch(
+                "matched",
+                FilmMetadata(
+                    tmdb_id=97546,
+                    media_type="tv",
+                    title="Ted Lasso",
+                    year=2020,
+                    overview="An American coach manages a football club.",
+                    genres=["Comedy"],
+                    vote_average=8.5,
+                    popularity=100,
+                ),
+            )
 
         def discover_movies(self, _genres: list[str]) -> list[object]:
             return []
 
     result = build_snapshot(reviews, watchlist, catalog=cast(TMDBClient, SeriesAwareCatalog()))
 
-    messages = [diagnostic.message for diagnostic in result.diagnostics]
-    assert any("unresolved TMDB movie match for Ted Lasso" in message for message in messages)
-    assert any("TMDB TV match: Ted Lasso (2020)" in message for message in messages)
-    assert any("film-only snapshot" in message for message in messages)
+    assert all(diagnostic.code != "catalog-unresolved" for diagnostic in result.diagnostics)
+    assert result.snapshot.watchlist[0].media_type == "tv"
+    assert result.snapshot.watchlist[0].tmdb_id == 97546
+    assert result.snapshot.watchlist[0].overview == "An American coach manages a football club."
 
 
 def test_successful_local_recommendation_run_records_generation_time(tmp_path: Path) -> None:

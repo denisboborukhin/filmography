@@ -176,6 +176,74 @@ def test_finds_exact_tv_title_for_movie_miss_diagnostics(tmp_path: Path) -> None
         http_client.close()
 
 
+def test_matches_tv_series_and_maps_metadata(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/3/genre/tv/list":
+            return httpx.Response(200, json={"genres": [{"id": 35, "name": "Comedy"}]})
+        assert request.url.path == "/3/search/tv"
+        return httpx.Response(
+            200,
+            json={
+                "results": [
+                    {
+                        "id": 97546,
+                        "name": "Ted Lasso",
+                        "original_name": "Ted Lasso",
+                        "first_air_date": "2020-08-14",
+                        "poster_path": "/ted.jpg",
+                        "overview": "An American coach manages a football club.",
+                        "genre_ids": [35],
+                        "vote_average": 8.5,
+                        "popularity": 100,
+                    }
+                ]
+            },
+        )
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        match = catalog.match_tv("Ted Lasso", allow_popular_without_year=True)
+    finally:
+        http_client.close()
+
+    assert match.status == "matched"
+    assert match.film is not None
+    assert match.film.media_type == "tv"
+    assert match.film.title == "Ted Lasso"
+    assert match.film.year == 2020
+    assert match.film.genres == ["Comedy"]
+    assert match.film.poster_url == "https://image.tmdb.org/t/p/w780/ted.jpg"
+
+
+def test_fetches_tv_details(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/3/tv/97546"
+        return httpx.Response(
+            200,
+            json={
+                "id": 97546,
+                "name": "Ted Lasso",
+                "original_name": "Ted Lasso",
+                "first_air_date": "2020-08-14",
+                "poster_path": "/ted.jpg",
+                "overview": "An American coach manages a football club.",
+                "genres": [{"id": 35, "name": "Comedy"}],
+                "vote_average": 8.5,
+                "popularity": 100,
+            },
+        )
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        series = catalog.get_tv(97546)
+    finally:
+        http_client.close()
+
+    assert series.media_type == "tv"
+    assert series.title == "Ted Lasso"
+    assert series.genres == ["Comedy"]
+
+
 def test_fetches_details_and_maps_catalog_metadata(tmp_path: Path) -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.url.path == "/3/movie/603"

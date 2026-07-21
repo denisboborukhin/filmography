@@ -59,5 +59,11 @@ describe('journal views', () => {
 
     expect(screen.getByLabelText('Your predicted rating: 8.5 out of 10')).toBeInTheDocument()
     expect(screen.getByLabelText('TMDB audience rating: 8 out of 10')).toBeInTheDocument()
+    expect(screen.getByLabelText('Discovery rating legend')).toHaveTextContent(
+      'Personal expected rating',
+    )
+    expect(screen.getByLabelText('Discovery rating legend')).toHaveTextContent(
+      'TMDB audience score',
+    )
   })
 })

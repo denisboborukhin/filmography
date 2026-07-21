@@ -3,12 +3,14 @@ import { CalendarDays } from 'lucide-react'
 interface FilmMetaProps {
   year: number | null
   genres: string[]
+  mediaType?: 'movie' | 'tv'
   limit?: number
 }
 
-export function FilmMeta({ year, genres, limit = 2 }: FilmMetaProps) {
+export function FilmMeta({ year, genres, mediaType = 'movie', limit = 2 }: FilmMetaProps) {
   return (
     <div className="film-meta">
+      {mediaType === 'tv' ? <span className="film-meta__media">Series</span> : null}
       {year ? (
         <span>
           <CalendarDays aria-hidden="true" size={14} />

@@ -12,6 +12,7 @@ import yaml
 from pydantic import ValidationError
 
 from filmography.models import (
+    MediaType,
     WatchedFilm,
     WatchlistFilm,
     film_matches_any,
@@ -148,6 +149,7 @@ def parse_review_note(path: Path) -> WatchedFilm:
 
     return WatchedFilm(
         tmdb_id=_optional_int(_get(metadata, "tmdbId", "tmdb_id", "tmdb"), "TMDB ID"),
+        media_type=_media_type(_get(metadata, "mediaType", "media_type", "type")),
         title=title,
         year=year,
         rating=rating,
@@ -256,6 +258,7 @@ def _parse_watchlist_line(line: str) -> WatchlistFilm:
     raw_title = _strip_markdown_link(segments[0])
     title, year = _split_title_year(raw_title)
     interest: float | None = None
+    media_type: MediaType = "movie"
     notes: list[str] = []
     tags: list[str] = []
     dismissed = False
@@ -268,6 +271,8 @@ def _parse_watchlist_line(line: str) -> WatchlistFilm:
             interest = normalize_score(value, scale=10)
         elif separator and normalized_key == "year":
             year = _optional_int(value, "year")
+        elif separator and normalized_key in {"mediatype", "media_type", "type"}:
+            media_type = _media_type(value)
         elif separator and normalized_key in {"note", "notes"}:
             if value:
                 notes.append(value)
@@ -279,6 +284,7 @@ def _parse_watchlist_line(line: str) -> WatchlistFilm:
             notes.append(segment)
 
     return WatchlistFilm(
+        media_type=media_type,
         title=title,
         year=year,
         interest=interest,
@@ -364,6 +370,19 @@ def _optional_date(value: object | None, label: str) -> date | None:
         return date.fromisoformat(str(value).strip())
     except ValueError as error:
         raise ValueError(f"{label} must use YYYY-MM-DD") from error
+
+
+def _media_type(value: object | None) -> MediaType:
+    if value is None or value == "":
+        return "movie"
+    if not isinstance(value, str):
+        raise ValueError("media type must be text")
+    normalized = value.strip().casefold()
+    if normalized in {"movie", "film"}:
+        return "movie"
+    if normalized in {"tv", "series", "serial", "show"}:
+        return "tv"
+    raise ValueError("media type must be movie or tv")
 
 
 def _string_list(value: object | None) -> list[str]:

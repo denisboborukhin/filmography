@@ -172,27 +172,24 @@ def _rationale(
     film: FilmMetadata,
     matches: list[str],
     preference_examples: dict[str, WatchedFilm],
-    catalog_score: float,
+    _catalog_score: float,
 ) -> str:
-    score_text = f"{_tenth_step(catalog_score):g}/10"
     if not matches:
         if film.genres:
             return (
-                f"Catalog-led pick: TMDB audiences rate it {score_text}, and its "
+                "Catalog-led pick with a "
                 f"{_join_labels(film.genres[:2])} profile adds variety to your discoveries."
             )
-        return (
-            f"Catalog-led pick: TMDB audiences rate it {score_text}, making it worth a closer look."
-        )
+        return "Catalog-led pick outside your usual genre signals."
 
     labels = _join_labels(matches[:2])
     examples = _example_titles(matches[:2], preference_examples)
     if examples:
         return (
             f"Personal match for {labels}, a signal from your high-rated {examples}. "
-            f"TMDB audience score: {score_text}."
+            "Use it as a taste-based next step."
         )
-    return f"Personal match for {labels}. TMDB audience score: {score_text}."
+    return f"Personal match for {labels}."
 
 
 def _clamp(value: float) -> float:

@@ -69,4 +69,17 @@ describe('snapshot schema', () => {
 
     expect(() => snapshotSchema.parse(invalid)).toThrow(/watched and watchlist/i)
   })
+
+  it('does not collapse movie and TV records that share a TMDB ID', () => {
+    const valid = structuredClone(snapshotFixture)
+    valid.watchlist[0] = {
+      ...valid.watchlist[0],
+      tmdbId: valid.watched[0].tmdbId,
+      mediaType: 'tv',
+      title: valid.watched[0].title,
+      year: valid.watched[0].year,
+    }
+
+    expect(snapshotSchema.parse(valid).watchlist[0].mediaType).toBe('tv')
+  })
 })

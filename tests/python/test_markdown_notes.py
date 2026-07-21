@@ -136,6 +136,18 @@ Draft review.
         parse_review_note(note)
 
 
+def test_review_accepts_explicit_series_media_type(tmp_path: Path) -> None:
+    note = _write(
+        tmp_path / "Ted Lasso.md",
+        "---\nrating: 8.4\nmediaType: tv\n---\nWarm and sharp.",
+    )
+
+    film = parse_review_note(note)
+
+    assert film.media_type == "tv"
+    assert film.title == "Ted Lasso"
+
+
 def test_review_rejects_missing_rating_and_malformed_frontmatter(tmp_path: Path) -> None:
     missing = _write(tmp_path / "Missing.md", "A review without metadata")
     malformed = _write(tmp_path / "Malformed.md", "---\nrating: [\n---\nBody")
@@ -176,13 +188,20 @@ title: Future films
 2. [[Persona (1966)]] | interest: 8 | quiet evening
 Moonlight (2016)
 Dismiss Me (2000) — dismissed: yes
+Ted Lasso — type: series
 """,
     )
 
     films, diagnostics = parse_watchlist_note(note)
 
     assert diagnostics == []
-    assert [film.title for film in films] == ["Dune", "Persona", "Moonlight", "Dismiss Me"]
+    assert [film.title for film in films] == [
+        "Dune",
+        "Persona",
+        "Moonlight",
+        "Dismiss Me",
+        "Ted Lasso",
+    ]
     assert films[0].year == 2021
     assert films[0].interest == 9.5
     assert films[0].notes == "See on a large screen"
@@ -191,6 +210,7 @@ Dismiss Me (2000) — dismissed: yes
     assert films[1].notes == "quiet evening"
     assert films[2].interest is None
     assert films[3].dismissed is True
+    assert films[4].media_type == "tv"
 
 
 def test_watchlist_accepts_plain_title_lines_in_multiple_languages(tmp_path: Path) -> None:

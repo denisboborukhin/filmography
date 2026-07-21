@@ -75,7 +75,7 @@ export function WatchlistView({ films }: WatchlistViewProps) {
       {visibleFilms.length > 0 ? (
         <div className="watchlist-grid">
           {visibleFilms.map((film) => (
-            <WatchlistCard film={film} key={`${film.tmdbId ?? film.title}-${film.year}`} />
+            <WatchlistCard film={film} key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`} />
           ))}
         </div>
       ) : (

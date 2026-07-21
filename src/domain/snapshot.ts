@@ -23,6 +23,7 @@ const stringListSchema = z
 export const filmSchema = z
   .object({
     tmdbId: z.number().int().positive().nullable(),
+    mediaType: z.enum(['movie', 'tv']).default('movie'),
     title: z.string().trim().min(1),
     originalTitle: nullableTextSchema,
     year: yearSchema,
@@ -88,6 +89,7 @@ export const recommendationSchema = filmSchema
 
 interface FilmIdentityInput {
   tmdbId: number | null
+  mediaType: 'movie' | 'tv'
   title: string
   year: number | null
 }
@@ -101,6 +103,7 @@ function normalizedTitle(title: string): string {
 }
 
 function filmsMatch(left: FilmIdentityInput, right: FilmIdentityInput): boolean {
+  if (left.mediaType !== right.mediaType) return false
   const catalogMatch =
     left.tmdbId !== null && right.tmdbId !== null && left.tmdbId === right.tmdbId
   const titleMatch =

@@ -25,6 +25,14 @@ def test_release_date_supplies_year_without_assignment_recursion() -> None:
     assert film.year == 2016
 
 
+def test_media_type_defaults_to_movie_and_separates_catalog_namespaces() -> None:
+    movie = WatchedFilm(tmdb_id=1, title="Shared ID", rating=8)
+    series = WatchlistFilm(tmdb_id=1, media_type="tv", title="Shared ID")
+
+    assert movie.media_type == "movie"
+    Snapshot(generated_at=datetime(2026, 7, 20, tzinfo=UTC), watched=[movie], watchlist=[series])
+
+
 @pytest.mark.parametrize(
     "source_url",
     ["/Users/person/private-review.md", "file:///private/review.md", "https://token@example.test"],
@@ -54,6 +62,16 @@ def test_recommendation_source_metadata_is_consistent() -> None:
             predicted_rating=8,
             rationale="Because",
             source="ai",
+            generated_at=generated_at,
+        )
+    with pytest.raises(ValidationError, match="recommendations must be movies"):
+        Recommendation(
+            tmdb_id=3,
+            media_type="tv",
+            title="Series",
+            predicted_rating=8,
+            rationale="Because",
+            source="deterministic",
             generated_at=generated_at,
         )
 

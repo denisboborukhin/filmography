@@ -38,7 +38,11 @@ export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProp
         </div>
         <div>
           <h3>{discovery.title}</h3>
-          <FilmMeta genres={discovery.genres} year={discovery.year} />
+          <FilmMeta
+            genres={discovery.genres}
+            mediaType={discovery.mediaType}
+            year={discovery.year}
+          />
         </div>
         <p className="discovery-card__reason">{discovery.rationale}</p>
         {featured && discovery.overview ? (
