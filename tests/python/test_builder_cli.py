@@ -134,6 +134,49 @@ def test_successful_local_recommendation_run_records_generation_time(tmp_path: P
     assert snapshot.recommendations_generated_at == now
 
 
+def test_watchlist_without_year_enriches_with_popular_catalog_match(tmp_path: Path) -> None:
+    reviews = tmp_path / "reviews"
+    reviews.mkdir()
+    watchlist = tmp_path / "Watchlist.md"
+    watchlist.write_text("Меню\n", encoding="utf-8")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/3/genre/movie/list":
+            return httpx.Response(200, json={"genres": []})
+        return httpx.Response(
+            200,
+            json={
+                "results": [
+                    {
+                        "id": 1,
+                        "title": "Menu",
+                        "release_date": "2012-01-01",
+                        "popularity": 10,
+                    },
+                    {
+                        "id": 593643,
+                        "title": "The Menu",
+                        "release_date": "2022-11-17",
+                        "popularity": 90,
+                    },
+                ]
+            },
+        )
+
+    http_client = httpx.Client(
+        base_url="https://catalog.test/3/",
+        transport=httpx.MockTransport(handler),
+    )
+    catalog = TMDBClient("token", tmp_path / "cache", http_client=http_client)
+    try:
+        snapshot = build_snapshot(reviews, watchlist, catalog=catalog).snapshot
+    finally:
+        http_client.close()
+
+    assert snapshot.watchlist[0].title == "The Menu"
+    assert snapshot.watchlist[0].tmdb_id == 593643
+
+
 def test_snapshot_write_is_atomic_round_trip_and_contains_no_credentials(tmp_path: Path) -> None:
     path = tmp_path / "public" / "data" / "filmography.json"
     snapshot = _previous_snapshot()

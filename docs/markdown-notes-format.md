@@ -88,8 +88,10 @@ This avoids guessing about ambiguous values: bare `rating: 5` means five out of 
 
 Matching compares both `tmdbId` and normalized title/year. A missing year is treated as unknown and
 therefore overlaps the same title with a known year; two different known years can represent distinct
-remakes. Catalog enrichment reports ambiguous and unresolved matches instead of selecting silently.
-Mixed records where only one note has a TMDB ID are still detected as duplicates.
+remakes. For translated titles, a single same-year TMDB candidate is accepted even when TMDB returns
+the English catalog title. Duplicate exact candidates are resolved only when one result has a unique
+popularity lead; popularity ties remain ambiguous. Mixed records where only one note has a TMDB ID
+are still detected as duplicates.
 
 ## Watchlist note
 
@@ -136,7 +138,9 @@ they do not change film status. Wiki-style links use their link target as the ti
 Markdown links use their visible label.
 
 Use a year or a TMDB-backed review entry whenever remakes share a title. Repeated watchlist entries,
-and films already present in the watched collection, are validation errors.
+and films already present in the watched collection, are validation errors. When a watchlist entry has
+no year, catalog enrichment picks the most popular unique TMDB candidate; if popularity cannot break a
+tie, the entry stays unresolved and is reported as a warning.
 
 ## Validation workflow
 

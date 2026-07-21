@@ -197,7 +197,7 @@ def _enrich_watchlist(
     catalog: TMDBClient,
     diagnostics: list[Diagnostic],
 ) -> WatchlistFilm:
-    metadata = _catalog_metadata(film, catalog, diagnostics)
+    metadata = _catalog_metadata(film, catalog, diagnostics, allow_popular_without_year=True)
     if metadata is None:
         return film
     return WatchlistFilm(
@@ -213,11 +213,17 @@ def _catalog_metadata(
     film: FilmMetadata,
     catalog: TMDBClient,
     diagnostics: list[Diagnostic],
+    *,
+    allow_popular_without_year: bool = False,
 ) -> FilmMetadata | None:
     try:
         if film.tmdb_id is not None:
             return catalog.get_movie(film.tmdb_id)
-        match = catalog.match_movie(film.title, film.year)
+        match = catalog.match_movie(
+            film.title,
+            film.year,
+            allow_popular_without_year=allow_popular_without_year,
+        )
     except CatalogError as error:
         diagnostics.append(
             Diagnostic("warning", "catalog-request-failed", f"{film.title}: {error}")

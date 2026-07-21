@@ -16,6 +16,7 @@ def _movie(
     *,
     original_title: str | None = None,
     genre_ids: list[int] | None = None,
+    popularity: float = 42.0,
 ) -> dict[str, object]:
     return {
         "id": tmdb_id,
@@ -25,7 +26,7 @@ def _movie(
         "poster_path": f"/{tmdb_id}.jpg",
         "overview": f"Overview for {title}",
         "vote_average": 8.1,
-        "popularity": 42.0,
+        "popularity": popularity,
         **({"genre_ids": genre_ids} if genre_ids is not None else {}),
     }
 
@@ -86,6 +87,69 @@ def test_reports_ambiguous_and_unresolved_matches(tmp_path: Path) -> None:
     assert len(ambiguous.candidates) == 2
     assert unresolved.status == "unresolved"
     assert unresolved.film is None
+
+
+def test_matches_localized_same_year_candidate_without_title_equality(tmp_path: Path) -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"results": [_movie(70160, "The Hunger Games", 2012)]})
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        match = catalog.match_movie("Голодные игры", 2012)
+    finally:
+        http_client.close()
+
+    assert match.status == "matched"
+    assert match.film is not None
+    assert match.film.title == "The Hunger Games"
+
+
+def test_picks_unique_popularity_winner_for_duplicate_exact_matches(tmp_path: Path) -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "results": [
+                    _movie(274479, "Joy", 2015, popularity=80),
+                    _movie(111, "Joy", 2015, popularity=5),
+                ]
+            },
+        )
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        match = catalog.match_movie("Joy", 2015)
+    finally:
+        http_client.close()
+
+    assert match.status == "matched"
+    assert match.film is not None
+    assert match.film.tmdb_id == 274479
+
+
+def test_yearless_popularity_fallback_is_explicit(tmp_path: Path) -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "results": [
+                    _movie(1, "Menu", 2012, popularity=10),
+                    _movie(593643, "The Menu", 2022, popularity=90),
+                ]
+            },
+        )
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        conservative = catalog.match_movie("Меню")
+        popular = catalog.match_movie("Меню", allow_popular_without_year=True)
+    finally:
+        http_client.close()
+
+    assert conservative.status == "unresolved"
+    assert popular.status == "matched"
+    assert popular.film is not None
+    assert popular.film.tmdb_id == 593643
 
 
 def test_fetches_details_and_maps_catalog_metadata(tmp_path: Path) -> None:

@@ -81,8 +81,14 @@ class TMDBClient:
         )
         return self._film_from_payload(payload)
 
-    def match_movie(self, title: str, year: int | None = None) -> CatalogMatch:
-        """Return only an exact, unique title/year match; never pick by popularity."""
+    def match_movie(
+        self,
+        title: str,
+        year: int | None = None,
+        *,
+        allow_popular_without_year: bool = False,
+    ) -> CatalogMatch:
+        """Match a title conservatively, with explicit fallbacks for localized catalog results."""
 
         params: dict[str, str | int] = {"query": title, "include_adult": "false", "page": 1}
         if year is not None:
@@ -112,7 +118,23 @@ class TMDBClient:
         if len(exact) == 1:
             return CatalogMatch("matched", exact[0], exact)
         if len(exact) > 1:
+            popular = _unique_popularity_winner(exact)
+            if popular is not None:
+                return CatalogMatch("matched", popular, exact)
             return CatalogMatch("ambiguous", None, exact)
+        if year is not None and _contains_non_ascii(title):
+            same_year = tuple(film for film in candidates if film.year == year)
+            if len(same_year) == 1:
+                return CatalogMatch("matched", same_year[0], same_year)
+            if len(same_year) > 1:
+                popular = _unique_popularity_winner(same_year)
+                if popular is not None:
+                    return CatalogMatch("matched", popular, same_year)
+                return CatalogMatch("ambiguous", None, same_year)
+        if year is None and allow_popular_without_year and candidates:
+            popular = _unique_popularity_winner(candidates)
+            if popular is not None:
+                return CatalogMatch("matched", popular, candidates)
         return CatalogMatch("unresolved", None, candidates[:5])
 
     def discover_movies(
@@ -326,6 +348,23 @@ def _optional_float(value: object) -> float | None:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
     return float(value)
+
+
+def _unique_popularity_winner(candidates: tuple[FilmMetadata, ...]) -> FilmMetadata | None:
+    scored = [
+        (candidate.popularity if candidate.popularity is not None else 0.0, candidate)
+        for candidate in candidates
+    ]
+    if not scored:
+        return None
+    ranked = sorted(scored, key=lambda item: item[0], reverse=True)
+    if len(ranked) > 1 and ranked[0][0] == ranked[1][0]:
+        return None
+    return ranked[0][1]
+
+
+def _contains_non_ascii(value: str) -> bool:
+    return any(ord(character) > 127 for character in value)
 
 
 def _parse_release_date(value: object) -> date | None:
