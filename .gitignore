@@ -1,5 +1,6 @@
 node_modules/
 dist/
+tasks/
 .vite/
 .coverage
 .pytest_cache/

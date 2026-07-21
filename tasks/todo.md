@@ -67,3 +67,22 @@ Verification completed:
 - Focused Markdown importer tests passed.
 - `make check test` passed: TypeScript, ESLint, Ruff, Pyright, Vitest, and Pytest.
 - `VITE_BASE_PATH=/filmography/ npm run build` passed.
+
+# AI provider error handling
+
+- [x] Make OpenAI 429 failures actionable.
+- [x] Keep API keys out of provider error messages.
+- [x] Verify failed AI calls preserve the previous recommendation set.
+- [x] Run focused and full verification.
+
+## Review
+
+Improved AI HTTP error handling so OpenAI 429 responses explain rate limits/quota and suggest
+concrete local actions. Authentication, access, and provider server failures also now produce
+sanitized messages without API keys.
+
+Verification completed:
+
+- Focused AI and CLI preservation tests passed.
+- `make check test` passed: TypeScript, ESLint, Ruff, Pyright, Vitest, and Pytest.
+- `VITE_BASE_PATH=/filmography/ npm run build` passed.

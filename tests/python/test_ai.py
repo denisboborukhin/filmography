@@ -119,6 +119,8 @@ def test_ai_client_wraps_http_failures_without_leaking_key() -> None:
         http_client.close()
 
     assert "super-secret" not in str(raised.value)
+    assert "429 Too Many Requests" in str(raised.value)
+    assert "--count" in str(raised.value)
 
 
 def test_resolver_verifies_tmdb_and_excludes_seen_ambiguous_and_duplicate_films(

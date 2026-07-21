@@ -158,6 +158,8 @@ class OpenAICompatibleClient:
         try:
             response = self._client.post("chat/completions", json=request_body)
             response.raise_for_status()
+        except httpx.HTTPStatusError as error:
+            raise AIError(_http_error_message(error.response)) from error
         except httpx.HTTPError as error:
             raise AIError(f"AI recommendation request failed: {error}") from error
         payload = _json_object(response.text)
@@ -251,3 +253,23 @@ def _extract_message_content(payload: dict[str, object]) -> str:
     if not isinstance(content, str) or not content.strip():
         raise AIError("AI provider message has no textual content")
     return content
+
+
+def _http_error_message(response: httpx.Response) -> str:
+    status = response.status_code
+    if status == 401:
+        return "AI recommendation request failed: OpenAI rejected the API key (401 Unauthorized)"
+    if status == 403:
+        return (
+            "AI recommendation request failed: OpenAI account or project lacks access "
+            "(403 Forbidden)"
+        )
+    if status == 429:
+        return (
+            "AI recommendation request failed: OpenAI rate limit or quota exceeded "
+            "(429 Too Many Requests). Try again later, lower --count, use a smaller model, "
+            "or check project billing/usage limits."
+        )
+    if 500 <= status < 600:
+        return f"AI recommendation request failed: provider server error ({status})"
+    return f"AI recommendation request failed: provider returned HTTP {status}"
