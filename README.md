@@ -90,9 +90,10 @@ the `response_format` request field.
 
 ## Markdown notes input
 
-Each watched film is one Markdown file in the reviews directory. The note body is the public review;
-supported YAML frontmatter supplies title, year, score, watched date, tags, and an optional TMDB ID.
-The watchlist is one Markdown note with one film per bullet or non-empty plain line.
+Each watched film is one Markdown file in the reviews directory. The filename can be the title, such
+as `Menu.md`, or title plus year, such as `Perfect Days (2023).md`. The note body is the public
+review; supported YAML frontmatter supplies score, watched date, categories/tags, and optional TMDB
+fields. The watchlist can be a simple plain-text list with one film title per line.
 
 See [Markdown notes input format](docs/markdown-notes-format.md) for the exact fields, examples,
 score rules, and duplicate handling.

@@ -154,7 +154,7 @@ def parse_review_note(path: Path) -> WatchedFilm:
         watched_at=_optional_date(
             _get(metadata, "watchedAt", "watched_at", "watched", "date"), "watched date"
         ),
-        tags=_string_list(_get(metadata, "tags", "genres")),
+        tags=_string_list(_get(metadata, "tags", "genres", "categories")),
         review=body.strip(),
         source_url=_optional_string(_get(metadata, "sourceUrl", "source_url", "source")),
     )
@@ -378,7 +378,12 @@ def _string_list(value: object | None) -> list[str]:
         raw_values = cast(list[str], values)
     else:
         raise ValueError("tags must be text or a list of text values")
-    return [item.removeprefix("#").strip() for item in raw_values if item.strip()]
+    normalized: list[str] = []
+    for item in raw_values:
+        tag = _strip_markdown_link(item.strip()).removeprefix("#").strip()
+        if tag:
+            normalized.append(tag)
+    return normalized
 
 
 def _optional_string(value: object | None) -> str | None:

@@ -93,6 +93,49 @@ Still precise.
     assert film.source_url == "https://example.test/review"
 
 
+def test_review_supports_filename_title_date_and_categories_template(tmp_path: Path) -> None:
+    note = _write(
+        tmp_path / "Menu.md",
+        """---
+date: "2026-07-21"
+categories:
+- "[[films resumes]]"
+- "#satire"
+rating: 8.5
+---
+
+Sharp social pressure in a compact thriller wrapper.
+""",
+    )
+
+    film = parse_review_note(note)
+
+    assert film.title == "Menu"
+    assert film.year is None
+    assert film.rating == 8.5
+    assert film.watched_at is not None and film.watched_at.isoformat() == "2026-07-21"
+    assert film.tags == ["films resumes", "satire"]
+    assert film.review == "Sharp social pressure in a compact thriller wrapper."
+
+
+def test_review_template_with_empty_rating_is_invalid_until_scored(tmp_path: Path) -> None:
+    note = _write(
+        tmp_path / "Unrated.md",
+        """---
+date: "2026-07-21"
+categories:
+- "[[films resumes]]"
+rating:
+---
+
+Draft review.
+""",
+    )
+
+    with pytest.raises(ValueError, match="missing required rating"):
+        parse_review_note(note)
+
+
 def test_review_rejects_missing_rating_and_malformed_frontmatter(tmp_path: Path) -> None:
     missing = _write(tmp_path / "Missing.md", "A review without metadata")
     malformed = _write(tmp_path / "Malformed.md", "---\nrating: [\n---\nBody")
@@ -148,6 +191,30 @@ Dismiss Me (2000) — dismissed: yes
     assert films[1].notes == "quiet evening"
     assert films[2].interest is None
     assert films[3].dismissed is True
+
+
+def test_watchlist_accepts_plain_title_lines_in_multiple_languages(tmp_path: Path) -> None:
+    note = _write(
+        tmp_path / "Watchlist.md",
+        """В диких условиях
+Меню
+Dumb money
+Ted lesso
+Social dilema
+""",  # noqa: RUF001
+    )
+
+    films, diagnostics = parse_watchlist_note(note)
+
+    assert diagnostics == []
+    assert [film.title for film in films] == [
+        "В диких условиях",  # noqa: RUF001
+        "Меню",
+        "Dumb money",
+        "Ted lesso",
+        "Social dilema",
+    ]
+    assert all(film.year is None and film.interest is None for film in films)
 
 
 def test_watchlist_reports_bad_lines_and_duplicates_without_stopping(tmp_path: Path) -> None:

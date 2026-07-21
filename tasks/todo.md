@@ -47,3 +47,23 @@ Verification completed:
 - Frontend snapshot schema tests passed.
 - `make check test` passed: TypeScript, ESLint, Ruff, Pyright, Vitest, and Pytest.
 - `VITE_BASE_PATH=/filmography/ npm run build` passed.
+
+# Personal Markdown format support
+
+- [x] Support review `categories` frontmatter as public tags.
+- [x] Normalize wiki-style category links into plain tag text.
+- [x] Document filename-based reviews and plain-title watchlists as first-class formats.
+- [x] Add tests for the user's review template and plain watchlist.
+- [x] Run focused and full verification.
+
+## Review
+
+Added first-class support for the user's current Markdown format. Review notes can use filename
+titles, `date`, `categories`, and `rating`; category wiki links and hash tags normalize into public
+tags. Plain watchlist files with one title per line are supported and documented.
+
+Verification completed:
+
+- Focused Markdown importer tests passed.
+- `make check test` passed: TypeScript, ESLint, Ruff, Pyright, Vitest, and Pytest.
+- `VITE_BASE_PATH=/filmography/ npm run build` passed.

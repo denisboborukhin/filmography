@@ -10,6 +10,25 @@ The filename is the title fallback. A note may start with YAML frontmatter delim
 text after frontmatter becomes the public Markdown review; leading and trailing whitespace is
 trimmed.
 
+Minimal review note:
+
+```markdown
+---
+date: "2026-07-21"
+categories:
+- "[[films resumes]]"
+rating: 8.5
+---
+
+Your review text.
+```
+
+With that format, the film title comes from the filename, for example `Menu.md` or
+`Perfect Days (2023).md`. The release year is optional in the filename, and TMDB can fill public
+catalog metadata during `build` or `recommend`.
+
+More explicit review note:
+
 ```markdown
 ---
 title: Perfect Days
@@ -41,14 +60,16 @@ Supported fields:
 | `ratingScale` | `5` or `10` | No | Makes an otherwise ambiguous numeric score explicit; aliases: `rating_scale`, `scale`. |
 | `watchedAt` | `YYYY-MM-DD` | No | Date watched. |
 | `tags` | YAML list or strings | No | Personal taste signals. Markdown `#tags` in prose remain prose. |
+| `categories` | YAML list or strings | No | Alias for tags; wiki-style links such as `[[films resumes]]` become plain text. |
 | `tmdbId` | positive integer | No | Canonical TMDB movie ID; avoids title matching. |
 | `sourceUrl` | URL | No | Optional public reference; aliases: `source_url`, `source`. |
 
 The parser also accepts `film` or `movie` for title, `watched`, `date`, or `watched_at` for the watched
-date, `genres` for tags, and `tmdb` or `tmdb_id` for the catalog ID. Tags may be a YAML list or a
-comma/space-separated string; leading `#` characters are removed. Unknown frontmatter is not copied.
-`sourceUrl` must be an absolute HTTP(S) URL without embedded credentials, so local paths and `file:`
-URLs are rejected. When `title` is absent, the filename still becomes the public title.
+date, `genres` for tags, and `tmdb` or `tmdb_id` for the catalog ID. Tags and categories may be a YAML
+list or a comma/space-separated string; leading `#` characters and wiki-style link wrappers are
+removed. Unknown frontmatter is not copied. `sourceUrl` must be an absolute HTTP(S) URL without
+embedded credentials, so local paths and `file:` URLs are rejected. When `title` is absent, the
+filename still becomes the public title.
 
 ### Score rules
 
@@ -73,7 +94,19 @@ Mixed records where only one note has a TMDB ID are still detected as duplicates
 ## Watchlist note
 
 Every Markdown bullet, numbered-list item, or non-empty plain line represents one film. Headings,
-blank lines, and lines beginning with an HTML comment are ignored. The canonical form is:
+blank lines, and lines beginning with an HTML comment are ignored.
+
+Plain-title lists are valid:
+
+```markdown
+В диких условиях
+Меню
+Dumb money
+Ted lesso
+Social dilema
+```
+
+Optional structured lines are also valid:
 
 ```markdown
 # Watchlist
