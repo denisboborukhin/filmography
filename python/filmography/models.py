@@ -30,6 +30,38 @@ class PublicModel(BaseModel):
     )
 
 
+class PersonCredit(PublicModel):
+    """A public TMDB person reference attached to a watched title."""
+
+    tmdb_id: PositiveId
+    name: str = Field(min_length=1)
+    profile_url: str | None = None
+    role: str | None = None
+
+    @field_validator("profile_url", "role", mode="after")
+    @classmethod
+    def empty_optional_string_is_none(cls, value: str | None) -> str | None:
+        return value or None
+
+
+class FilmCredits(PublicModel):
+    """People used to derive the public personal taste profile."""
+
+    cast: list[PersonCredit] = Field(default_factory=lambda: list[PersonCredit]())
+    filmmaker: PersonCredit | None = None
+
+    @field_validator("cast", mode="after")
+    @classmethod
+    def unique_cast(cls, values: list[PersonCredit]) -> list[PersonCredit]:
+        result: list[PersonCredit] = []
+        seen: set[int] = set()
+        for person in values:
+            if person.tmdb_id not in seen:
+                seen.add(person.tmdb_id)
+                result.append(person)
+        return result
+
+
 class FilmMetadata(PublicModel):
     """Catalog metadata embedded into all public film records."""
 
@@ -70,6 +102,7 @@ class WatchedFilm(FilmMetadata):
     tags: list[str] = Field(default_factory=list)
     review: str = ""
     source_url: str | None = None
+    credits: FilmCredits = Field(default_factory=FilmCredits)
 
     @field_validator("tags", mode="after")
     @classmethod

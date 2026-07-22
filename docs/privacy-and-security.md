@@ -11,7 +11,7 @@ repository.
 | Review text, rating, tags, watched date, optional public source URL | Local updater and generated snapshot | Yes |
 | Watchlist title, interest, note, tags, dismissed state | Local updater and generated snapshot | Yes |
 | Recommendation title, score, rationale, model name, date | Generated snapshot | Yes |
-| TMDB IDs, metadata, and poster URLs | TMDB request and generated snapshot | Yes |
+| TMDB IDs, metadata, poster URLs, and watched-title people credits | TMDB request and generated snapshot | Yes |
 | Local notes path and source file path | Local updater only | No |
 | TMDB token | Local updater process only | No |
 | AI key and endpoint credentials | Local updater process only | No |
@@ -21,6 +21,12 @@ The static site makes no runtime calls to TMDB or an AI provider. Poster images 
 visitor's browser from the public image host recorded in the snapshot and may reveal the visitor's IP
 address to that host. When review frontmatter has no title, the source filename stem is intentionally
 published as the film title even though the file path itself is not included.
+
+The generated snapshot publishes the TMDB IDs, names, profile image URLs, and credited roles of the
+principal cast and one lead filmmaker attached to each watched title. The director is preferred;
+the most important producer credit is used only as a fallback. Favorite-person rankings and
+the relationship map are calculated in the browser from this already-public snapshot; they do not
+send personal scores or browsing behavior to another service.
 
 ## What leaves the computer
 

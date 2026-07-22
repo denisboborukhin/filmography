@@ -1058,6 +1058,307 @@ h3 {
   padding-top: 1rem;
 }
 
+.favorite-people-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.favorite-people-group {
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.favorite-people-group h3 {
+  padding-bottom: 0.85rem;
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.favorite-people-group ol {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.favorite-people-group li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.favorite-people-group li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.favorite-people-group a {
+  font-size: 0.82rem;
+  font-weight: 720;
+  text-decoration: none;
+}
+
+.favorite-people-group a:hover {
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.favorite-people-group li span,
+.favorite-people-group > p {
+  color: var(--ink-soft);
+  font-size: 0.67rem;
+  white-space: nowrap;
+}
+
+.favorite-people-group > p {
+  margin: 1rem 0 0;
+  white-space: normal;
+}
+
+.taste-network-intro {
+  max-width: 47rem;
+  margin: -0.5rem 0 1.25rem;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.taste-network {
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.taste-network__toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.taste-network__filters {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.5rem;
+}
+
+.role-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.network-range-filters {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.network-range-filters label {
+  display: grid;
+  flex: 1 1 11rem;
+  gap: 0.35rem;
+  max-width: 15rem;
+}
+
+.network-range-filters label span {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  color: var(--ink-soft);
+  font-size: 0.61rem;
+  font-weight: 720;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.network-range-filters label strong {
+  color: var(--ink);
+  font-size: 0.68rem;
+}
+
+.network-range-filters input {
+  width: 100%;
+  accent-color: var(--accent-dark);
+  cursor: pointer;
+}
+
+.taste-network__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.taste-network__actions > span {
+  color: var(--ink-soft);
+  font-size: 0.67rem;
+  white-space: nowrap;
+}
+
+.role-filters button,
+.network-reset {
+  min-height: 2rem;
+  padding: 0.4rem 0.65rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  font-size: 0.69rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.role-filters button[aria-pressed="true"] {
+  color: white;
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+.network-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink-soft);
+}
+
+.role-filters button:hover,
+.network-reset:hover {
+  border-color: var(--accent);
+}
+
+.taste-network__canvas {
+  overflow: auto;
+  background: #f8f5ef;
+}
+
+.taste-network__canvas svg {
+  display: block;
+  width: 100%;
+  min-width: 48rem;
+  min-height: 34rem;
+  touch-action: none;
+}
+
+.network-link {
+  stroke: #bfb8ac;
+  stroke-opacity: 0.72;
+  stroke-width: 1.2;
+}
+
+.network-link--filmmaker {
+  stroke: var(--accent);
+}
+
+.network-node {
+  color: var(--ink-soft);
+  cursor: grab;
+  outline: none;
+}
+
+.network-node:active {
+  cursor: grabbing;
+}
+
+.network-node circle {
+  fill: var(--surface);
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.network-node--film {
+  color: var(--accent-dark);
+}
+
+.network-node--film circle {
+  fill: var(--accent-wash);
+  stroke-width: 3;
+}
+
+.network-node--selected circle,
+.network-node:focus-visible circle {
+  fill: var(--green-wash);
+  stroke: var(--green);
+  stroke-width: 4;
+}
+
+.network-node text {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 650;
+  pointer-events: none;
+  user-select: none;
+}
+
+.network-node--film text {
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.network-selection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.2rem;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.network-selection div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.network-selection span {
+  color: var(--ink-soft);
+  font-size: 0.6rem;
+  font-weight: 740;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.network-selection strong {
+  font-size: 0.87rem;
+}
+
+.network-selection a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--accent-dark);
+  font-size: 0.72rem;
+  font-weight: 720;
+  text-decoration: none;
+}
+
+.network-selection p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+}
+
+.taste-network__empty {
+  min-height: 12rem;
+  padding: 4rem 2rem;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px dashed var(--line);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -1261,7 +1562,7 @@ h3 {
     left: 0;
     z-index: 40;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 0;
     width: 100%;
     min-height: 4rem;
@@ -1343,6 +1644,10 @@ h3 {
 
   .site-footer {
     align-items: start;
+  }
+
+  .favorite-people-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1503,6 +1808,25 @@ h3 {
   .loading-state,
   .error-state {
     padding: 2.2rem 1.4rem;
+  }
+
+  .taste-network__toolbar,
+  .network-selection {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .taste-network__actions {
+    justify-content: space-between;
+  }
+
+  .network-range-filters label {
+    max-width: none;
+  }
+
+  .network-reset,
+  .network-selection a {
+    width: max-content;
   }
 }
 

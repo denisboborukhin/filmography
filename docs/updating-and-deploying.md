@@ -20,6 +20,11 @@ export TMDB_ACCESS_TOKEN="your-tmdb-read-access-token"
 uv run filmography build --reviews "/path/to/Reviews" --watchlist "/path/to/Watchlist.md"
 ```
 
+With TMDB configured, the same build refreshes principal cast and one lead filmmaker for watched
+titles. The director is preferred, with a producer used only as fallback. These credits power the
+static Taste map. A credits lookup failure is a warning: the film
+metadata is still written and the previous successful credits are retained when available.
+
 For a new AI discovery set, also configure the provider and run:
 
 ```bash
@@ -62,7 +67,8 @@ commit:
    ```
 
 4. Confirm recommendation rationales reveal no private detail from the source reviews.
-5. Run the full verification suite and inspect the production site locally.
+5. Confirm the published cast and lead-filmmaker credits are acceptable.
+6. Run the full verification suite and inspect the production site locally.
 
    ```bash
    make check

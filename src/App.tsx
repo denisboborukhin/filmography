@@ -6,6 +6,7 @@ import {
   Compass,
   Eye,
   RefreshCw,
+  Share2,
   WifiOff,
   type LucideProps,
 } from 'lucide-react'
@@ -15,12 +16,14 @@ import { DashboardView } from './views/DashboardView'
 import { DiscoveriesView } from './views/DiscoveriesView'
 import { WatchedView } from './views/WatchedView'
 import { WatchlistView } from './views/WatchlistView'
+import { TasteView } from './views/TasteView'
 
 const navigation = [
   { id: 'dashboard', label: 'Journal', icon: Clapperboard },
   { id: 'watched', label: 'Watched', icon: Eye },
   { id: 'watchlist', label: 'Watchlist', icon: Bookmark },
   { id: 'discoveries', label: 'Discoveries', icon: Compass },
+  { id: 'taste', label: 'Taste map', icon: Share2 },
 ] as const satisfies readonly { id: string; label: string; icon: ComponentType<LucideProps> }[]
 type View = (typeof navigation)[number]['id']
 const views = new Set<string>(navigation.map((item) => item.id))
@@ -109,6 +112,7 @@ export function App() {
         />
       )
     }
+    if (view === 'taste') return <TasteView films={snapshot.watched} />
     return <DashboardView snapshot={snapshot} />
   })()
 

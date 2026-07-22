@@ -7,7 +7,14 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from filmography.models import Recommendation, Snapshot, WatchedFilm, WatchlistFilm
+from filmography.models import (
+    FilmCredits,
+    PersonCredit,
+    Recommendation,
+    Snapshot,
+    WatchedFilm,
+    WatchlistFilm,
+)
 from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import ValidationError
 
@@ -32,6 +39,14 @@ def test_media_type_defaults_to_movie_and_separates_catalog_namespaces() -> None
 
     assert movie.media_type == "movie"
     Snapshot(generated_at=datetime(2026, 7, 20, tzinfo=UTC), watched=[movie], watchlist=[series])
+
+
+def test_credits_deduplicate_people_within_each_role() -> None:
+    person = PersonCredit(tmdb_id=1, name="Person")
+    credits = FilmCredits(cast=[person, person.model_copy()], filmmaker=person)
+
+    assert credits.cast == [person]
+    assert credits.filmmaker == person
 
 
 @pytest.mark.parametrize(
@@ -199,6 +214,10 @@ def test_snapshot_serializes_stable_camel_case_contract() -> None:
         "aiDiscoveries",
     }
     assert payload["watched"][0]["tmdbId"] is None  # type: ignore[index]
+    assert payload["watched"][0]["credits"] == {  # type: ignore[index]
+        "cast": [],
+        "filmmaker": None,
+    }
 
 
 def test_static_schema_describes_the_runtime_contract() -> None:
@@ -227,6 +246,27 @@ def test_static_schema_describes_the_runtime_contract() -> None:
     ).model_dump(mode="json", by_alias=True)
     invalid["watched"][0]["rating"] = 9.25  # type: ignore[index]
     assert any(validator.iter_errors(invalid))  # pyright: ignore[reportUnknownMemberType]
+
+
+def test_snapshots_without_credits_remain_backward_compatible() -> None:
+    root = Path(__file__).parents[2]
+    snapshot = Snapshot(
+        generated_at=datetime(2026, 7, 20, tzinfo=UTC),
+        watched=[WatchedFilm(title="Legacy film", rating=8)],
+    ).model_dump(mode="json", by_alias=True)
+    del snapshot["watched"][0]["credits"]  # type: ignore[index]
+
+    parsed = Snapshot.model_validate(snapshot)
+    assert parsed.watched[0].credits == FilmCredits()
+
+    schema_value: object = json.loads(
+        (root / "schemas" / "snapshot.schema.json").read_text(encoding="utf-8")
+    )
+    assert isinstance(schema_value, dict)
+    Draft202012Validator(
+        cast(dict[str, object], schema_value),
+        format_checker=FormatChecker(),
+    ).validate(snapshot)  # pyright: ignore[reportUnknownMemberType]
 
 
 def test_demo_snapshot_satisfies_python_and_static_json_schemas() -> None:

@@ -283,6 +283,90 @@ def test_fetches_details_and_maps_catalog_metadata(tmp_path: Path) -> None:
     assert film.poster_url == "https://image.tmdb.org/t/p/w780/603.jpg"
 
 
+def test_fetches_principal_cast_and_prefers_director_as_lead_filmmaker(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/3/movie/603/credits"
+        return httpx.Response(
+            200,
+            json={
+                "cast": [
+                    {
+                        "id": 1,
+                        "name": "Lead Actor",
+                        "character": "The Lead",
+                        "profile_path": "/actor.jpg",
+                    }
+                ],
+                "crew": [
+                    {
+                        "id": 2,
+                        "name": "Film Director",
+                        "job": "Director",
+                        "department": "Directing",
+                        "profile_path": None,
+                    },
+                    {
+                        "id": 3,
+                        "name": "Film Producer",
+                        "job": "Executive Producer",
+                        "department": "Production",
+                        "profile_path": "/producer.jpg",
+                    },
+                    {
+                        "id": 4,
+                        "name": "Visual Effects Producer",
+                        "job": "VFX Producer",
+                        "department": "Visual Effects",
+                    },
+                ],
+            },
+        )
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        credits = catalog.get_credits(603, "movie")
+    finally:
+        http_client.close()
+
+    assert [(person.name, person.role) for person in credits.cast] == [("Lead Actor", "The Lead")]
+    assert credits.filmmaker is not None
+    assert (credits.filmmaker.name, credits.filmmaker.role) == ("Film Director", "Director")
+    assert credits.cast[0].profile_url == "https://image.tmdb.org/t/p/w185/actor.jpg"
+
+
+def test_uses_producer_when_credits_have_no_director(tmp_path: Path) -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "cast": [],
+                "crew": [
+                    {
+                        "id": 3,
+                        "name": "Executive",
+                        "job": "Executive Producer",
+                        "department": "Production",
+                    },
+                    {
+                        "id": 2,
+                        "name": "Lead Producer",
+                        "job": "Producer",
+                        "department": "Production",
+                    },
+                ],
+            },
+        )
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        credits = catalog.get_credits(603, "movie")
+    finally:
+        http_client.close()
+
+    assert credits.filmmaker is not None
+    assert (credits.filmmaker.name, credits.filmmaker.role) == ("Lead Producer", "Producer")
+
+
 def test_discovers_movies_using_preferred_genre_ids(tmp_path: Path) -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/3/genre/movie/list":

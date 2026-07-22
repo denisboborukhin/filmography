@@ -22,6 +22,19 @@ export const snapshotFixture: FilmographySnapshot = {
       tags: ['dreamlike', 'coming-of-age'],
       review: 'A **tender** and uncanny journey.',
       sourceUrl: null,
+      credits: {
+        cast: [
+          { tmdbId: 1001, name: 'Favorite Actor', profileUrl: null, role: 'Chihiro' },
+          { tmdbId: 1010, name: 'Secondary Shared Actor', profileUrl: null, role: 'Friend' },
+          { tmdbId: 1011, name: 'Supporting Actor A', profileUrl: null, role: 'Parent' },
+        ],
+        filmmaker: {
+          tmdbId: 1002,
+          name: 'Favorite Filmmaker',
+          profileUrl: null,
+          role: 'Director',
+        },
+      },
     },
     {
       tmdbId: 38,
@@ -40,6 +53,19 @@ export const snapshotFixture: FilmographySnapshot = {
       tags: ['memory'],
       review: 'Form and feeling work together.',
       sourceUrl: null,
+      credits: {
+        cast: [
+          { tmdbId: 1001, name: 'Favorite Actor', profileUrl: null, role: 'Joel' },
+          { tmdbId: 1010, name: 'Secondary Shared Actor', profileUrl: null, role: 'Friend' },
+          { tmdbId: 1012, name: 'Supporting Actor B', profileUrl: null, role: 'Clementine' },
+        ],
+        filmmaker: {
+          tmdbId: 1002,
+          name: 'Favorite Filmmaker',
+          profileUrl: null,
+          role: 'Director',
+        },
+      },
     },
   ],
   watchlist: [

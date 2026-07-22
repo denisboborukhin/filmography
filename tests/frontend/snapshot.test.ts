@@ -12,6 +12,18 @@ describe('snapshot schema', () => {
     expect(snapshotSchema.parse(demoSnapshot).schemaVersion).toBe(1)
   })
 
+  it('supplies empty credits for an older snapshot', () => {
+    const legacy = structuredClone(snapshotFixture) as unknown as {
+      watched: Array<{ credits?: unknown }>
+    }
+    delete legacy.watched[0].credits
+
+    expect(snapshotSchema.parse(legacy).watched[0].credits).toEqual({
+      cast: [],
+      filmmaker: null,
+    })
+  })
+
   it('rejects unknown fields rather than leaking unpublished data', () => {
     expect(() =>
       snapshotSchema.parse({

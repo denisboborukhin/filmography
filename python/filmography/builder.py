@@ -12,11 +12,13 @@ from pydantic import ValidationError
 from filmography.ai import AIError, OpenAICompatibleClient, resolve_ai_suggestions
 from filmography.markdown_notes import Diagnostic, ImportValidationError, import_markdown_notes
 from filmography.models import (
+    FilmCredits,
     FilmMetadata,
     Recommendation,
     Snapshot,
     WatchedFilm,
     WatchlistFilm,
+    films_match,
     unique_unmatched_films,
 )
 from filmography.recommendations import (
@@ -53,7 +55,16 @@ def build_snapshot(
     watched = imported.watched
     watchlist = imported.watchlist
     if catalog is not None:
-        watched = [_enrich_watched(film, catalog, diagnostics) for film in imported.watched]
+        previous_watched = previous.watched if previous is not None else []
+        watched = [
+            _enrich_watched(
+                film,
+                catalog,
+                diagnostics,
+                previous_watched=previous_watched,
+            )
+            for film in imported.watched
+        ]
         watchlist = [
             _enrich_watchlist(film, catalog, diagnostics, watched=watched)
             for film in imported.watchlist
@@ -190,10 +201,17 @@ def _enrich_watched(
     film: WatchedFilm,
     catalog: TMDBClient,
     diagnostics: list[Diagnostic],
+    *,
+    previous_watched: list[WatchedFilm],
 ) -> WatchedFilm:
     metadata = _catalog_metadata(film, catalog, diagnostics)
     if metadata is None:
         return film
+    prior_credits = next(
+        (previous.credits for previous in previous_watched if films_match(metadata, previous)),
+        FilmCredits(),
+    )
+    credits = _catalog_credits(metadata, catalog, diagnostics, fallback=prior_credits)
     return WatchedFilm(
         **metadata.model_dump(),
         rating=film.rating,
@@ -201,7 +219,26 @@ def _enrich_watched(
         tags=film.tags,
         review=film.review,
         source_url=film.source_url,
+        credits=credits,
     )
+
+
+def _catalog_credits(
+    film: FilmMetadata,
+    catalog: TMDBClient,
+    diagnostics: list[Diagnostic],
+    *,
+    fallback: FilmCredits,
+) -> FilmCredits:
+    if film.tmdb_id is None:
+        return FilmCredits()
+    try:
+        return catalog.get_credits(film.tmdb_id, film.media_type)
+    except CatalogError as error:
+        diagnostics.append(
+            Diagnostic("warning", "catalog-credits-failed", f"{film.title}: {error}")
+        )
+        return fallback
 
 
 def _enrich_watchlist(
@@ -301,8 +338,8 @@ def _tv_diagnostic_detail(title: str, catalog: TMDBClient) -> str:
     if not tv_titles:
         return ""
     return (
-        f"; TMDB TV match: {', '.join(tv_titles)}. "
-        "Series are kept as plain watchlist text and are not enriched in this film-only snapshot."
+        f"; possible TMDB TV match: {', '.join(tv_titles)}. "
+        "Set mediaType to tv when the title should be treated as a series."
     )
 
 

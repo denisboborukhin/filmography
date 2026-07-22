@@ -75,6 +75,34 @@
       "maximum": 10,
       "multipleOf": 0.1
     },
+    "personCredit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tmdbId", "name", "profileUrl", "role"],
+      "properties": {
+        "tmdbId": { "type": "integer", "minimum": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "profileUrl": { "$ref": "#/$defs/nullableString" },
+        "role": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "filmCredits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cast", "filmmaker"],
+      "properties": {
+        "cast": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/personCredit" }
+        },
+        "filmmaker": {
+          "anyOf": [
+            { "$ref": "#/$defs/personCredit" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
     "filmMetadataProperties": {
       "type": "object",
       "properties": {
@@ -153,7 +181,8 @@
         "watchedAt": { "$ref": "#/$defs/nullableDate" },
         "tags": { "type": "array", "items": { "type": "string" } },
         "review": { "type": "string" },
-        "sourceUrl": { "$ref": "#/$defs/nullablePublicUrl" }
+        "sourceUrl": { "$ref": "#/$defs/nullablePublicUrl" },
+        "credits": { "$ref": "#/$defs/filmCredits" }
       }
     },
     "watchlistFilm": {

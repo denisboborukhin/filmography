@@ -16,7 +16,15 @@ from filmography.builder import (
     write_snapshot,
 )
 from filmography.cli import build_parser, main
-from filmography.models import FilmMetadata, Recommendation, Snapshot, WatchlistFilm
+from filmography.models import (
+    FilmCredits,
+    FilmMetadata,
+    PersonCredit,
+    Recommendation,
+    Snapshot,
+    WatchedFilm,
+    WatchlistFilm,
+)
 from filmography.tmdb import CatalogMatch, TMDBClient
 
 
@@ -141,6 +149,72 @@ def test_builder_enriches_series_when_movie_lookup_is_unresolved(tmp_path: Path)
     assert result.snapshot.watchlist[0].media_type == "tv"
     assert result.snapshot.watchlist[0].tmdb_id == 97546
     assert result.snapshot.watchlist[0].overview == "An American coach manages a football club."
+
+
+def test_builder_enriches_watched_credits_and_keeps_metadata_when_credits_fail(
+    tmp_path: Path,
+) -> None:
+    reviews = tmp_path / "reviews"
+    reviews.mkdir()
+    (reviews / "Arrival (2016).md").write_text("---\nrating: 9\n---\nReview", encoding="utf-8")
+    watchlist = tmp_path / "Watchlist.md"
+    watchlist.write_text("", encoding="utf-8")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/3/search/movie":
+            return httpx.Response(
+                200,
+                json={
+                    "results": [
+                        {
+                            "id": 329865,
+                            "title": "Arrival",
+                            "release_date": "2016-11-10",
+                            "vote_average": 7.6,
+                        }
+                    ]
+                },
+            )
+        if request.url.path == "/3/movie/329865/credits":
+            return httpx.Response(503)
+        if request.url.path == "/3/genre/movie/list":
+            return httpx.Response(200, json={"genres": []})
+        if request.url.path == "/3/discover/movie":
+            return httpx.Response(200, json={"results": []})
+        raise AssertionError(f"unexpected path: {request.url.path}")
+
+    http_client = httpx.Client(
+        base_url="https://catalog.test/3/",
+        transport=httpx.MockTransport(handler),
+    )
+    catalog = TMDBClient("token", tmp_path / "cache", http_client=http_client)
+    try:
+        result = build_snapshot(
+            reviews,
+            watchlist,
+            catalog=catalog,
+            previous=Snapshot(
+                generated_at=datetime(2026, 7, 20, tzinfo=UTC),
+                watched=[
+                    WatchedFilm(
+                        tmdb_id=329865,
+                        title="Arrival",
+                        year=2016,
+                        rating=8,
+                        credits=FilmCredits(
+                            filmmaker=PersonCredit(tmdb_id=137427, name="Denis Villeneuve")
+                        ),
+                    )
+                ],
+            ),
+        )
+    finally:
+        http_client.close()
+
+    assert result.snapshot.watched[0].tmdb_id == 329865
+    assert result.snapshot.watched[0].credits.filmmaker is not None
+    assert result.snapshot.watched[0].credits.filmmaker.name == "Denis Villeneuve"
+    assert any(diagnostic.code == "catalog-credits-failed" for diagnostic in result.diagnostics)
 
 
 def test_successful_local_recommendation_run_records_generation_time(tmp_path: Path) -> None:
@@ -294,6 +368,8 @@ def test_watchlist_expected_rating_is_predicted_when_missing_and_preserves_manua
             )
         if request.url.path in {"/3/search/tv", "/3/discover/movie"}:
             return httpx.Response(200, json={"results": []})
+        if request.url.path == "/3/movie/1/credits":
+            return httpx.Response(200, json={"cast": [], "crew": []})
         if request.url.path in {"/3/genre/movie/list", "/3/genre/tv/list"}:
             return httpx.Response(200, json={"genres": [{"id": 878, "name": "Science Fiction"}]})
         raise AssertionError(f"unexpected path: {request.url.path}")

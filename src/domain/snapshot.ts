@@ -20,6 +20,35 @@ const stringListSchema = z
     'Values must be unique',
   )
 
+export const personCreditSchema = z
+  .object({
+    tmdbId: z.number().int().positive(),
+    name: z.string().trim().min(1),
+    profileUrl: nullableTextSchema,
+    role: nullableTextSchema,
+  })
+  .strict()
+
+export const filmCreditsSchema = z
+  .object({
+    cast: z.array(personCreditSchema),
+    filmmaker: personCreditSchema.nullable(),
+  })
+  .strict()
+  .superRefine((credits, context) => {
+    const seen = new Set<number>()
+    credits.cast.forEach((person, index) => {
+      if (seen.has(person.tmdbId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate cast person: ${person.name}`,
+          path: ['cast', index],
+        })
+      }
+      seen.add(person.tmdbId)
+    })
+  })
+
 export const filmSchema = z
   .object({
     tmdbId: z.number().int().positive().nullable(),
@@ -43,6 +72,7 @@ export const watchedFilmSchema = filmSchema
     tags: stringListSchema,
     review: z.string().trim(),
     sourceUrl: nullablePublicUrlSchema,
+    credits: filmCreditsSchema.default({ cast: [], filmmaker: null }),
   })
   .strict()
 
@@ -205,6 +235,8 @@ export const snapshotSchema = z
   })
 
 export type Film = z.infer<typeof filmSchema>
+export type PersonCredit = z.infer<typeof personCreditSchema>
+export type FilmCredits = z.infer<typeof filmCreditsSchema>
 export type WatchedFilm = z.infer<typeof watchedFilmSchema>
 export type WatchlistFilm = z.infer<typeof watchlistFilmSchema>
 export type Recommendation = z.infer<typeof recommendationSchema>

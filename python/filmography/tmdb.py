@@ -13,10 +13,12 @@ from typing import Literal, cast
 import httpx
 from pydantic import ValidationError
 
-from filmography.models import FilmMetadata, MediaType, film_identity
+from filmography.models import FilmCredits, FilmMetadata, MediaType, PersonCredit, film_identity
 
 _DEFAULT_BASE_URL = "https://api.themoviedb.org/3"
 _POSTER_BASE_URL = "https://image.tmdb.org/t/p/w780"
+_PROFILE_BASE_URL = "https://image.tmdb.org/t/p/w185"
+_MAX_CAST = 12
 
 
 class CatalogError(RuntimeError):
@@ -76,6 +78,18 @@ class TMDBClient:
     def get_tv(self, tmdb_id: int) -> FilmMetadata:
         """Fetch a TV series by canonical ID."""
         return self._get_media(tmdb_id, "tv")
+
+    def get_credits(self, tmdb_id: int, media_type: MediaType) -> FilmCredits:
+        """Fetch principal cast and production credits for a movie or TV series."""
+
+        if tmdb_id < 1:
+            raise ValueError("TMDB ID must be positive")
+        payload = self._get_json(
+            f"/{media_type}/{tmdb_id}/credits",
+            {},
+            validator=self._credits_from_payload,
+        )
+        return self._credits_from_payload(payload)
 
     def match_movie(
         self,
@@ -313,6 +327,31 @@ class TMDBClient:
             _required_int(item, "id")
             _required_string(item, "name")
 
+    @staticmethod
+    def _credits_from_payload(payload: Mapping[str, object]) -> FilmCredits:
+        cast_people = [
+            _person_from_payload(item, role_key="character")
+            for item in _list_of_mappings(payload.get("cast"), "TMDB cast credits")[:_MAX_CAST]
+        ]
+        crew = _list_of_mappings(payload.get("crew"), "TMDB crew credits")
+        directors = [
+            _person_from_payload(item, role_key="job")
+            for item in crew
+            if _optional_string(item.get("job")) == "Director"
+        ]
+        producers = sorted(
+            (item for item in crew if _is_producer_credit(item)),
+            key=_producer_priority,
+        )
+        filmmaker = directors[0] if directors else None
+        if filmmaker is None and producers:
+            filmmaker = _person_from_payload(producers[0], role_key="job")
+        try:
+            return FilmCredits(cast=cast_people, filmmaker=filmmaker)
+        except ValidationError as error:
+            message = error.errors()[0]["msg"]
+            raise CatalogError(f"TMDB credits are invalid: {message}") from error
+
     def _get_json(
         self,
         path: str,
@@ -401,6 +440,42 @@ def _optional_float(value: object) -> float | None:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
     return float(value)
+
+
+def _person_from_payload(payload: Mapping[str, object], *, role_key: str) -> PersonCredit:
+    profile_path = payload.get("profile_path")
+    profile_url = (
+        f"{_PROFILE_BASE_URL}{profile_path}"
+        if isinstance(profile_path, str) and profile_path.startswith("/")
+        else None
+    )
+    try:
+        return PersonCredit(
+            tmdb_id=_required_int(payload, "id"),
+            name=_required_string(payload, "name"),
+            profile_url=profile_url,
+            role=_optional_string(payload.get(role_key)),
+        )
+    except ValidationError as error:
+        message = error.errors()[0]["msg"]
+        raise CatalogError(f"TMDB person credit is invalid: {message}") from error
+
+
+def _is_producer_credit(payload: Mapping[str, object]) -> bool:
+    job = (_optional_string(payload.get("job")) or "").casefold()
+    department = (_optional_string(payload.get("department")) or "").casefold()
+    return department == "production" and "producer" in job
+
+
+def _producer_priority(payload: Mapping[str, object]) -> int:
+    job = (_optional_string(payload.get("job")) or "").casefold()
+    return {
+        "producer": 0,
+        "executive producer": 1,
+        "co-producer": 2,
+        "associate producer": 3,
+        "line producer": 4,
+    }.get(job, 5)
 
 
 def _unique_popularity_winner(candidates: tuple[FilmMetadata, ...]) -> FilmMetadata | None:
