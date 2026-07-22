@@ -1,5 +1,6 @@
 import type { WatchlistFilm } from '../domain/snapshot'
 import { FilmMeta } from './FilmMeta'
+import { FilmTitleLink } from './FilmTitleLink'
 import { Poster } from './Poster'
 import { ScorePair } from './ScorePair'
 
@@ -15,7 +16,9 @@ export function WatchlistCard({ film, compact = false }: WatchlistCardProps) {
         <Poster path={film.posterUrl} size="small" title={film.title} />
         <div className="compact-card__body">
           <div className="compact-card__heading">
-            <h3>{film.title}</h3>
+            <h3>
+              <FilmTitleLink film={film}>{film.title}</FilmTitleLink>
+            </h3>
             <FilmMeta genres={film.genres} limit={1} mediaType={film.mediaType} year={film.year} />
           </div>
           <div className="compact-card__footer">
@@ -37,7 +40,9 @@ export function WatchlistCard({ film, compact = false }: WatchlistCardProps) {
       <div className="watchlist-card__body">
         <div className="watchlist-card__heading">
           <div>
-            <h3>{film.title}</h3>
+            <h3>
+              <FilmTitleLink film={film}>{film.title}</FilmTitleLink>
+            </h3>
             <FilmMeta
               genres={film.genres}
               limit={2}

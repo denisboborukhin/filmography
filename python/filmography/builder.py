@@ -17,7 +17,7 @@ from filmography.models import (
     Snapshot,
     WatchedFilm,
     WatchlistFilm,
-    film_matches_any,
+    unique_unmatched_films,
 )
 from filmography.recommendations import (
     predict_personal_rating,
@@ -60,7 +60,9 @@ def build_snapshot(
         ]
 
     now = _utc_datetime(generated_at)
-    retained_ai = _retain_valid_ai(previous.ai_discoveries if previous else [], watched, watchlist)
+    retained_ai = unique_unmatched_films(
+        previous.ai_discoveries if previous else [], [*watched, *watchlist]
+    )
     deterministic: list[Recommendation] = []
     deterministic_refreshed = False
     if catalog is not None:
@@ -76,8 +78,7 @@ def build_snapshot(
             deterministic_refreshed = True
         except CatalogError as error:
             diagnostics.append(Diagnostic("warning", "catalog-discovery-failed", str(error)))
-    retained_ids = {item.tmdb_id for item in retained_ai}
-    deterministic = [item for item in deterministic if item.tmdb_id not in retained_ids]
+    deterministic = unique_unmatched_films(deterministic, retained_ai)
     watched.sort(
         key=lambda film: (
             -(film.watched_at.toordinal() if film.watched_at is not None else 0),
@@ -138,14 +139,13 @@ def refresh_ai_recommendations(
         raise AIError(
             f"AI returned no new recommendations that could be verified with TMDB{suffix}"
         )
-    ai_ids = {item.tmdb_id for item in resolved.recommendations}
     updated = snapshot.model_copy(
         update={
             "recommendations_generated_at": now,
             "ai_discoveries": list(resolved.recommendations),
-            "deterministic_discoveries": [
-                item for item in snapshot.deterministic_discoveries if item.tmdb_id not in ai_ids
-            ],
+            "deterministic_discoveries": unique_unmatched_films(
+                snapshot.deterministic_discoveries, resolved.recommendations
+            ),
         }
     )
     # model_copy does not rerun model validators, so explicitly validate the serialized result.
@@ -304,22 +304,6 @@ def _tv_diagnostic_detail(title: str, catalog: TMDBClient) -> str:
         f"; TMDB TV match: {', '.join(tv_titles)}. "
         "Series are kept as plain watchlist text and are not enriched in this film-only snapshot."
     )
-
-
-def _retain_valid_ai(
-    recommendations: list[Recommendation],
-    watched: list[WatchedFilm],
-    watchlist: list[WatchlistFilm],
-) -> list[Recommendation]:
-    excluded = [*watched, *watchlist]
-    retained: list[Recommendation] = []
-    seen: set[int] = set()
-    for item in recommendations:
-        if item.tmdb_id in seen or film_matches_any(item, excluded):
-            continue
-        seen.add(item.tmdb_id)
-        retained.append(item)
-    return retained
 
 
 def _utc_datetime(value: datetime | None) -> datetime:

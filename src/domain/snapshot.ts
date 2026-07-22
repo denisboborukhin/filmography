@@ -58,6 +58,7 @@ export const watchlistFilmSchema = filmSchema
 export const recommendationSchema = filmSchema
   .extend({
     tmdbId: z.number().int().positive(),
+    mediaType: z.literal('movie').default('movie'),
     predictedRating: scoreSchema,
     rationale: z.string().trim().min(1),
     source: z.enum(['deterministic', 'ai']),
@@ -96,7 +97,8 @@ interface FilmIdentityInput {
 
 function normalizedTitle(title: string): string {
   return title
-    .toLocaleLowerCase()
+    .normalize('NFKC')
+    .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .trim()
     .replace(/\s+/g, ' ')

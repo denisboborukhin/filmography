@@ -4,6 +4,7 @@ import { DiscoveryCard } from '../components/DiscoveryCard'
 import { EmptyState } from '../components/EmptyState'
 import { ReviewCard } from '../components/ReviewCard'
 import { WatchlistCard } from '../components/WatchlistCard'
+import { filmKey } from '../lib/filmList'
 import { formatScore } from '../lib/format'
 
 interface DashboardViewProps {
@@ -22,19 +23,17 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
     .filter((film) => !film.dismissed)
     .sort((left, right) => (right.interest ?? -1) - (left.interest ?? -1))
     .slice(0, 4)
-  const discoveries = [...snapshot.aiDiscoveries, ...snapshot.deterministicDiscoveries].filter(
-    (film, index, all) =>
-      all.findIndex(
-        (candidate) => candidate.mediaType === film.mediaType && candidate.tmdbId === film.tmdbId,
-      ) === index,
-  )
+  const discoveries = [
+    ...snapshot.aiDiscoveries,
+    ...snapshot.deterministicDiscoveries,
+  ]
   const averageRating =
     snapshot.watched.length === 0
       ? null
       : snapshot.watched.reduce((sum, film) => sum + film.rating, 0) / snapshot.watched.length
 
   return (
-    <div className="view dashboard-view">
+    <div className="view">
       <section className="dashboard-hero">
         <div className="dashboard-hero__copy">
           <p className="eyebrow">Personal film journal</p>
@@ -114,7 +113,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
                 <ReviewCard
                   compact
                   film={film}
-                  key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`}
+                  key={filmKey(film)}
                 />
               ))}
             </div>
@@ -134,12 +133,12 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
             </a>
           </div>
           {priorityWatchlist.length > 0 ? (
-            <div className="compact-list compact-list--watchlist">
+            <div className="compact-list">
               {priorityWatchlist.map((film) => (
                 <WatchlistCard
                   compact
                   film={film}
-                  key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`}
+                  key={filmKey(film)}
                 />
               ))}
             </div>
@@ -162,7 +161,7 @@ export function DashboardView({ snapshot }: DashboardViewProps) {
           </div>
           <div className="discovery-grid">
             {discoveries.slice(1, 5).map((film) => (
-              <DiscoveryCard discovery={film} key={`${film.source}-${film.mediaType}-${film.tmdbId}`} />
+              <DiscoveryCard discovery={film} key={filmKey(film)} />
             ))}
           </div>
         </section>

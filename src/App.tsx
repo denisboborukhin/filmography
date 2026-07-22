@@ -16,25 +16,18 @@ import { DiscoveriesView } from './views/DiscoveriesView'
 import { WatchedView } from './views/WatchedView'
 import { WatchlistView } from './views/WatchlistView'
 
-const views = ['dashboard', 'watched', 'watchlist', 'discoveries'] as const
-type View = (typeof views)[number]
-
-interface NavigationItem {
-  id: View
-  label: string
-  icon: ComponentType<LucideProps>
-}
-
-const navigation: NavigationItem[] = [
+const navigation = [
   { id: 'dashboard', label: 'Journal', icon: Clapperboard },
   { id: 'watched', label: 'Watched', icon: Eye },
   { id: 'watchlist', label: 'Watchlist', icon: Bookmark },
   { id: 'discoveries', label: 'Discoveries', icon: Compass },
-]
+] as const satisfies readonly { id: string; label: string; icon: ComponentType<LucideProps> }[]
+type View = (typeof navigation)[number]['id']
+const views = new Set<string>(navigation.map((item) => item.id))
 
-function viewFromHash(): View {
+function viewFromHash(): View | null {
   const candidate = window.location.hash.replace(/^#\/?/, '')
-  return views.includes(candidate as View) ? (candidate as View) : 'dashboard'
+  return views.has(candidate) ? (candidate as View) : null
 }
 
 function LoadingScreen() {
@@ -78,12 +71,15 @@ function ErrorScreen({ message, retry }: ErrorScreenProps) {
 
 export function App() {
   const { status, result, error, retry } = useSnapshot()
-  const [view, setView] = useState<View>(viewFromHash)
+  const [view, setView] = useState<View>(() => viewFromHash() ?? 'dashboard')
   const mainRef = useRef<HTMLElement>(null)
   const isFirstView = useRef(true)
 
   useEffect(() => {
-    const handleHashChange = () => setView(viewFromHash())
+    const handleHashChange = () => {
+      const nextView = viewFromHash()
+      if (nextView) setView(nextView)
+    }
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])

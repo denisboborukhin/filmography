@@ -1,10 +1,9 @@
-import { FilterBar } from './FilterBar'
+import { Search } from 'lucide-react'
 import type { FilmListSort } from '../lib/filmList'
 
 interface FilmListControlsProps {
   genre: string
   genres: string[]
-  genreId: string
   onGenreChange: (value: string) => void
   onQueryChange: (value: string) => void
   onSortChange: (value: FilmListSort) => void
@@ -13,13 +12,11 @@ interface FilmListControlsProps {
   resultCount: number
   searchLabel: string
   sort: FilmListSort
-  sortId: string
 }
 
 export function FilmListControls({
   genre,
   genres,
-  genreId,
   onGenreChange,
   onQueryChange,
   onSortChange,
@@ -28,38 +25,47 @@ export function FilmListControls({
   resultCount,
   searchLabel,
   sort,
-  sortId,
 }: FilmListControlsProps) {
   return (
-    <FilterBar
-      label={searchLabel}
-      onQueryChange={onQueryChange}
-      query={query}
-      resultCount={resultCount}
-      selects={[
-        {
-          id: genreId,
-          label: 'Genre',
-          options: [
-            { label: 'All genres', value: 'all' },
-            ...genres.map((item) => ({ label: item, value: item })),
-          ],
-          value: genre,
-          onChange: onGenreChange,
-        },
-        {
-          id: sortId,
-          label: 'Sort',
-          options: [
-            { label: 'Title A-Z', value: 'title' },
-            { label: 'Newest release', value: 'year' },
-            { label: 'Highest TMDB score', value: 'tmdb' },
-            { label: personalSortLabel, value: 'personal' },
-          ],
-          value: sort,
-          onChange: (value) => onSortChange(value as FilmListSort),
-        },
-      ]}
-    />
+    <div className="filter-bar">
+      <label className="search-field">
+        <span className="sr-only">{searchLabel}</span>
+        <Search aria-hidden="true" size={18} />
+        <input
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder={searchLabel}
+          type="search"
+          value={query}
+        />
+      </label>
+      <div className="filter-bar__selects">
+        <label className="select-field">
+          <span>Genre</span>
+          <select onChange={(event) => onGenreChange(event.target.value)} value={genre}>
+            <option value="all">All genres</option>
+            {genres.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="select-field">
+          <span>Sort</span>
+          <select
+            onChange={(event) => onSortChange(event.target.value as FilmListSort)}
+            value={sort}
+          >
+            <option value="title">Title A-Z</option>
+            <option value="year">Newest release</option>
+            <option value="tmdb">Highest TMDB score</option>
+            <option value="personal">{personalSortLabel}</option>
+          </select>
+        </label>
+      </div>
+      <p aria-live="polite" className="result-count">
+        {resultCount} {resultCount === 1 ? 'film' : 'films'}
+      </p>
+    </div>
   )
 }

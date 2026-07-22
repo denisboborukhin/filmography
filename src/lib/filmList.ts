@@ -1,9 +1,22 @@
 export type FilmListSort = 'title' | 'year' | 'tmdb' | 'personal'
 
-interface SortableFilm {
+interface FilmIdentity {
+  mediaType: 'movie' | 'tv'
+  tmdbId: number | null
   title: string
   year: number | null
+}
+
+interface SortableFilm extends Pick<FilmIdentity, 'title' | 'year'> {
   voteAverage: number | null
+}
+
+export function filmKey(film: FilmIdentity): string {
+  return `${film.mediaType}-${film.tmdbId ?? film.title}-${film.year ?? 'unknown'}`
+}
+
+export function genresForFilms(films: { genres: string[] }[]): string[] {
+  return [...new Set(films.flatMap((film) => film.genres))].sort()
 }
 
 export function compareFilmListItems<TFilm extends SortableFilm>(
@@ -31,4 +44,3 @@ function compareTitle(left: SortableFilm, right: SortableFilm): number {
 function nullableScore(value: number | null): number {
   return value ?? -1
 }
-

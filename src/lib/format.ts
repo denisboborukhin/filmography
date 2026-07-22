@@ -29,8 +29,9 @@ export function posterUrl(path: string | null): string | null {
   return `https://image.tmdb.org/t/p/w500${path.startsWith('/') ? path : `/${path}`}`
 }
 
-export function filmLabel(film: Pick<Film, 'title' | 'year'>): string {
-  return film.year ? `${film.title} (${film.year})` : film.title
+export function catalogUrl(film: Pick<Film, 'mediaType' | 'tmdbId'>): string | null {
+  if (film.tmdbId === null) return null
+  return `https://www.themoviedb.org/${film.mediaType}/${film.tmdbId}`
 }
 
 export function searchFilm(film: Film, query: string, extra: string[] = []): boolean {

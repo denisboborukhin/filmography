@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, date, datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import cast
 
@@ -219,6 +220,14 @@ def test_static_schema_describes_the_runtime_contract() -> None:
         "aiDiscoveries",
     }
 
+    validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    invalid = Snapshot(
+        generated_at=datetime(2026, 7, 20, tzinfo=UTC),
+        watched=[WatchedFilm(title="Film", rating=9.2)],
+    ).model_dump(mode="json", by_alias=True)
+    invalid["watched"][0]["rating"] = 9.25  # type: ignore[index]
+    assert any(validator.iter_errors(invalid))  # pyright: ignore[reportUnknownMemberType]
+
 
 def test_demo_snapshot_satisfies_python_and_static_json_schemas() -> None:
     root = Path(__file__).parents[2]
@@ -226,7 +235,8 @@ def test_demo_snapshot_satisfies_python_and_static_json_schemas() -> None:
         (root / "public" / "data" / "filmography.json").read_text(encoding="utf-8")
     )
     schema_value: object = json.loads(
-        (root / "schemas" / "snapshot.schema.json").read_text(encoding="utf-8")
+        (root / "schemas" / "snapshot.schema.json").read_text(encoding="utf-8"),
+        parse_float=Decimal,
     )
     assert isinstance(schema_value, dict)
 
@@ -235,4 +245,5 @@ def test_demo_snapshot_satisfies_python_and_static_json_schemas() -> None:
         cast(dict[str, object], schema_value),
         format_checker=FormatChecker(),
     )
-    validator.validate(snapshot_value)  # pyright: ignore[reportUnknownMemberType]
+    decimal_snapshot = json.loads(json.dumps(snapshot_value), parse_float=Decimal)
+    validator.validate(decimal_snapshot)  # pyright: ignore[reportUnknownMemberType]

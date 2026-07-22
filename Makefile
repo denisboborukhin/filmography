@@ -1,7 +1,7 @@
 .PHONY: install check test build web-build web-test python-test
 
 install:
-	npm install
+	npm ci
 	uv sync --dev
 
 check:

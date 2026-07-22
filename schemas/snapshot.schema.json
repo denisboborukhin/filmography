@@ -63,9 +63,6 @@
         { "type": "null" }
       ]
     },
-    "nullableNumber": {
-      "anyOf": [{ "type": "number" }, { "type": "null" }]
-    },
     "nullableDate": {
       "anyOf": [
         { "type": "string", "format": "date" },
@@ -75,7 +72,8 @@
     "score": {
       "type": "number",
       "minimum": 0,
-      "maximum": 10
+      "maximum": 10,
+      "multipleOf": 0.1
     },
     "filmMetadataProperties": {
       "type": "object",

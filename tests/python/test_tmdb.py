@@ -104,6 +104,26 @@ def test_matches_localized_same_year_candidate_without_title_equality(tmp_path: 
     assert match.film.title == "The Hunger Games"
 
 
+def test_movie_search_resolves_genres_from_movie_catalog(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/3/genre/movie/list":
+            return httpx.Response(200, json={"genres": [{"id": 18, "name": "Drama"}]})
+        assert request.url.path == "/3/search/movie"
+        return httpx.Response(
+            200,
+            json={"results": [_movie(1, "Arrival", 2016, genre_ids=[18])]},
+        )
+
+    catalog, http_client = _client(tmp_path, handler)
+    try:
+        match = catalog.match_movie("Arrival", 2016)
+    finally:
+        http_client.close()
+
+    assert match.film is not None
+    assert match.film.genres == ["Drama"]
+
+
 def test_picks_unique_popularity_winner_for_duplicate_exact_matches(tmp_path: Path) -> None:
     def handler(_request: httpx.Request) -> httpx.Response:
         return httpx.Response(

@@ -49,6 +49,13 @@ describe('snapshot schema', () => {
     expect(() => snapshotSchema.parse(invalid)).toThrow()
   })
 
+  it('rejects TV series in movie recommendation collections', () => {
+    const invalid = structuredClone(snapshotFixture)
+    Object.assign(invalid.deterministicDiscoveries[0], { mediaType: 'tv' })
+
+    expect(() => snapshotSchema.parse(invalid)).toThrow()
+  })
+
   it('treats a missing year as a wildcard when excluding discoveries', () => {
     const invalid = structuredClone(snapshotFixture)
     invalid.watched[0].tmdbId = null

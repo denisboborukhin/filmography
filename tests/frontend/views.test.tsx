@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import '@testing-library/jest-dom/vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import { DiscoveriesView } from '../../src/views/DiscoveriesView'
@@ -42,6 +42,18 @@ describe('journal views', () => {
     expect(screen.getByLabelText('TMDB audience score: 8.5 out of 10')).toBeInTheDocument()
   })
 
+  it('links watched cards to their TMDB pages', () => {
+    render(<WatchedView films={snapshotFixture.watched} />)
+
+    const titleLink = screen.getByRole('link', { name: 'Spirited Away' })
+
+    expect(titleLink).toHaveAttribute(
+      'href',
+      'https://www.themoviedb.org/movie/129',
+    )
+    expect(titleLink.closest('h2')).not.toBeNull()
+  })
+
   it('shows expected personal and TMDB scores in the watchlist', () => {
     render(<WatchlistView films={snapshotFixture.watchlist} />)
 
@@ -49,6 +61,18 @@ describe('journal views', () => {
     expect(screen.getByLabelText('Personal expected score: 9.0 out of 10')).toBeInTheDocument()
     expect(screen.getByLabelText('TMDB audience score: 8.4 out of 10')).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Highest expected personal score' })).toBeInTheDocument()
+  })
+
+  it('links watchlist cards to their TMDB pages', () => {
+    render(<WatchlistView films={snapshotFixture.watchlist} />)
+
+    const titleLink = screen.getByRole('link', { name: 'Howl’s Moving Castle' })
+
+    expect(titleLink).toHaveAttribute(
+      'href',
+      'https://www.themoviedb.org/movie/4935',
+    )
+    expect(titleLink.closest('h3')).not.toBeNull()
   })
 
   it('uses the same compact card structure for dashboard reviews and watchlist entries', () => {
@@ -59,7 +83,8 @@ describe('journal views', () => {
     expect(container.querySelectorAll('.compact-card .score-pair')).toHaveLength(3)
   })
 
-  it('combines AI recommendations and local taste matches in discoveries', () => {
+  it('combines discoveries with AI picks before local taste matches', async () => {
+    const user = userEvent.setup()
     render(
       <DiscoveriesView
         ai={snapshotFixture.aiDiscoveries}
@@ -73,6 +98,11 @@ describe('journal views', () => {
     expect(screen.getAllByRole('article').length).toBeGreaterThanOrEqual(7)
     expect(screen.getByLabelText('Genre')).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Highest TMDB score' })).toBeInTheDocument()
+    expect(within(screen.getAllByRole('article')[0]).getByText('AI pick')).toBeInTheDocument()
+
+    await user.selectOptions(screen.getByLabelText('Sort'), 'tmdb')
+
+    expect(within(screen.getAllByRole('article')[0]).getByText('AI pick')).toBeInTheDocument()
   })
 
   it('filters discoveries by genre', async () => {
@@ -114,5 +144,23 @@ describe('journal views', () => {
     )
     expect(screen.getByText('An old man and a young scout travel by flying house.')).toBeInTheDocument()
     expect(screen.queryByText(/Suggested by example-model/i)).not.toBeInTheDocument()
+  })
+
+  it('links discovery cards to their TMDB pages', () => {
+    render(
+      <DiscoveriesView
+        ai={snapshotFixture.aiDiscoveries}
+        deterministic={snapshotFixture.deterministicDiscoveries}
+        generatedAt={snapshotFixture.recommendationsGeneratedAt}
+      />,
+    )
+
+    const titleLink = screen.getByRole('link', { name: 'Up' })
+
+    expect(titleLink).toHaveAttribute(
+      'href',
+      'https://www.themoviedb.org/movie/14160',
+    )
+    expect(titleLink.closest('h3')).not.toBeNull()
   })
 })

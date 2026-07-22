@@ -1,37 +1,26 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import type { WatchlistFilm } from '../domain/snapshot'
 import { EmptyState } from '../components/EmptyState'
 import { FilmListControls } from '../components/FilmListControls'
 import { PageHeader } from '../components/PageHeader'
 import { RatingLegend } from '../components/RatingLegend'
 import { WatchlistCard } from '../components/WatchlistCard'
-import { compareFilmListItems, type FilmListSort } from '../lib/filmList'
-import { searchFilm } from '../lib/format'
+import { useFilmList } from '../hooks/useFilmList'
+import { filmKey } from '../lib/filmList'
 
 interface WatchlistViewProps {
   films: WatchlistFilm[]
 }
 
+const watchlistSearchText = (film: WatchlistFilm) => [...film.tags, film.notes]
+const watchlistScore = (film: WatchlistFilm) => film.interest
+
 export function WatchlistView({ films }: WatchlistViewProps) {
   const activeFilms = useMemo(() => films.filter((film) => !film.dismissed), [films])
-  const [query, setQuery] = useState('')
-  const [genre, setGenre] = useState('all')
-  const [sort, setSort] = useState<FilmListSort>('title')
-  const genres = useMemo(
-    () => [...new Set(activeFilms.flatMap((film) => film.genres))].sort(),
-    [activeFilms],
-  )
-
-  const visibleFilms = useMemo(
-    () =>
-      activeFilms
-        .filter(
-          (film) =>
-            searchFilm(film, query, [...film.tags, film.notes]) &&
-            (genre === 'all' || film.genres.includes(genre)),
-        )
-        .sort((left, right) => compareFilmListItems(left, right, sort, (film) => film.interest)),
-    [activeFilms, genre, query, sort],
+  const { genre, genres, query, setGenre, setQuery, setSort, sort, visibleFilms } = useFilmList(
+    activeFilms,
+    watchlistSearchText,
+    watchlistScore,
   )
 
   return (
@@ -42,7 +31,6 @@ export function WatchlistView({ films }: WatchlistViewProps) {
       <RatingLegend label="Watchlist score legend" primaryLabel="Personal expected score" />
       <FilmListControls
         genre={genre}
-        genreId="watchlist-genre"
         genres={genres}
         onGenreChange={setGenre}
         onQueryChange={setQuery}
@@ -52,15 +40,11 @@ export function WatchlistView({ films }: WatchlistViewProps) {
         resultCount={visibleFilms.length}
         searchLabel="Search the watchlist"
         sort={sort}
-        sortId="watchlist-sort"
       />
       {visibleFilms.length > 0 ? (
         <div className="watchlist-grid">
           {visibleFilms.map((film) => (
-            <WatchlistCard
-              film={film}
-              key={`${film.mediaType}-${film.tmdbId ?? film.title}-${film.year}`}
-            />
+            <WatchlistCard film={film} key={filmKey(film)} />
           ))}
         </div>
       ) : (

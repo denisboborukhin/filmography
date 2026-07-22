@@ -1,6 +1,7 @@
 import { Bot, BrainCircuit } from 'lucide-react'
 import type { Recommendation } from '../domain/snapshot'
 import { FilmMeta } from './FilmMeta'
+import { FilmTitleLink } from './FilmTitleLink'
 import { Poster } from './Poster'
 import { ScorePair } from './ScorePair'
 
@@ -42,7 +43,9 @@ export function DiscoveryCard({ discovery, featured = false }: DiscoveryCardProp
           />
         </div>
         <div>
-          <h3>{discovery.title}</h3>
+          <h3>
+            <FilmTitleLink film={discovery}>{discovery.title}</FilmTitleLink>
+          </h3>
           <FilmMeta
             genres={discovery.genres}
             mediaType={discovery.mediaType}

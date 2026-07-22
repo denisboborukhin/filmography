@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import type { WatchedFilm } from '../domain/snapshot'
 import { formatDate } from '../lib/format'
 import { FilmMeta } from './FilmMeta'
+import { FilmTitleLink } from './FilmTitleLink'
 import { Poster } from './Poster'
 import { ScorePair } from './ScorePair'
 
@@ -18,7 +19,9 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
         <Poster path={film.posterUrl} size="small" title={film.title} />
         <div className="compact-card__body">
           <div className="compact-card__heading">
-            <h3>{film.title}</h3>
+            <h3>
+              <FilmTitleLink film={film}>{film.title}</FilmTitleLink>
+            </h3>
             <FilmMeta genres={film.genres} limit={1} mediaType={film.mediaType} year={film.year} />
           </div>
           <div className="compact-card__footer">
@@ -47,7 +50,9 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
       <div className="review-card__body">
         <header className="review-card__header">
           <div>
-            <h2>{film.title}</h2>
+            <h2>
+              <FilmTitleLink film={film}>{film.title}</FilmTitleLink>
+            </h2>
             <FilmMeta genres={film.genres} limit={3} mediaType={film.mediaType} year={film.year} />
           </div>
           <span className="watched-date">
@@ -83,9 +88,7 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
                 <li key={tag}>{tag}</li>
               ))}
             </ul>
-          ) : (
-            <span />
-          )}
+          ) : null}
           {film.sourceUrl ? (
             <a className="source-link" href={film.sourceUrl} rel="noreferrer" target="_blank">
               Source

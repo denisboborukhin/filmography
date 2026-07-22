@@ -1,12 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import type { Recommendation } from '../domain/snapshot'
 import { DiscoveryCard } from '../components/DiscoveryCard'
 import { EmptyState } from '../components/EmptyState'
 import { FilmListControls } from '../components/FilmListControls'
 import { PageHeader } from '../components/PageHeader'
 import { RatingLegend } from '../components/RatingLegend'
-import { compareFilmListItems, type FilmListSort } from '../lib/filmList'
-import { formatDate, searchFilm } from '../lib/format'
+import { useFilmList } from '../hooks/useFilmList'
+import { filmKey } from '../lib/filmList'
+import { formatDate } from '../lib/format'
 
 interface DiscoveriesViewProps {
   deterministic: Recommendation[]
@@ -14,38 +15,17 @@ interface DiscoveriesViewProps {
   generatedAt: string | null
 }
 
-export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesViewProps) {
-  const films = useMemo(
-    () =>
-      [...ai, ...deterministic].filter(
-        (film, index, all) =>
-          all.findIndex(
-            (candidate) =>
-              candidate.mediaType === film.mediaType && candidate.tmdbId === film.tmdbId,
-          ) === index,
-      ),
-    [ai, deterministic],
-  )
-  const [query, setQuery] = useState('')
-  const [genre, setGenre] = useState('all')
-  const [sort, setSort] = useState<FilmListSort>('title')
-  const genres = useMemo(
-    () => [...new Set(films.flatMap((film) => film.genres))].sort(),
-    [films],
-  )
+const discoverySearchText = (film: Recommendation) => [film.rationale]
+const discoveryScore = (film: Recommendation) => film.predictedRating
+const discoveryPriority = (film: Recommendation) => (film.source === 'ai' ? 0 : 1)
 
-  const visibleFilms = useMemo(
-    () =>
-      films
-        .filter(
-          (film) =>
-            searchFilm(film, query, [film.rationale]) &&
-            (genre === 'all' || film.genres.includes(genre)),
-        )
-        .sort((left, right) =>
-          compareFilmListItems(left, right, sort, (film) => film.predictedRating),
-        ),
-    [films, genre, query, sort],
+export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesViewProps) {
+  const films = useMemo(() => [...ai, ...deterministic], [ai, deterministic])
+  const { genre, genres, query, setGenre, setQuery, setSort, sort, visibleFilms } = useFilmList(
+    films,
+    discoverySearchText,
+    discoveryScore,
+    discoveryPriority,
   )
 
   return (
@@ -59,7 +39,6 @@ export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesV
       <RatingLegend label="Discovery score legend" primaryLabel="Personal expected score" />
       <FilmListControls
         genre={genre}
-        genreId="discovery-genre"
         genres={genres}
         onGenreChange={setGenre}
         onQueryChange={setQuery}
@@ -69,12 +48,11 @@ export function DiscoveriesView({ deterministic, ai, generatedAt }: DiscoveriesV
         resultCount={visibleFilms.length}
         searchLabel="Search discoveries"
         sort={sort}
-        sortId="discovery-sort"
       />
       {visibleFilms.length > 0 ? (
         <div className="discovery-grid discovery-grid--archive">
           {visibleFilms.map((film) => (
-            <DiscoveryCard discovery={film} key={`${film.source}-${film.mediaType}-${film.tmdbId}`} />
+            <DiscoveryCard discovery={film} key={filmKey(film)} />
           ))}
         </div>
       ) : (

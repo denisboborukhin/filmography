@@ -266,30 +266,29 @@ def _parse_suggestion_content(content: str) -> AISuggestionBatch:
     try:
         return AISuggestionBatch.model_validate_json(content)
     except ValidationError as original_error:
-        normalized = _normalize_provider_json(content)
-        if normalized is not None:
-            try:
-                return AISuggestionBatch.model_validate(normalized)
-            except ValidationError:
-                pass
         extracted_json = _extract_json_object(content)
-        if extracted_json is not None:
-            normalized = _normalize_provider_json(extracted_json)
-            if normalized is not None:
-                try:
-                    return AISuggestionBatch.model_validate(normalized)
-                except ValidationError:
-                    pass
-            try:
-                return AISuggestionBatch.model_validate_json(extracted_json)
-            except ValidationError:
-                pass
+        for candidate in (content, extracted_json):
+            batch = _validated_provider_json(candidate)
+            if batch is not None:
+                return batch
         markdown_batch = _parse_markdown_suggestions(content)
         if markdown_batch is not None:
             return markdown_batch
         raise AIError(
             f"AI response does not match the recommendation schema: {original_error}"
         ) from original_error
+
+
+def _validated_provider_json(content: str | None) -> AISuggestionBatch | None:
+    if content is None:
+        return None
+    normalized = _normalize_provider_json(content)
+    if normalized is None:
+        return None
+    try:
+        return AISuggestionBatch.model_validate(normalized)
+    except ValidationError:
+        return None
 
 
 def _extract_json_object(content: str) -> str | None:

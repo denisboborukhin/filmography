@@ -190,12 +190,6 @@ def film_identity(title: str, year: int | None) -> tuple[str, int | None]:
     return normalized, year
 
 
-def media_identity(film: FilmMetadata) -> MediaType:
-    """Return the catalog namespace for ID and title identity checks."""
-
-    return film.media_type
-
-
 def film_titles_overlap(
     left_title: str,
     left_year: int | None,
@@ -214,7 +208,7 @@ def film_titles_overlap(
 def films_match(left: FilmMetadata, right: FilmMetadata) -> bool:
     """Match catalog IDs when available and always check the human title identity."""
 
-    if media_identity(left) != media_identity(right):
+    if left.media_type != right.media_type:
         return False
     return (
         left.tmdb_id is not None and right.tmdb_id is not None and left.tmdb_id == right.tmdb_id
@@ -225,6 +219,21 @@ def film_matches_any(film: FilmMetadata, existing: Sequence[FilmMetadata]) -> bo
     """Return whether a film overlaps any watched, watchlisted, or recommended record."""
 
     return any(films_match(film, item) for item in existing)
+
+
+def unique_unmatched_films[FilmRecord: FilmMetadata](
+    films: Sequence[FilmRecord], excluded: Sequence[FilmMetadata] = ()
+) -> list[FilmRecord]:
+    """Keep the first film for each canonical identity, excluding existing records."""
+
+    accepted: list[FilmRecord] = []
+    comparisons = list(excluded)
+    for film in films:
+        if film_matches_any(film, comparisons):
+            continue
+        accepted.append(film)
+        comparisons.append(film)
+    return accepted
 
 
 def _unique_nonempty(values: list[str]) -> list[str]:
