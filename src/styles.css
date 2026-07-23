@@ -936,8 +936,7 @@ h3 {
   font-size: 0.69rem;
 }
 
-.review-card__review,
-.review-card__overview {
+.review-card__review {
   max-width: 50rem;
   margin: 1.6rem 0;
   color: #37352f;
@@ -1778,8 +1777,7 @@ h3 {
     font-size: 0.62rem;
   }
 
-  .review-card__review,
-  .review-card__overview {
+  .review-card__review {
     margin-top: 1.15rem;
     font-size: 1rem;
   }

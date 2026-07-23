@@ -42,6 +42,15 @@ describe('journal views', () => {
     expect(screen.getByLabelText('TMDB audience score: 8.5 out of 10')).toBeInTheDocument()
   })
 
+  it('leaves an unwritten review empty instead of substituting catalog text', () => {
+    const film = structuredClone(snapshotFixture.watched[0])
+    film.review = ''
+    render(<WatchedView films={[film]} />)
+
+    expect(screen.queryByText(film.overview)).not.toBeInTheDocument()
+    expect(screen.queryByText('No written review was included.')).not.toBeInTheDocument()
+  })
+
   it('links watched cards to their TMDB pages', () => {
     render(<WatchedView films={snapshotFixture.watched} />)
 

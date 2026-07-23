@@ -75,11 +75,7 @@ export function ReviewCard({ film, compact = false }: ReviewCardProps) {
               {film.review}
             </ReactMarkdown>
           </div>
-        ) : film.overview ? (
-          <p className="review-card__overview">{film.overview}</p>
-        ) : (
-          <p className="review-card__overview">No written review was included.</p>
-        )}
+        ) : null}
 
         <footer className="review-card__footer">
           {film.tags.length > 0 ? (
