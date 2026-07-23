@@ -178,6 +178,42 @@ def test_ai_client_extracts_fenced_json_from_compat_provider() -> None:
     assert batch.recommendations[0].title == "Moneyball"
 
 
+def test_ai_client_extracts_text_from_message_content_parts() -> None:
+    result = {
+        "recommendations": [
+            {
+                "title": "Moneyball",
+                "year": 2011,
+                "predictedRating": 8,
+                "rationale": "Data-driven sports drama fits the profile.",
+            }
+        ]
+    }
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "content": [
+                                {"type": "text", "text": json.dumps(result)},
+                            ]
+                        }
+                    }
+                ]
+            },
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.suggest([], [], count=1)
+    finally:
+        http_client.close()
+
+    assert batch.recommendations[0].title == "Moneyball"
+
+
 def test_ai_client_normalizes_provider_score_aliases() -> None:
     result = {
         "recommendations": [
@@ -440,6 +476,46 @@ def test_ai_client_wraps_http_failures_without_leaking_key() -> None:
     assert "super-secret" not in str(raised.value)
     assert "429 Too Many Requests" in str(raised.value)
     assert "--count" in str(raised.value)
+
+
+def test_ai_client_reports_provider_shape_when_message_has_no_text() -> None:
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {
+                            "role": "assistant",
+                            "content": None,
+                            "refusal": "The model refused to answer.",
+                            "tool_calls": [],
+                        },
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 20,
+                    "completion_tokens": 0,
+                    "total_tokens": 20,
+                },
+            },
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        with pytest.raises(AIError) as raised:
+            ai_client.suggest([], [], count=1)
+    finally:
+        http_client.close()
+
+    message = str(raised.value)
+    assert "AI provider message has no textual content" in message
+    assert "finish_reason='stop'" in message
+    assert "content_type=NoneType" in message
+    assert "refusal='The model refused to answer.'" in message
+    assert "usage[prompt_tokens=20, completion_tokens=0, total_tokens=20]" in message
+    assert "super-secret" not in message
 
 
 def test_resolver_verifies_tmdb_and_excludes_seen_ambiguous_and_duplicate_films(

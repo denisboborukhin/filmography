@@ -484,19 +484,124 @@ def _json_object(raw_json: str) -> dict[str, object]:
 def _extract_message_content(payload: dict[str, object]) -> str:
     choices = payload.get("choices")
     if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
-        raise AIError("AI provider response has no choices")
+        raise AIError(f"AI provider response has no choices ({_response_summary(payload)})")
     first = cast(dict[str, object], choices[0])
     message = first.get("message")
     if not isinstance(message, dict):
-        raise AIError("AI provider response has no message")
+        raise AIError(f"AI provider response has no message ({_choice_summary(first, payload)})")
     typed_message = cast(dict[str, object], message)
     parsed = typed_message.get("parsed")
     if isinstance(parsed, dict):
         return json.dumps(parsed, ensure_ascii=False)
     content = typed_message.get("content")
+    if isinstance(content, list):
+        content = _text_from_content_parts(cast(list[object], content))
     if not isinstance(content, str) or not content.strip():
-        raise AIError("AI provider message has no textual content")
+        raise AIError(
+            "AI provider message has no textual content "
+            f"({_message_summary(first, typed_message, payload)})"
+        )
     return content
+
+
+def _text_from_content_parts(content: list[object]) -> str:
+    parts: list[str] = []
+    for item in content:
+        if isinstance(item, str):
+            parts.append(item)
+            continue
+        if not isinstance(item, dict):
+            continue
+        typed_item = cast(dict[str, object], item)
+        text = typed_item.get("text")
+        if isinstance(text, str):
+            parts.append(text)
+            continue
+        nested_text = typed_item.get("content")
+        if isinstance(nested_text, str):
+            parts.append(nested_text)
+    return "\n".join(part for part in parts if part.strip())
+
+
+def _response_summary(payload: dict[str, object]) -> str:
+    keys = ", ".join(sorted(payload))
+    usage = _usage_summary(payload.get("usage"))
+    return _join_summary_parts(f"top-level keys=[{keys or 'none'}]", usage)
+
+
+def _choice_summary(choice: dict[str, object], payload: dict[str, object]) -> str:
+    return _join_summary_parts(
+        f"choice keys=[{', '.join(sorted(choice)) or 'none'}]",
+        _finish_reason_summary(choice),
+        _usage_summary(payload.get("usage")),
+    )
+
+
+def _message_summary(
+    choice: dict[str, object], message: dict[str, object], payload: dict[str, object]
+) -> str:
+    content = message.get("content")
+    parsed = message.get("parsed")
+    tool_calls = message.get("tool_calls")
+    return _join_summary_parts(
+        f"finish_reason={_safe_scalar(choice.get('finish_reason'))}",
+        f"message keys=[{', '.join(sorted(message)) or 'none'}]",
+        f"content_type={type(content).__name__}",
+        f"parsed_type={type(parsed).__name__}",
+        _tool_calls_summary(tool_calls),
+        _refusal_summary(message.get("refusal")),
+        _usage_summary(payload.get("usage")),
+    )
+
+
+def _finish_reason_summary(choice: dict[str, object]) -> str:
+    return f"finish_reason={_safe_scalar(choice.get('finish_reason'))}"
+
+
+def _tool_calls_summary(value: object) -> str:
+    if isinstance(value, list):
+        return f"tool_calls={len(cast(list[object], value))}"
+    return f"tool_calls_type={type(value).__name__}"
+
+
+def _refusal_summary(value: object) -> str:
+    if not isinstance(value, str) or not value.strip():
+        return ""
+    return f"refusal={_preview(value)}"
+
+
+def _usage_summary(value: object) -> str:
+    if not isinstance(value, dict):
+        return ""
+    usage = cast(dict[str, object], value)
+    interesting = (
+        "prompt_tokens",
+        "completion_tokens",
+        "total_tokens",
+        "input_tokens",
+        "output_tokens",
+    )
+    parts = [f"{key}={usage[key]}" for key in interesting if isinstance(usage.get(key), int)]
+    return f"usage[{', '.join(parts)}]" if parts else ""
+
+
+def _safe_scalar(value: object) -> str:
+    if isinstance(value, str):
+        return _preview(value)
+    if value is None or isinstance(value, (int, float, bool)):
+        return repr(value)
+    return type(value).__name__
+
+
+def _preview(value: str, *, limit: int = 160) -> str:
+    collapsed = " ".join(value.split())
+    if len(collapsed) > limit:
+        collapsed = f"{collapsed[: limit - 1]}..."
+    return repr(collapsed)
+
+
+def _join_summary_parts(*parts: str) -> str:
+    return "; ".join(part for part in parts if part)
 
 
 def _parse_suggestion_content(content: str) -> AISuggestionBatch:

@@ -100,7 +100,9 @@ known targets from the non-manual watchlist and local taste matches against your
 history. Explicit watchlist scores always win. It requests ten verified AI picks by default and
 publishes a refreshed AI pick set only when at least five suggestions survive TMDB verification. If
 one AI request fails, the updater keeps the last valid data for that part while still applying the
-other successful request.
+other successful request. Provider failures include safe response-shape diagnostics such as finish
+reason, message keys, content type, refusal text, tool-call count, and token usage. The diagnostics do
+not print API keys or the full request payload.
 
 Alternative providers must implement `POST /chat/completions` and support strict JSON Schema through
 the `response_format` request field. For OpenRouter, set `FILMOGRAPHY_AI_BASE_URL` to
