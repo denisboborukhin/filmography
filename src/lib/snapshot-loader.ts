@@ -48,7 +48,7 @@ async function readCacheStorage(): Promise<FilmographySnapshot | null> {
 export async function loadSnapshot(signal?: AbortSignal): Promise<LoadedSnapshot> {
   try {
     const response = await fetch(SNAPSHOT_URL, {
-      cache: 'no-cache',
+      cache: 'reload',
       headers: { Accept: 'application/json' },
       signal,
     })

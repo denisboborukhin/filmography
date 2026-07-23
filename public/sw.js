@@ -143,13 +143,14 @@ async function networkFirst(request, fallbackUrl) {
 }
 
 async function cachedShell(request) {
-  const cache = await caches.open(SHELL_CACHE)
-  const matchOptions = { ignoreVary: true }
-  const cached =
-    (await cache.match(request, matchOptions)) ??
-    (await cache.match(scopeUrl, matchOptions))
-  return cached ?? networkFirst(request, scopeUrl)
+  return networkFirst(request, scopeUrl)
 }
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
 
 self.addEventListener('fetch', (event) => {
   const { request } = event

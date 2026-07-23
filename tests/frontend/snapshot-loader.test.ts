@@ -43,7 +43,7 @@ describe('snapshot loader', () => {
 
     expect(fetch).toHaveBeenCalledWith(
       SNAPSHOT_URL,
-      expect.objectContaining({ cache: 'no-cache' }),
+      expect.objectContaining({ cache: 'reload' }),
     )
     expect(result).toEqual({ snapshot: snapshotFixture, source: 'network', warning: null })
     expect(JSON.parse(window.localStorage.getItem(SNAPSHOT_STORAGE_KEY) ?? '')).toEqual(

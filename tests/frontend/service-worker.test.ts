@@ -71,7 +71,7 @@ async function dispatchFetch(
 }
 
 describe('service worker offline routing', () => {
-  it('serves a cached application shell without waiting for the network', async () => {
+  it('tries the network for navigation before falling back to the cached shell', async () => {
     const worker = loadWorker(new Map([[scope, '<main>cached journal</main>']]))
     const listener = worker.listeners.get('fetch')
     expect(listener).toBeDefined()
@@ -85,7 +85,7 @@ describe('service worker offline routing', () => {
 
     expect(await response.text()).toContain('cached journal')
     expect(worker.open).toHaveBeenCalledWith('filmography-shell-v1')
-    expect(worker.fetchMock).not.toHaveBeenCalled()
+    expect(worker.fetchMock).toHaveBeenCalled()
   })
 
   it('uses the shell cache for same-origin images before the poster cache', async () => {
