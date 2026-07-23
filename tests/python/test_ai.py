@@ -75,7 +75,7 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     assert captured["path"] == "/v1/chat/completions"
     request_body = cast(dict[str, object], captured["body"])
     assert request_body["model"] == "test-model"
-    assert request_body["max_tokens"] == 8000
+    assert request_body["max_tokens"] == 48000
     assert "reasoning" not in request_body
     serialized_body = json.dumps(request_body)
     assert "A complete review." in serialized_body
@@ -103,12 +103,12 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
 
 
 def test_ai_client_validates_max_tokens_range() -> None:
-    with pytest.raises(ValueError, match="between 128 and 32000"):
+    with pytest.raises(ValueError, match="between 128 and 128000"):
         OpenAICompatibleClient(
             "super-secret",
             "test-model",
             "https://provider.test/v1",
-            max_tokens=64000,
+            max_tokens=256000,
         )
 
 

@@ -66,7 +66,7 @@ export TMDB_ACCESS_TOKEN="your-tmdb-read-access-token"
 export FILMOGRAPHY_AI_API_KEY="your-provider-key"       # optional
 export FILMOGRAPHY_AI_BASE_URL="https://api.openai.com/v1" # optional; this is the default
 export FILMOGRAPHY_AI_MODEL="your-model-name"           # optional
-export FILMOGRAPHY_AI_MAX_TOKENS="8000"                 # optional; response cap, 128-32000
+export FILMOGRAPHY_AI_MAX_TOKENS="48000"                # optional; response cap, 128-128000
 ```
 
 Validate notes without writing output:

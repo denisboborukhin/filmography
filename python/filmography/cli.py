@@ -180,7 +180,7 @@ def _create_ai_client(stack: ExitStack) -> OpenAICompatibleClient | None:
     api_key = os.environ.get("FILMOGRAPHY_AI_API_KEY", "").strip()
     model = os.environ.get("FILMOGRAPHY_AI_MODEL", "").strip()
     base_url = os.environ.get("FILMOGRAPHY_AI_BASE_URL", "https://api.openai.com/v1").strip()
-    raw_max_tokens = os.environ.get("FILMOGRAPHY_AI_MAX_TOKENS", "8000").strip()
+    raw_max_tokens = os.environ.get("FILMOGRAPHY_AI_MAX_TOKENS", "48000").strip()
     missing = [
         name
         for name, value in (
