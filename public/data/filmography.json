@@ -1,8 +1,579 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-21T18:30:02.177119Z",
-  "recommendationsGeneratedAt": "2026-07-21T18:30:02.185051Z",
+  "generatedAt": "2026-07-23T07:32:47.165916Z",
+  "recommendationsGeneratedAt": "2026-07-23T07:32:47.174287Z",
   "watched": [
+    {
+      "tmdbId": 77338,
+      "mediaType": "movie",
+      "title": "The Intouchables",
+      "originalTitle": "Intouchables",
+      "year": 2011,
+      "releaseDate": "2011-11-02",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/1QU7HKgsQbGpzsJbJK4pAVQV9F5.jpg",
+      "overview": "A true story of two men who should never have met – a quadriplegic aristocrat who was injured in a paragliding accident and a young man from the projects.",
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
+      "voteAverage": 8.273,
+      "popularity": 26.3349,
+      "rating": 8.8,
+      "watchedAt": "2026-07-23",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Весёлый и интересный фильм о счастье в жизни.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 33161,
+            "name": "François Cluzet",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/9T4dsl1Mof1joCDVLByw1ATHvWq.jpg",
+            "role": "Philippe"
+          },
+          {
+            "tmdbId": 78423,
+            "name": "Omar Sy",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/Uuy6WuizieB4fOIGFp0gY90Yq2.jpg",
+            "role": "Driss"
+          },
+          {
+            "tmdbId": 19370,
+            "name": "Anne Le Ny",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/eyvOUlmpllkSTRRT2mmGcUUrKZR.jpg",
+            "role": "Yvonne"
+          },
+          {
+            "tmdbId": 219708,
+            "name": "Audrey Fleurot",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/83wsYI6oRWrtkcKr7ozobh1VWrm.jpg",
+            "role": "Magalie"
+          },
+          {
+            "tmdbId": 84430,
+            "name": "Joséphine de Meaux",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/kpkTzxQTcVhaANLEtqX5TKZ9Njr.jpg",
+            "role": "La DRH société de courses"
+          },
+          {
+            "tmdbId": 2411,
+            "name": "Clotilde Mollet",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/pu1sHxq0mvv61gTJGRhYGfMbZ18.jpg",
+            "role": "Marcelle"
+          },
+          {
+            "tmdbId": 26107,
+            "name": "Alba Gaïa Bellugi",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/t867vdItkJURwMcdSpewBlWZBYO.jpg",
+            "role": "Elisa"
+          },
+          {
+            "tmdbId": 581728,
+            "name": "Cyril Mendy",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/9yLrfKP5h4RKCyUKtKvuez9sfgM.jpg",
+            "role": "Adama"
+          },
+          {
+            "tmdbId": 1411815,
+            "name": "Salimata Kamate",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/3opCuVDzaArRYo8RYZ2tDAwYqdf.jpg",
+            "role": "Fatou"
+          },
+          {
+            "tmdbId": 1411817,
+            "name": "Absa Diatou Toure",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/rFFyQTOJnQtrPJVbeXI1kX1zWkf.jpg",
+            "role": "Mina"
+          },
+          {
+            "tmdbId": 146212,
+            "name": "Grégoire Oestermann",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/gBDwBSDnd4EwOB9SzenZwDarJIy.jpg",
+            "role": "Antoine"
+          },
+          {
+            "tmdbId": 1349054,
+            "name": "Dominique Daguier",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/30N8wnbFC18euVDTS1i9H7JCP6E.jpg",
+            "role": "Ami Philippe"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 84426,
+          "name": "Olivier Nakache",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/cLfpk5eIT8h7NnZcz6Iti3DPkRu.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 82596,
+      "mediaType": "tv",
+      "title": "Emily in Paris",
+      "originalTitle": "Emily in Paris",
+      "year": 2020,
+      "releaseDate": "2020-10-02",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/c0bkO416OU7YGdOFktk45H8REgL.jpg",
+      "overview": "New passions. New fashions. New Emily? A plucky American marketing whiz spreads her wings in life and love after landing her dream job in Paris.",
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
+      "voteAverage": 7.558,
+      "popularity": 17.9872,
+      "rating": 7.8,
+      "watchedAt": "2026-07-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Интересный и добрый сериал про весёлую и наполненную жизнь.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 112561,
+            "name": "Lily Collins",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/w7ZXE2qRmmdPpUt2hRIaFuyoaNd.jpg",
+            "role": "Emily Cooper"
+          },
+          {
+            "tmdbId": 20530,
+            "name": "Philippine Leroy-Beaulieu",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/1wt9AWB8HQz23VDmcZA0tVQn0vx.jpg",
+            "role": "Sylvie Grateau"
+          },
+          {
+            "tmdbId": 1285023,
+            "name": "Ashley Park",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/aFw4TmHuaAIpz9nCvtadtO1AYGZ.jpg",
+            "role": "Mindy Chen"
+          },
+          {
+            "tmdbId": 2417980,
+            "name": "Lucas Bravo",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/uO6vMlJBMASyOQMisvnPehjsfJB.jpg",
+            "role": "Gabriel"
+          },
+          {
+            "tmdbId": 1746088,
+            "name": "Samuel Arnold",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/r5cHeGdcOXHfNjeGamlJG1WQLRS.jpg",
+            "role": "Julien"
+          },
+          {
+            "tmdbId": 2320594,
+            "name": "Bruno Gouery",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/w0JGP6mtph0PAaRmXagD9PcpQ5M.jpg",
+            "role": "Luc"
+          },
+          {
+            "tmdbId": 233096,
+            "name": "Lucien Laviscount",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/3GndTFV0wMGDwocS4rP5Z194uYu.jpg",
+            "role": "Alfie Peterson"
+          },
+          {
+            "tmdbId": 1300918,
+            "name": "Eugenio Franceschini",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/jeXQmBBuwuCUwHFmLy6GwXWhlkY.jpg",
+            "role": "Marcello Muratori"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 1117311,
+          "name": "Yolanda T. Cochran",
+          "profileUrl": null,
+          "role": "Producer"
+        }
+      }
+    },
+    {
+      "tmdbId": 97546,
+      "mediaType": "tv",
+      "title": "Ted Lasso",
+      "originalTitle": "Ted Lasso",
+      "year": 2020,
+      "releaseDate": "2020-08-14",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/5fhZdwP1DVJ0FyVH6vrFdHwpXIn.jpg",
+      "overview": "Ted Lasso, an American football coach, moves to England when he's hired to manage a soccer team—despite having no experience. With cynical players and a doubtful town, will he get them to see the Ted Lasso Way?",
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
+      "voteAverage": 8.346,
+      "popularity": 44.1628,
+      "rating": 8.6,
+      "watchedAt": "2026-07-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Каждая серия сериала пронизана тем, как открытость к миру позволяет достигать высот. Тед всегда смотрит на ситуацию с позитивной стороны и несмотря на проблемы и сложности делает выводы и двигается вперёд.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 58224,
+            "name": "Jason Sudeikis",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/uuacnP9DOHMsmj8FhBi0cWWDgrn.jpg",
+            "role": "Ted Lasso"
+          },
+          {
+            "tmdbId": 1278487,
+            "name": "Hannah Waddingham",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/eHAICyhvjiRZCgzKyJCk9hWnnjr.jpg",
+            "role": "Rebecca Welton"
+          },
+          {
+            "tmdbId": 3555,
+            "name": "Jeremy Swift",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/muRh4WbyEE4S2763bv777ywpKP3.jpg",
+            "role": "Leslie Higgins"
+          },
+          {
+            "tmdbId": 21422,
+            "name": "Brett Goldstein",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/xYdFNE7EkncE8uiPJzT3RrkqcAQ.jpg",
+            "role": "Roy Kent"
+          },
+          {
+            "tmdbId": 1113365,
+            "name": "Brendan Hunt",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/7Z8q2WUop3q5BdyaBD6YvweGWrZ.jpg",
+            "role": "Coach Beard"
+          },
+          {
+            "tmdbId": 36594,
+            "name": "Juno Temple",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/nvsPrM4OKHVCDivgMx4FF6PgE5f.jpg",
+            "role": "Keeley Jones"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 2342625,
+          "name": "Leann Bowen",
+          "profileUrl": null,
+          "role": "Executive Producer"
+        }
+      }
+    },
+    {
+      "tmdbId": 1314481,
+      "mediaType": "movie",
+      "title": "The Devil Wears Prada 2",
+      "originalTitle": "The Devil Wears Prada 2",
+      "year": 2026,
+      "releaseDate": "2026-04-29",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/fCAURTUx3YfsJ8k9I0UamjSILiR.jpg",
+      "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival.",
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "voteAverage": 7.116,
+      "popularity": 180.5329,
+      "rating": 7.9,
+      "watchedAt": "2026-07-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Интересный фильм про то, как важно оставаться человеком.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 1813,
+            "name": "Anne Hathaway",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/nbccV2pMoyLTCeg5DQip24Eq0Jp.jpg",
+            "role": "Andy Sachs"
+          },
+          {
+            "tmdbId": 5064,
+            "name": "Meryl Streep",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/g5cVxQBAQ3AXt3LhdBXtbbN47Uc.jpg",
+            "role": "Miranda Priestly"
+          },
+          {
+            "tmdbId": 5081,
+            "name": "Emily Blunt",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/5nCSG5TL1bP1geD8aaBfaLnLLCD.jpg",
+            "role": "Emily"
+          },
+          {
+            "tmdbId": 2283,
+            "name": "Stanley Tucci",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/q4TanMDI5Rgsvw4SfyNbPBh4URr.jpg",
+            "role": "Nigel"
+          },
+          {
+            "tmdbId": 11181,
+            "name": "Kenneth Branagh",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/AbCqqFxNi5w3nDUFdQt0DGMFh5H.jpg",
+            "role": "Stuart"
+          },
+          {
+            "tmdbId": 15009,
+            "name": "Justin Theroux",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/vnI9L0rXBAw1HeC0Q8hJGeJMGAW.jpg",
+            "role": "Benji Barnes"
+          },
+          {
+            "tmdbId": 140,
+            "name": "Lucy Liu",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/9nbtjqsx3De7hO2XDtrBQ7M9VCH.jpg",
+            "role": "Sasha Barnes"
+          },
+          {
+            "tmdbId": 10580,
+            "name": "Tracie Thoms",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/9PKUJJtqFRbZDhme6uDzIu0mRIE.jpg",
+            "role": "Lily"
+          },
+          {
+            "tmdbId": 1192389,
+            "name": "Tibor Feldman",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/b6tVKhCkNWltObwyHpGfBLuaPt6.jpg",
+            "role": "Irv Ravitz"
+          },
+          {
+            "tmdbId": 107770,
+            "name": "B.J. Novak",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/o8Xf1khxhKGTz3QAplXD35opRA8.jpg",
+            "role": "Jay Ravitz"
+          },
+          {
+            "tmdbId": 221032,
+            "name": "Patrick Brammall",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/l4IlGBxkYcCwqtfuKfWyHa9JCn6.jpg",
+            "role": "Peter"
+          },
+          {
+            "tmdbId": 2223752,
+            "name": "Simone Ashley",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/uL7t73kzhrRLY9ilNze1dYhHfg3.jpg",
+            "role": "Amari"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 5065,
+          "name": "David Frankel",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/hfIjLMo8Upl6MXhn1YcoDoXeeZn.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 356305,
+      "mediaType": "movie",
+      "title": "Why Him?",
+      "originalTitle": "Why Him?",
+      "year": 2016,
+      "releaseDate": "2016-12-22",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/eezFoKz7bXgdbjeieeCYJFXPKSu.jpg",
+      "overview": "A dad forms a bitter rivalry with his daughter's young rich boyfriend.",
+      "genres": [
+        "Comedy"
+      ],
+      "voteAverage": 6.387,
+      "popularity": 3.8623,
+      "rating": 8.0,
+      "watchedAt": "2026-04-22",
+      "tags": [
+        "films resumes",
+        "fun"
+      ],
+      "review": "Смешной добрый фильм с прикольными моментами из мира хайтек.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 17419,
+            "name": "Bryan Cranston",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/npIIZJGSrcJIJ6yHdmbqO6Jzo5I.jpg",
+            "role": "Ned Fleming"
+          },
+          {
+            "tmdbId": 17051,
+            "name": "James Franco",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/bjmAntHGiibLZixH8nTNVBzaFQn.jpg",
+            "role": "Laird Mayhew"
+          },
+          {
+            "tmdbId": 1059597,
+            "name": "Zoey Deutch",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/tn6ErnytTct7HNAFG2dW17QcBk5.jpg",
+            "role": "Stephanie Fleming"
+          },
+          {
+            "tmdbId": 52119,
+            "name": "Megan Mullally",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/ypdczVeLt9B2zSOeY7e6RO2XWJQ.jpg",
+            "role": "Barb Fleming"
+          },
+          {
+            "tmdbId": 971299,
+            "name": "Griffin Gluck",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/j7KSBKYLgnLxkZfhQ679HRSDIjj.jpg",
+            "role": "Scotty Fleming"
+          },
+          {
+            "tmdbId": 298410,
+            "name": "Keegan-Michael Key",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/xmdzYXP9j87a43FSiL138nLesuS.jpg",
+            "role": "Gustav"
+          },
+          {
+            "tmdbId": 53862,
+            "name": "Kaley Cuoco",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/c01Ma8Jrr2OJ6uoikPwDK34Y8eK.jpg",
+            "role": "Justine (voice)"
+          },
+          {
+            "tmdbId": 5726,
+            "name": "Cedric the Entertainer",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/s6UrY5uofyxXsU5PydWBoLFReK0.jpg",
+            "role": "Lou Dunne"
+          },
+          {
+            "tmdbId": 130535,
+            "name": "Zack Pearlman",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/ez93T66xMaCycaw5aoh61o6FO2H.jpg",
+            "role": "Kevin Dingle"
+          },
+          {
+            "tmdbId": 1163979,
+            "name": "Jee Young Han",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/htRg5qDTLaDdrPFsqracWa8ZOy7.jpg",
+            "role": "Marnie Dingle"
+          },
+          {
+            "tmdbId": 1728401,
+            "name": "Grace Hazelett",
+            "profileUrl": null,
+            "role": "Vanessa Dingle"
+          },
+          {
+            "tmdbId": 1728402,
+            "name": "Sadie Hazelett",
+            "profileUrl": null,
+            "role": "Vanessa Dingle"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 17871,
+          "name": "John Hamburg",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/flYIdyuPlLZQ8ur7guVGGvffN0R.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 329865,
+      "mediaType": "movie",
+      "title": "Arrival",
+      "originalTitle": "Arrival",
+      "year": 2016,
+      "releaseDate": "2016-11-10",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/x2FJsf1ElAgr63Y3PNPtJrcmpoe.jpg",
+      "overview": "Taking place after alien crafts land around the world, an expert linguist is recruited by the military to determine whether they come in peace or are a threat.",
+      "genres": [
+        "Drama",
+        "Science Fiction",
+        "Mystery"
+      ],
+      "voteAverage": 7.631,
+      "popularity": 15.8454,
+      "rating": 7.7,
+      "watchedAt": "2026-02-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 9273,
+            "name": "Amy Adams",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/1h2r2VTpoFb5QefAaBYYQgQzL9z.jpg",
+            "role": "Louise Banks"
+          },
+          {
+            "tmdbId": 17604,
+            "name": "Jeremy Renner",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/yB84D1neTYXfWBaV0QOE9RF2VCu.jpg",
+            "role": "Ian Donnelly"
+          },
+          {
+            "tmdbId": 2178,
+            "name": "Forest Whitaker",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/4w7l5JUwnwFNBy7J93ZwYN1nihm.jpg",
+            "role": "Colonel Weber"
+          },
+          {
+            "tmdbId": 72873,
+            "name": "Michael Stuhlbarg",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/aYB3SQm3h6ZyAdlbGyiNfakjx56.jpg",
+            "role": "Agent Halpern"
+          },
+          {
+            "tmdbId": 225411,
+            "name": "Mark O'Brien",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/8ckgltvlife4BBJcBpHEQWXfQ9p.jpg",
+            "role": "Captain Marks"
+          },
+          {
+            "tmdbId": 21629,
+            "name": "Tzi Ma",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/x4fz0LCIiBNGdil3nBYO22W7QJ0.jpg",
+            "role": "General Shang"
+          },
+          {
+            "tmdbId": 1646444,
+            "name": "Abigail Pniowsky",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/eFjFSNghr04PT6eBHzqLCvCUiXm.jpg",
+            "role": "8-Year-Old Hannah"
+          },
+          {
+            "tmdbId": 1522166,
+            "name": "Julia Scarlett Dan",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/5keIOToJhdil2uaTOXq5JX4e3OR.jpg",
+            "role": "12-Year-Old Hannah"
+          },
+          {
+            "tmdbId": 1646448,
+            "name": "Jadyn Malone",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/pVcseEB0gNjmkGRbvmnV8XAsPae.jpg",
+            "role": "6-Year-Old Hannah"
+          },
+          {
+            "tmdbId": 135993,
+            "name": "Frank Schorpion",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/aYHpKplVgIeuN8VoJq5R1Im9QKi.jpg",
+            "role": "Dr. Kettler"
+          },
+          {
+            "tmdbId": 1752147,
+            "name": "Lucas Chartier-Dessert",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/fi3OjPClyiHFom5dmtWVEaByvRY.jpg",
+            "role": "Private Lasky"
+          },
+          {
+            "tmdbId": 1646452,
+            "name": "Christian Jadah",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/mIyyQ8maFwGv4s4can7c0mwN9UX.jpg",
+            "role": "Private Combs"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 137427,
+          "name": "Denis Villeneuve",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/zdDx9Xs93UIrJFWYApYR28J8M6b.jpg",
+          "role": "Director"
+        }
+      }
+    },
     {
       "tmdbId": 22803,
       "mediaType": "movie",
@@ -14,17 +585,416 @@
       "overview": "A frustrated man decides to take justice into his own hands after a plea bargain sets one of his family's killers free. He targets not only the killer but also the district attorney and others involved in the deal.",
       "genres": [
         "Drama",
-        "Crime"
+        "Crime",
+        "Thriller"
       ],
       "voteAverage": 7.398,
       "popularity": 8.1037,
-      "rating": 7.0,
+      "rating": 7.2,
       "watchedAt": "2025-11-03",
       "tags": [
         "films resumes"
       ],
-      "review": "---\n\n\n---",
-      "sourceUrl": null
+      "review": "Зрелищный фильм об изобретательной мести. Герой -- гений, который чётко продумал последовательность от него независящих действий на 1000 шагов в перёд и вводит этим всех в недоумение.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 134,
+            "name": "Jamie Foxx",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/zD8Nsy4Xrghp7WunwpCj5JKBPeU.jpg",
+            "role": "Nick Rice"
+          },
+          {
+            "tmdbId": 17276,
+            "name": "Gerard Butler",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/i54XoxYieuff2w6MwyfwVUBvmR0.jpg",
+            "role": "Clyde Alexander Shelton"
+          },
+          {
+            "tmdbId": 17782,
+            "name": "Colm Meaney",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/guL6RJdlRMtOJN3LoaY3G8hG4Rd.jpg",
+            "role": "Detective Dunnigan"
+          },
+          {
+            "tmdbId": 14888,
+            "name": "Bruce McGill",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/j4mn0fPdhhXfRqQwheAwCU8Hwrm.jpg",
+            "role": "Jonas Cantrell"
+          },
+          {
+            "tmdbId": 57451,
+            "name": "Leslie Bibb",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/g3a1O9lOTZvrwQupUtg4Fc3CdTd.jpg",
+            "role": "Sarah Lowell"
+          },
+          {
+            "tmdbId": 124304,
+            "name": "Michael Irby",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/9cX8pKujyAlOyqGSAgvKNdA3qRj.jpg",
+            "role": "Detective Garza"
+          },
+          {
+            "tmdbId": 21142,
+            "name": "Gregory Itzin",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/lUACgFTvuhRhAC3GwnpcWMGLxo4.jpg",
+            "role": "Warden Iger"
+          },
+          {
+            "tmdbId": 35705,
+            "name": "Regina Hall",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/jiFZ4xNrvUUZLBHnJu71CvdN4kj.jpg",
+            "role": "Kelly Rice"
+          },
+          {
+            "tmdbId": 124305,
+            "name": "Emerald-Angel Young",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/lliqGN60XcJzNCkxPUjszzSuUag.jpg",
+            "role": "Denise Rice"
+          },
+          {
+            "tmdbId": 1577506,
+            "name": "Brooke Stacy Mills",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/8aL7mSJ7NlGjy41YGxRcpiMabLq.jpg",
+            "role": "Clyde's Wife"
+          },
+          {
+            "tmdbId": 36091,
+            "name": "Christian Stolte",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/hE460cJmuckGHWKGdSgmPxD9ixY.jpg",
+            "role": "Clarence Darby"
+          },
+          {
+            "tmdbId": 6907,
+            "name": "Annie Corley",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/rz72CxdBciMiyqY38Ik6C6dMB3I.jpg",
+            "role": "Judge Laura Burch"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 37932,
+          "name": "F. Gary Gray",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/lVbwLnxtdiQaS8oGWFZMkhATLc5.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 157336,
+      "mediaType": "movie",
+      "title": "Interstellar",
+      "originalTitle": "Interstellar",
+      "year": 2014,
+      "releaseDate": "2014-11-05",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg",
+      "overview": "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.",
+      "genres": [
+        "Adventure",
+        "Drama",
+        "Science Fiction"
+      ],
+      "voteAverage": 8.482,
+      "popularity": 67.9623,
+      "rating": 9.1,
+      "watchedAt": "2025-08-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Невероятная игра актёров и музыка погружают в атмосферу и заставляют переживать все события вместе с героями. Фильм пронизан трудными решениями и открытым финалом: жив ли Купер?",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 10297,
+            "name": "Matthew McConaughey",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/lCySuYjhXix3FzQdS4oceDDrXKI.jpg",
+            "role": "Cooper"
+          },
+          {
+            "tmdbId": 1813,
+            "name": "Anne Hathaway",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/nbccV2pMoyLTCeg5DQip24Eq0Jp.jpg",
+            "role": "Brand"
+          },
+          {
+            "tmdbId": 3895,
+            "name": "Michael Caine",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/bVZRMlpjTAO2pJK6v90buFgVbSW.jpg",
+            "role": "Professor Brand"
+          },
+          {
+            "tmdbId": 83002,
+            "name": "Jessica Chastain",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/eQKnihReJeB9vQEa5gySzAlKfZt.jpg",
+            "role": "Murph"
+          },
+          {
+            "tmdbId": 1893,
+            "name": "Casey Affleck",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/304ilSygaCRWykoBWAL67TOw8g9.jpg",
+            "role": "Tom"
+          },
+          {
+            "tmdbId": 8210,
+            "name": "Wes Bentley",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/voD93lzFZrr9xfAggwFcPRBi84i.jpg",
+            "role": "Doyle"
+          },
+          {
+            "tmdbId": 17052,
+            "name": "Topher Grace",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/oJQxl4DG0KSCtOGrpWNhYz9gUZA.jpg",
+            "role": "Getty"
+          },
+          {
+            "tmdbId": 851784,
+            "name": "Mackenzie Foy",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/wzH60SrqWp2XMkBfLgdBhx5EJ82.jpg",
+            "role": "Murph (10 Yrs.)"
+          },
+          {
+            "tmdbId": 9560,
+            "name": "Ellen Burstyn",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/zGihSIVRzwmCqilnA4PmNM4C2RT.jpg",
+            "role": "Murph (older)"
+          },
+          {
+            "tmdbId": 12074,
+            "name": "John Lithgow",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/ajfuBSm1HuVqFJlbTmAlza62Xxr.jpg",
+            "role": "Donald"
+          },
+          {
+            "tmdbId": 58549,
+            "name": "Bill Irwin",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/bAV5qsljgiHQkn3QluB5clVYC13.jpg",
+            "role": "TARS (voice)"
+          },
+          {
+            "tmdbId": 55411,
+            "name": "David Gyasi",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/1382u2e4jiGhuDKgeK9UZtXXqfh.jpg",
+            "role": "Romilly"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 525,
+          "name": "Christopher Nolan",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/xuAIuYSmsUzKlUMBFGVZaWsY3DZ.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 1241894,
+      "mediaType": "movie",
+      "title": "Woodwalkers",
+      "originalTitle": "Woodwalkers",
+      "year": 2024,
+      "releaseDate": "2024-10-17",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/bC1r04ohuxv5feaGDzQ0lXz7Bbl.jpg",
+      "overview": "Humans who can shapeshift into animals struggle to integrate with others without revealing their special abilities. As a group, they strive to inform and institute change in the perspective of deforestation and the importance of natural habitats. However, when that cannot happen, they're forced to take matters into their own hands.",
+      "genres": [
+        "Fantasy",
+        "Family"
+      ],
+      "voteAverage": 6.354,
+      "popularity": 3.5148,
+      "rating": 7.2,
+      "watchedAt": "2025-08-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 2982534,
+            "name": "Emile Chérif",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/1piOAICtgfVvKAU8QSZLjNILUJ3.jpg",
+            "role": "Carag"
+          },
+          {
+            "tmdbId": 4072268,
+            "name": "Lilli Falk",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/rdvtuPzvSkfYu3R14keUNS3rg1w.jpg",
+            "role": "Holly"
+          },
+          {
+            "tmdbId": 4670408,
+            "name": "Johan von Ehrlich",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/iPWqsR5AlZHEgk1RKvymgQtbWna.jpg",
+            "role": "Brandon"
+          },
+          {
+            "tmdbId": 4670430,
+            "name": "Sophie Lelenta",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/jigsqYSV9zVGkbjVqhAPVGpLcSQ.jpg",
+            "role": "Lou"
+          },
+          {
+            "tmdbId": 213581,
+            "name": "Oliver Masucci",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/u3ndWBPECxyKf6CRAZqjlJ92hQw.jpg",
+            "role": "Andrew Milling"
+          },
+          {
+            "tmdbId": 678,
+            "name": "Martina Gedeck",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/ju7H4RLIzfrcMg2e3SUAaA9fEc6.jpg",
+            "role": "Lissa Clearwater"
+          },
+          {
+            "tmdbId": 16783,
+            "name": "Hannah Herzsprung",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/r7HqgdYtosrLnAwJKVnfDr13mdz.jpg",
+            "role": "Anna Ralston"
+          },
+          {
+            "tmdbId": 4670431,
+            "name": "Emil Bloch",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/7rxAk6zk8GnpXpaZEN8zg7oQNvs.jpg",
+            "role": "Jeffrey"
+          },
+          {
+            "tmdbId": 4523550,
+            "name": "Olivia Sinclair",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/ck6hnWslF3lQobJOVQ8KS42rd4m.jpg",
+            "role": "Tikaani"
+          },
+          {
+            "tmdbId": 1156440,
+            "name": "David Wurawa",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/m8kird9Y9LefnDhYujkT5em8hT.jpg",
+            "role": "Mr. Ellwood"
+          },
+          {
+            "tmdbId": 1491022,
+            "name": "Anton Noori",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/mawzlNE7rlSW121wgKnMJDDFYM6.jpg",
+            "role": "James Bridger"
+          },
+          {
+            "tmdbId": 1133520,
+            "name": "Lucas Gregorowicz",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/z5qyyFEtyoUt64qgxZCQ0we1g6h.jpg",
+            "role": "Donald Ralston"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 1302623,
+          "name": "Damián John Harper",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/AwhrCmyS9WTOKsAzXQUvpeFe70s.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 296096,
+      "mediaType": "movie",
+      "title": "Me Before You",
+      "originalTitle": "Me Before You",
+      "year": 2016,
+      "releaseDate": "2016-06-01",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/Ia3dzj5LnCj1ZBdlVeJrbKJQxG.jpg",
+      "overview": "Lou Clark, a directionless 26-year-old from the English countryside, takes a job at the local castle as a caregiver and companion to a wealthy young banker, Will Traynor. Wheelchair-bound from an accident two years prior, the once adventurous Will has all but given up — that is until Lou determines to show him that life is worth living.",
+      "genres": [
+        "Drama",
+        "Romance"
+      ],
+      "voteAverage": 7.929,
+      "popularity": 16.5128,
+      "rating": 8.3,
+      "watchedAt": "2025-07-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Классный, добрый фильм про любовь и радости жизни.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 1223786,
+            "name": "Emilia Clarke",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/iFY6t7Ux9r70WB7Sp0TTVz6eGtm.jpg",
+            "role": "Louisa 'Lou' Clark"
+          },
+          {
+            "tmdbId": 237455,
+            "name": "Sam Claflin",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/e5CU4tjCNZFfm7ITmZfzjZse2Bb.jpg",
+            "role": "William 'Will' Traynor"
+          },
+          {
+            "tmdbId": 47627,
+            "name": "Janet McTeer",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/qOKAI6aunD4J5MXiwwomAhI3jI2.jpg",
+            "role": "Camilla Traynor"
+          },
+          {
+            "tmdbId": 4391,
+            "name": "Charles Dance",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/3xHwq5lchAI6mfW0aGQOEijexv6.jpg",
+            "role": "Stephen Traynor"
+          },
+          {
+            "tmdbId": 74056,
+            "name": "Brendan Coyle",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/x62gQenNH3fVHfDkTL0UDyVFHgo.jpg",
+            "role": "Bernard Clark"
+          },
+          {
+            "tmdbId": 1080542,
+            "name": "Jenna Coleman",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/tnEVlK6gvQfhGOQr3zgZwVt43IW.jpg",
+            "role": "Katrina 'Treena' Clark"
+          },
+          {
+            "tmdbId": 96841,
+            "name": "Matthew Lewis",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/aPQCLK2gxWOallsFoEwjb1p9lWE.jpg",
+            "role": "Patrick"
+          },
+          {
+            "tmdbId": 122535,
+            "name": "Samantha Spiro",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/tZ1Oz5DIc8dugsbGdtPnt0WOAAh.jpg",
+            "role": "Josie Clark"
+          },
+          {
+            "tmdbId": 1231106,
+            "name": "Stephen Peacocke",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/y5rEVZ7NCkBKDhmOlMl6q1nONpz.jpg",
+            "role": "Nathan"
+          },
+          {
+            "tmdbId": 556356,
+            "name": "Vanessa Kirby",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/tViEEsjvbhrJxWsOipUqIYjdHEb.jpg",
+            "role": "Alicia Dawares"
+          },
+          {
+            "tmdbId": 1173230,
+            "name": "Ben Lloyd-Hughes",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/cEsPLtLwCneRE99VkNIKUri5rk0.jpg",
+            "role": "Rupert Collins"
+          },
+          {
+            "tmdbId": 34901,
+            "name": "Joanna Lumley",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/omQvLqkQf9yemMroaj6MJbf37sf.jpg",
+            "role": "Mary Rawlinson"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 1096867,
+          "name": "Thea Sharrock",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/levYh65v2zBLBROydIjQijBupgW.jpg",
+          "role": "Director"
+        }
+      }
     },
     {
       "tmdbId": 70160,
@@ -35,16 +1005,209 @@
       "releaseDate": "2012-03-12",
       "posterUrl": "https://image.tmdb.org/t/p/w780/yXCbOiVDCxO71zI7cuwBRXdftq8.jpg",
       "overview": "In a dystopian society where the Capitol forces each district to send two young tributes to fight to the death in a televised spectacle, a girl volunteers to take her sister’s place, setting the stage for a struggle of survival and defiance.",
-      "genres": [],
+      "genres": [
+        "Science Fiction",
+        "Adventure",
+        "Action",
+        "Thriller"
+      ],
       "voteAverage": 7.224,
       "popularity": 6.8687,
-      "rating": 7.0,
+      "rating": 7.5,
       "watchedAt": "2025-07-21",
       "tags": [
         "films resumes"
       ],
-      "review": "---\n\n\n---",
-      "sourceUrl": null
+      "review": "",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 72129,
+            "name": "Jennifer Lawrence",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/6WTY6HjXMGxnHilJRVC3eLnu43F.jpg",
+            "role": "Katniss Everdeen"
+          },
+          {
+            "tmdbId": 27972,
+            "name": "Josh Hutcherson",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/f0eosZ1Fx0VBUyspq8K2f8sUSBn.jpg",
+            "role": "Peeta Mellark"
+          },
+          {
+            "tmdbId": 96066,
+            "name": "Liam Hemsworth",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/7UIm9RoBnlqS1uLlbElAY8urdWD.jpg",
+            "role": "Gale Hawthorne"
+          },
+          {
+            "tmdbId": 57755,
+            "name": "Woody Harrelson",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/igxYDQBbTEdAqaJxaW6ffqswmUU.jpg",
+            "role": "Haymitch Abernathy"
+          },
+          {
+            "tmdbId": 9281,
+            "name": "Elizabeth Banks",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg",
+            "role": "Effie Trinket"
+          },
+          {
+            "tmdbId": 77069,
+            "name": "Lenny Kravitz",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/dUlUZgeCcichbLdnPEfFrD4iy5G.jpg",
+            "role": "Cinna"
+          },
+          {
+            "tmdbId": 2283,
+            "name": "Stanley Tucci",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/q4TanMDI5Rgsvw4SfyNbPBh4URr.jpg",
+            "role": "Caesar Flickerman"
+          },
+          {
+            "tmdbId": 55636,
+            "name": "Donald Sutherland",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/yM8WO2BYqFvgQXAvf4CIuCYnY4j.jpg",
+            "role": "President Coriolanus Snow"
+          },
+          {
+            "tmdbId": 8210,
+            "name": "Wes Bentley",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/voD93lzFZrr9xfAggwFcPRBi84i.jpg",
+            "role": "Seneca Crane"
+          },
+          {
+            "tmdbId": 13014,
+            "name": "Toby Jones",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/y6kLmjLgZ1sceaE4Zi1fwF0YsvZ.jpg",
+            "role": "Claudius Templesmith"
+          },
+          {
+            "tmdbId": 23498,
+            "name": "Alexander Ludwig",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/3KpzKT4iGhNivSISQMe6EwpAmCi.jpg",
+            "role": "Cato"
+          },
+          {
+            "tmdbId": 77517,
+            "name": "Isabelle Fuhrman",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/f85lSSPHMZZihqs7qfOn1xQHtH7.jpg",
+            "role": "Clove"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 23964,
+          "name": "Gary Ross",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/xIQshBR5eJgzD7RjEXuRwfFvATW.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 210577,
+      "mediaType": "movie",
+      "title": "Gone Girl",
+      "originalTitle": "Gone Girl",
+      "year": 2014,
+      "releaseDate": "2014-10-01",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/ts996lKsxvjkO2yiYG0ht4qAicO.jpg",
+      "overview": "With his wife's disappearance having become the focus of an intense media circus, a man sees the spotlight turned on him when it's suspected that he may not be innocent.",
+      "genres": [
+        "Mystery",
+        "Thriller",
+        "Drama"
+      ],
+      "voteAverage": 7.891,
+      "popularity": 16.2297,
+      "rating": 8.2,
+      "watchedAt": "2025-03-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Фильм с совершенно неожиданным и удивительным сюжетный поворотом.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 880,
+            "name": "Ben Affleck",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/aTcqu8cI4wMohU17xTdqmXKTGrw.jpg",
+            "role": "Nick Dunne"
+          },
+          {
+            "tmdbId": 10882,
+            "name": "Rosamund Pike",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/8ObNklHDi2hjdz0ayzJFB9jtqzm.jpg",
+            "role": "Amy Dunne"
+          },
+          {
+            "tmdbId": 41686,
+            "name": "Neil Patrick Harris",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/r2twLWLwDpKJ7JyhWsD1YsL7rJV.jpg",
+            "role": "Desi Collings"
+          },
+          {
+            "tmdbId": 80602,
+            "name": "Tyler Perry",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/8KU0OizemVLrERXt5HJIa0PAkIN.jpg",
+            "role": "Tanner Bolt"
+          },
+          {
+            "tmdbId": 1308445,
+            "name": "Carrie Coon",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/vWChiHhXFjZVKC6HbACyyRFmdW4.jpg",
+            "role": "Margo Dunne"
+          },
+          {
+            "tmdbId": 21165,
+            "name": "Kim Dickens",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/yr6kstI1hdLP6LXz2xyBB4ovduj.jpg",
+            "role": "Detective Rhonda Boney"
+          },
+          {
+            "tmdbId": 11663,
+            "name": "Patrick Fugit",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/bsONcodcqRKV97p1Oo1jcPkEnDA.jpg",
+            "role": "Officer James Gilpin"
+          },
+          {
+            "tmdbId": 15412,
+            "name": "David Clennon",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/jLOf8nYolcb4P8LUDOW7QK5Y9pH.jpg",
+            "role": "Rand Elliott"
+          },
+          {
+            "tmdbId": 52878,
+            "name": "Lisa Banes",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/bSYs9z8Su9Ewg71XO8LdiNu2OwU.jpg",
+            "role": "Marybeth Elliott"
+          },
+          {
+            "tmdbId": 1294,
+            "name": "Missi Pyle",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/lKMPTI0PbPv6kGQiublwHOp73Ff.jpg",
+            "role": "Ellen Abbott"
+          },
+          {
+            "tmdbId": 1186505,
+            "name": "Emily Ratajkowski",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/1YngeK5Bbgw9bu6YG5ZgvCIo4ZX.jpg",
+            "role": "Andie Fitzgerald"
+          },
+          {
+            "tmdbId": 83872,
+            "name": "Casey Wilson",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/byeNihBQQUSWtEUpQMFnnQ0aEOV.jpg",
+            "role": "Noelle Hawthorne"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 7467,
+          "name": "David Fincher",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/tpEczFclQZeKAiCeKZZ0adRvtfz.jpg",
+          "role": "Director"
+        }
+      }
     },
     {
       "tmdbId": 274479,
@@ -61,13 +1224,411 @@
       ],
       "voteAverage": 6.553,
       "popularity": 2.9635,
-      "rating": 7.5,
+      "rating": 8.4,
       "watchedAt": "2024-11-21",
       "tags": [
         "films resumes"
       ],
-      "review": "---\n\n\n![[joy.jpeg]]\n\nФильм о невероятно доброй девушке, которая несмотря на все трудности преследовала свою цель, не забывая о морали и чести. Даже в самые сложные моменты, она помогала своим близким, хотя те не поддерживали героиню в трудную минуту, а наоборот -- мешали и говорили, что ничего не выйдет. Очевидно, они были неправы.  Все вокруг пытались ей навредить, кто-то случайно, а кто-то специально.\nДжой, главная героиня, -- невероятная изобретательница. Ее невозможно остановить, она всегда идет вперед и в итоге добивается успеха. Получив известность, она продолжает помогать таким же изобретателям решать те проблемы, которые преследовали ее на пути. Джой полностью открыта миру и излучает только добро.\n\n---",
-      "sourceUrl": null
+      "review": "![[joy.jpeg]]\n\nФильм о невероятно доброй девушке, которая несмотря на все трудности преследует свою цель, при этом не забывая о морали и чести. Даже в самые сложные моменты, она помогает своим близким, хотя те ее совершенно не поддерживают, а наоборот говорят, что ничего не выйдет. Все вокруг пытаются ей навредить, кто-то случайно, а кто-то специально.\nДжой, главная героиня, -- невероятная изобретательница. Ее невозможно остановить, она всегда идет вперед и в итоге добивается успеха. Получив известность, она продолжает помогать таким же изобретателям решать те проблемы, которые преследовали ее на этом пути. Джой полностью открыта миру и излучает только добро.  \nФильм вдохновляет и воодушевляет.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 72129,
+            "name": "Jennifer Lawrence",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/6WTY6HjXMGxnHilJRVC3eLnu43F.jpg",
+            "role": "Joy"
+          },
+          {
+            "tmdbId": 380,
+            "name": "Robert De Niro",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/cT8htcckIuyI1Lqwt1CvD02ynTh.jpg",
+            "role": "Rudy"
+          },
+          {
+            "tmdbId": 51329,
+            "name": "Bradley Cooper",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/sQq0nft6YZmJ7EMQwPcbaxym3AL.jpg",
+            "role": "Neil Walker"
+          },
+          {
+            "tmdbId": 25616,
+            "name": "Edgar Ramírez",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/o9xJcedad1BwpMcgDGtW5dVgzH.jpg",
+            "role": "Tony"
+          },
+          {
+            "tmdbId": 6587,
+            "name": "Diane Ladd",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/l09hDywACsXFkmSy7d8V2YJiRNW.jpg",
+            "role": "Mimi"
+          },
+          {
+            "tmdbId": 12519,
+            "name": "Virginia Madsen",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/2u72BF7i189nAcX1kEJLjGMsb0c.jpg",
+            "role": "Terry"
+          },
+          {
+            "tmdbId": 6588,
+            "name": "Isabella Rossellini",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/ebcTowZoBZCDxaWd5ZrL2ZR5mQ3.jpg",
+            "role": "Trudy"
+          },
+          {
+            "tmdbId": 1026947,
+            "name": "Dascha Polanco",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/bIIjxz1EKZEtHeGjju82FkObyl2.jpg",
+            "role": "Jackie"
+          },
+          {
+            "tmdbId": 126932,
+            "name": "Elisabeth Röhm",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/hIlBBZD2Rou4to1OauI799jV1UH.jpg",
+            "role": "Peggy"
+          },
+          {
+            "tmdbId": 194477,
+            "name": "Susan Lucci",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/n4OTkSFaA824U5QuNkR4zUnFPW0.jpg",
+            "role": "Danica"
+          },
+          {
+            "tmdbId": 1221558,
+            "name": "Laura Wright",
+            "profileUrl": null,
+            "role": "Clarinda"
+          },
+          {
+            "tmdbId": 215890,
+            "name": "Maurice Benard",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/soTGLUO1QjA0zon1MovyCHjCeWs.jpg",
+            "role": "Ridge"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 17883,
+          "name": "David O. Russell",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/ve5hLHeUc3bi3yT25VKuPejfrMg.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 350,
+      "mediaType": "movie",
+      "title": "The Devil Wears Prada",
+      "originalTitle": "The Devil Wears Prada",
+      "year": 2006,
+      "releaseDate": "2006-06-29",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/8912AsVuS7Sj915apArUFbv6F9L.jpg",
+      "overview": "A young woman from the Midwest gets more than she bargained for when she moves to New York to become a writer and ends up as the assistant to the tyrannical, larger-than-life editor-in-chief of a major fashion magazine.",
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
+      "voteAverage": 7.441,
+      "popularity": 29.441,
+      "rating": 7.9,
+      "watchedAt": "2024-07-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Интересный фильм про усердную и трудную работу.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 5064,
+            "name": "Meryl Streep",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/g5cVxQBAQ3AXt3LhdBXtbbN47Uc.jpg",
+            "role": "Miranda Priestly"
+          },
+          {
+            "tmdbId": 1813,
+            "name": "Anne Hathaway",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/nbccV2pMoyLTCeg5DQip24Eq0Jp.jpg",
+            "role": "Andy Sachs"
+          },
+          {
+            "tmdbId": 5081,
+            "name": "Emily Blunt",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/5nCSG5TL1bP1geD8aaBfaLnLLCD.jpg",
+            "role": "Emily"
+          },
+          {
+            "tmdbId": 2283,
+            "name": "Stanley Tucci",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/q4TanMDI5Rgsvw4SfyNbPBh4URr.jpg",
+            "role": "Nigel"
+          },
+          {
+            "tmdbId": 1284159,
+            "name": "Simon Baker",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/oay0Lo2zl0lJdguptxgx1BK9Xq7.jpg",
+            "role": "Christian Thompson"
+          },
+          {
+            "tmdbId": 5090,
+            "name": "Adrian Grenier",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/ghSzUkiw7OjRq0poNOlCjbXbdU6.jpg",
+            "role": "Nate"
+          },
+          {
+            "tmdbId": 10580,
+            "name": "Tracie Thoms",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/9PKUJJtqFRbZDhme6uDzIu0mRIE.jpg",
+            "role": "Lily"
+          },
+          {
+            "tmdbId": 10581,
+            "name": "Rich Sommer",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/cfbJ3nyiyRpSq2mLrbbrbg1k3Dh.jpg",
+            "role": "Doug"
+          },
+          {
+            "tmdbId": 10582,
+            "name": "Daniel Sunjata",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/w3Wa0d7j2auA2R8FQvjrgfB3ozo.jpg",
+            "role": "James Holt"
+          },
+          {
+            "tmdbId": 24535,
+            "name": "David Marshall Grant",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/81E0yZVUrojvq10qKRdSvNkq9up.jpg",
+            "role": "Richard Sachs"
+          },
+          {
+            "tmdbId": 37421,
+            "name": "James Naughton",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/iXFkBdxB2Qd2uNwXka9pTp6XBXS.jpg",
+            "role": "Stephen"
+          },
+          {
+            "tmdbId": 1192389,
+            "name": "Tibor Feldman",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/b6tVKhCkNWltObwyHpGfBLuaPt6.jpg",
+            "role": "Irv Ravitz"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 5065,
+          "name": "David Frankel",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/hfIjLMo8Upl6MXhn1YcoDoXeeZn.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 310307,
+      "mediaType": "movie",
+      "title": "The Founder",
+      "originalTitle": "The Founder",
+      "year": 2016,
+      "releaseDate": "2016-11-24",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/8gLIksu5ggdfBL1UbeTeonHquxl.jpg",
+      "overview": "The true story of how Ray Kroc, a salesman from Illinois, met Mac and Dick McDonald, who were running a burger operation in 1950s Southern California. Kroc was impressed by the brothers’ speedy system of making the food and saw franchise potential. He maneuvered himself into a position to be able to pull the company from the brothers and create a billion-dollar empire.",
+      "genres": [
+        "Drama",
+        "History"
+      ],
+      "voteAverage": 7.149,
+      "popularity": 5.5132,
+      "rating": 7.0,
+      "watchedAt": "2024-07-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 2232,
+            "name": "Michael Keaton",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/tYSja1KByFnZ4Hkp3stPqkKHnNL.jpg",
+            "role": "Ray Kroc"
+          },
+          {
+            "tmdbId": 17039,
+            "name": "Nick Offerman",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/f6z3mPVtaF40ewfdmZydprAjmYd.jpg",
+            "role": "Dick McDonald"
+          },
+          {
+            "tmdbId": 3911,
+            "name": "John Carroll Lynch",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/lXlHxLK91U2l3yb77Tw32yEHJyT.jpg",
+            "role": "Mac McDonald"
+          },
+          {
+            "tmdbId": 1817,
+            "name": "Linda Cardellini",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/bcycvynDprC1rrhBNrnBjn5uOUd.jpg",
+            "role": "Joan Smith"
+          },
+          {
+            "tmdbId": 107770,
+            "name": "B.J. Novak",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/o8Xf1khxhKGTz3QAplXD35opRA8.jpg",
+            "role": "Harry J. Sonneborn"
+          },
+          {
+            "tmdbId": 4784,
+            "name": "Laura Dern",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/gB9PnGEvxKg33OSlcqptQwTBwPE.jpg",
+            "role": "Ethel Kroc"
+          },
+          {
+            "tmdbId": 1622087,
+            "name": "Justin Randell Brooke",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/m1l9mG8XM4DxfyW9zuiX67zgPqk.jpg",
+            "role": "Fred Turner"
+          },
+          {
+            "tmdbId": 1785189,
+            "name": "Kate Kneeland",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/jv2FbzzMaY7Xub173735i9fjUE5.jpg",
+            "role": "June Martino"
+          },
+          {
+            "tmdbId": 17178,
+            "name": "Patrick Wilson",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/oym6H2QD9esk4yABjCHaUoNAOa8.jpg",
+            "role": "Rollie Smith"
+          },
+          {
+            "tmdbId": 76021,
+            "name": "Griff Furst",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/kC7MQMSMockWSHpIkAFJp4LwPI8.jpg",
+            "role": "Jim Zien"
+          },
+          {
+            "tmdbId": 41019,
+            "name": "Wilbur Fitzgerald",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/2s0MtvrLkzb4zGQyLeJLmUWoEWU.jpg",
+            "role": "Jerry Cullen"
+          },
+          {
+            "tmdbId": 114634,
+            "name": "David de Vries",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/5dhZVrTfNFpJZP5qvbiaaYrC7Z4.jpg",
+            "role": "Jack Horford"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 54040,
+          "name": "John Lee Hancock",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/ytGKxuC1sFUmd68jUwDA37Jn0LG.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 496243,
+      "mediaType": "movie",
+      "title": "Parasite",
+      "originalTitle": "기생충",
+      "year": 2019,
+      "releaseDate": "2019-05-30",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+      "overview": "All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks for their livelihood until they get entangled in an unexpected incident.",
+      "genres": [
+        "Comedy",
+        "Thriller",
+        "Drama"
+      ],
+      "voteAverage": 8.491,
+      "popularity": 33.3252,
+      "rating": 8.1,
+      "watchedAt": "2024-05-21",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Фильм о пропасти между бедными и богатыми.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 20738,
+            "name": "Song Kang-ho",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/kBM9UTPYXUA2RNk210DXhztLFns.jpg",
+            "role": "Kim Ki-taek"
+          },
+          {
+            "tmdbId": 115290,
+            "name": "Lee Sun-kyun",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/nHFBbSFohzOUOvMxPVwe3Es2nJw.jpg",
+            "role": "Park Dong-ik"
+          },
+          {
+            "tmdbId": 556435,
+            "name": "Cho Yeo-jeong",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/5MgWM8pkUiYkj9MEaEpO0Ir1FD9.jpg",
+            "role": "Yeon-kyo"
+          },
+          {
+            "tmdbId": 1255881,
+            "name": "Choi Woo-shik",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/hRDiuKWwe156zRjEu826eci7H3r.jpg",
+            "role": "Ki-woo"
+          },
+          {
+            "tmdbId": 1442583,
+            "name": "Park So-dam",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/fGVOikpvivopeATDy6ZzLdKYXDu.jpg",
+            "role": "Ki-jung"
+          },
+          {
+            "tmdbId": 1572354,
+            "name": "Lee Jung-eun",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/4r3K47UpSmzZ5t9cyTRRqRl9rdz.jpg",
+            "role": "Moon-gwang"
+          },
+          {
+            "tmdbId": 2158882,
+            "name": "Jang Hye-jin",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/pZiQXSWwo9F4gncHfa1yw0CQjxk.jpg",
+            "role": "Chung-sook"
+          },
+          {
+            "tmdbId": 1694435,
+            "name": "Park Myung-hoon",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/5SucrxkigHss7UuJKrkfAZX5MXz.jpg",
+            "role": "Geun-se"
+          },
+          {
+            "tmdbId": 1418762,
+            "name": "Jung Zi-so",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/jsUPFmY1HlML92ubVtSE8L8ovz6.jpg",
+            "role": "Da-hye"
+          },
+          {
+            "tmdbId": 2306987,
+            "name": "Jung Hyeon-jun",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/vZadA6ip6V2kh0VZW9RwnLcYFgW.jpg",
+            "role": "Da-song"
+          },
+          {
+            "tmdbId": 1709230,
+            "name": "Park Keun-rok",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/j3AEOJskfSm7nhR8RnDm6njRN3W.jpg",
+            "role": "Driver Yoon"
+          },
+          {
+            "tmdbId": 2326809,
+            "name": "Jung Yi-seo",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/o6Nfe0BiZs6CCSm8BigPshbu0px.jpg",
+            "role": "Pizza Manager"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 21684,
+          "name": "Bong Joon Ho",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/stwnTvZAoD8gEJEDHpDQyLCyDy5.jpg",
+          "role": "Director"
+        }
+      }
     },
     {
       "tmdbId": 60308,
@@ -83,33 +1644,267 @@
       ],
       "voteAverage": 7.299,
       "popularity": 6.1943,
-      "rating": 7.0,
+      "rating": 7.4,
       "watchedAt": "2024-01-30",
       "tags": [
         "films resumes",
         "lifestyle"
       ],
-      "review": "---\n\"Человек, изменивший всё\" — фильм, основанный на реальных событиях, про статистику и математику в игре бейсбол.\n\nБейсбольный клуб, имеющий скудное финансирование, нуждается в новшествах при наборе игроков. Без денег, по-другому им никак не достичь высот. \n\nМенеджер клуба находит молодого парня, который производит оценку игроков основываясь исключительно на статистике. Он находит спортсменов, имеющих хорошие показатели в нужных областях, но при этом сильно недооценённых при привычных методах набора команды. Вместе, они набирают таких людей, закрывая разные позиции. \n\nНикто не верит в эту систему, герои терпят много неудач. В основном, из-за ошибок тренера, который ведёт игру \"по-старому\". Так проигрывается игра за игрой. \nНо решая все трудности, получается поставить невероятный рекорд и выйти в финал. \n\nГерои мечтают и верят, что можно изменить положение дел. Доказать, что команды без большого финансирования, также могут достигать побед. Раньше это считалось невозможным, но у них действительно получилось.",
-      "sourceUrl": null
+      "review": "\"Человек, изменивший всё\" — фильм, основанный на реальных событиях, про статистику и математику в игре бейсбол.\n\nБейсбольный клуб, имеющий скудное финансирование, нуждается в новшествах при наборе игроков. Без денег, по-другому им никак не достичь высот. \n\nМенеджер клуба находит молодого парня, который производит оценку игроков основываясь исключительно на статистике. Он находит спортсменов, имеющих хорошие показатели в нужных областях, но при этом сильно недооценённых при привычных методах набора команды. Вместе, они набирают таких людей, закрывая разные позиции. \n\nНикто не верит в эту систему, герои терпят много неудач. В основном, из-за ошибок тренера, который ведёт игру \"по-старому\". Так проигрывается игра за игрой. \nНо решая все трудности, получается поставить невероятный рекорд и выйти в финал. \n\nГерои мечтают и верят, что можно изменить положение дел. Доказать, что команды без большого финансирования, также могут достигать побед. Раньше это считалось невозможным, но у них действительно получилось.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 287,
+            "name": "Brad Pitt",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/cckcYc2v0yh1tc9QjRelptcOBko.jpg",
+            "role": "Billy Beane"
+          },
+          {
+            "tmdbId": 21007,
+            "name": "Jonah Hill",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/cymlWttB83MsAGR2EkTgANtjeRH.jpg",
+            "role": "Peter Brand"
+          },
+          {
+            "tmdbId": 1233,
+            "name": "Philip Seymour Hoffman",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/50rqDkmvXwjwVhFH7q6ph2Rkw7S.jpg",
+            "role": "Art Howe"
+          },
+          {
+            "tmdbId": 32,
+            "name": "Robin Wright",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/d3rIv0y2p0jMsQ7ViR7O1606NZa.jpg",
+            "role": "Sharon"
+          },
+          {
+            "tmdbId": 73457,
+            "name": "Chris Pratt",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/872Hzdq95gsbMRabsColTW3TLrD.jpg",
+            "role": "Scott Hatteberg"
+          },
+          {
+            "tmdbId": 55205,
+            "name": "Stephen Bishop",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/duiEwqhUI8gnMWHQ3K2DKO4Xo3w.jpg",
+            "role": "David Justice"
+          },
+          {
+            "tmdbId": 31508,
+            "name": "Reed Diamond",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/z3ESNaXSeHiGmmhm49Og9FeXwG8.jpg",
+            "role": "Mark Shapiro"
+          },
+          {
+            "tmdbId": 84685,
+            "name": "Brent Jennings",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/1koVGx5tgu4FRSbscOTT3sWp0i9.jpg",
+            "role": "Ron Washington"
+          },
+          {
+            "tmdbId": 181067,
+            "name": "Ken Medlock",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/dgbhapNyMaXNUrKau2uqMdapPLn.jpg",
+            "role": "Grady Fuson"
+          },
+          {
+            "tmdbId": 16859,
+            "name": "Tammy Blanchard",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/ztbtRXEBJaOiQevIn0xNKAzu9MU.jpg",
+            "role": "Elizabeth Hatteberg"
+          },
+          {
+            "tmdbId": 10489,
+            "name": "Jack McGee",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/4fmjQ4z0Y7UraH8Pk2qxABvwmGS.jpg",
+            "role": "John Poloni"
+          },
+          {
+            "tmdbId": 61216,
+            "name": "Vyto Ruginis",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/les4ZXAb2TL1Crqa8DzGwLvwns5.jpg",
+            "role": "Pittaro"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 5345,
+          "name": "Bennett Miller",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/r1XGBl8TYNuCm7APjWN8npP4DEw.jpg",
+          "role": "Director"
+        }
+      }
+    },
+    {
+      "tmdbId": 205596,
+      "mediaType": "movie",
+      "title": "The Imitation Game",
+      "originalTitle": "The Imitation Game",
+      "year": 2014,
+      "releaseDate": "2014-11-14",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/zSqJ1qFq8NXFfi7JeIYMlzyR0dx.jpg",
+      "overview": "Based on the real life story of legendary cryptanalyst Alan Turing, the film portrays the nail-biting race against time by Turing and his brilliant team of code-breakers at Britain's top-secret Government Code and Cypher School at Bletchley Park, during the darkest days of World War II.",
+      "genres": [
+        "History",
+        "Drama",
+        "Thriller",
+        "War"
+      ],
+      "voteAverage": 7.983,
+      "popularity": 14.7058,
+      "rating": 8.0,
+      "watchedAt": "2023-07-22",
+      "tags": [
+        "films resumes"
+      ],
+      "review": "Отличный фильм про приверженность к своему делу и заинтересованность в достижении успеха, несмотря на угнетения и упрёки со стороны.",
+      "sourceUrl": null,
+      "credits": {
+        "cast": [
+          {
+            "tmdbId": 71580,
+            "name": "Benedict Cumberbatch",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/wz3MRiMmoz6b5X3oSzMRC9nLxY1.jpg",
+            "role": "Alan Turing"
+          },
+          {
+            "tmdbId": 116,
+            "name": "Keira Knightley",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/k69IOXdz8PAvaegAI8WYvQvyyUJ.jpg",
+            "role": "Joan Clarke"
+          },
+          {
+            "tmdbId": 1247,
+            "name": "Matthew Goode",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/3XaKKl0bKswTWbJ0Lh9nZ4UdAQo.jpg",
+            "role": "Hugh Alexander"
+          },
+          {
+            "tmdbId": 139549,
+            "name": "Rory Kinnear",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/8aEABMeHXOozwE5DrMxUlCM9mpG.jpg",
+            "role": "Detective Robert Nock"
+          },
+          {
+            "tmdbId": 85718,
+            "name": "Allen Leech",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/cJZSyKNUKwdNPEgkt2ocXohtUBH.jpg",
+            "role": "John Cairncross"
+          },
+          {
+            "tmdbId": 213394,
+            "name": "Matthew Beard",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/qbFEcaQLnE0bU8xutnsmYzKrjn0.jpg",
+            "role": "Peter Hilton"
+          },
+          {
+            "tmdbId": 4391,
+            "name": "Charles Dance",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/3xHwq5lchAI6mfW0aGQOEijexv6.jpg",
+            "role": "Commander Denniston"
+          },
+          {
+            "tmdbId": 2983,
+            "name": "Mark Strong",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/3cNmatYsoifytg7TfQhI1EHow3v.jpg",
+            "role": "Stewart Menzies"
+          },
+          {
+            "tmdbId": 1362119,
+            "name": "James Northcote",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/7eON5XLEGFseOWhSXDh7h5JsF9H.jpg",
+            "role": "Jack Good"
+          },
+          {
+            "tmdbId": 43034,
+            "name": "Tom Goodman-Hill",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/3LhuG5oJ1ZBIaKdHZBVC9LFF2jK.jpg",
+            "role": "Sergeant Staehl"
+          },
+          {
+            "tmdbId": 27764,
+            "name": "Steven Waddington",
+            "profileUrl": "https://image.tmdb.org/t/p/w185/hTsS9lg5Qi8KeWXmnMn45LfnIAx.jpg",
+            "role": "Superintendent Smith"
+          },
+          {
+            "tmdbId": 1121975,
+            "name": "Ilan Goodman",
+            "profileUrl": null,
+            "role": "Keith Furman"
+          }
+        ],
+        "filmmaker": {
+          "tmdbId": 77965,
+          "name": "Morten Tyldum",
+          "profileUrl": "https://image.tmdb.org/t/p/w185/yTAUscziHY7mVGQ2BdBCflGYLde.jpg",
+          "role": "Director"
+        }
+      }
     }
   ],
   "watchlist": [
     {
-      "tmdbId": 97546,
-      "mediaType": "tv",
-      "title": "Ted Lasso",
-      "originalTitle": "Ted Lasso",
-      "year": 2020,
-      "releaseDate": "2020-08-14",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/5fhZdwP1DVJ0FyVH6vrFdHwpXIn.jpg",
-      "overview": "Ted Lasso, an American football coach, moves to England when he's hired to manage a soccer team—despite having no experience. With cynical players and a doubtful town, will he get them to see the Ted Lasso Way?",
+      "tmdbId": 1169789,
+      "mediaType": "movie",
+      "title": "Bob Trevino Likes It",
+      "originalTitle": "Bob Trevino Likes It",
+      "year": 2025,
+      "releaseDate": "2025-03-20",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/kMIiBztK0PgwIQ0FMItv4dd8wIL.jpg",
+      "overview": "Lily Trevino unexpectedly befriends an online stranger who shares her self-centered father’s name. This new Bob Trevino’s support could transform her life.",
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "voteAverage": 7.4,
+      "popularity": 1.5791,
+      "interest": 8.1,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 550776,
+      "mediaType": "movie",
+      "title": "Believe Me: The Abduction of Lisa McVey",
+      "originalTitle": "Believe Me: The Abduction of Lisa McVey",
+      "year": 2018,
+      "releaseDate": "2018-09-30",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/qbJEzCzEKDHPZDiRvSSBiYEKaAH.jpg",
+      "overview": "On the night she plans on taking her own life, 17-year-old 'Lisa McVey' is kidnapped and finds herself fighting to stay alive and is raped. She manages to talk her attacker into releasing her, but when she returns home, no one believes her story except for one detective, who suspects she was abducted by a serial killer. Based on horrifying true events.",
       "genres": [
         "Drama",
-        "Comedy"
+        "TV Movie",
+        "Crime"
       ],
-      "voteAverage": 8.346,
-      "popularity": 40.289,
-      "interest": 9.3,
+      "voteAverage": 8.022,
+      "popularity": 3.4474,
+      "interest": 8.0,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 705996,
+      "mediaType": "movie",
+      "title": "Decision to Leave",
+      "originalTitle": "헤어질 결심",
+      "year": 2022,
+      "releaseDate": "2022-06-29",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/zI8KZ4EdLUymWKX1YEkpZ0gtPUa.jpg",
+      "overview": "From a mountain peak in South Korea, a man plummets to his death. Did he jump, or was he pushed? When detective Hae-joon arrives on the scene, he begins to suspect the dead man’s wife Seo-rae. But as he digs deeper into the investigation, he finds himself trapped in a web of deception and desire.",
+      "genres": [
+        "Thriller",
+        "Mystery",
+        "Romance"
+      ],
+      "voteAverage": 7.319,
+      "popularity": 6.5978,
+      "interest": 8.0,
+      "interestSource": "ai",
       "notes": "",
       "tags": [],
       "dismissed": false
@@ -124,12 +1919,14 @@
       "posterUrl": "https://image.tmdb.org/t/p/w780/e9u7luSxFKOZgPTB9XHFnPArGdP.jpg",
       "overview": "Vlogger Keith Gill sinks his life savings into GameStop stock and posts about it. When social media starts blowing up, so do his life and the lives of everyone following him. As a stock tip becomes a movement, everyone gets rich—until the billionaires fight back, and both sides find their worlds turned upside down.",
       "genres": [
+        "History",
         "Comedy",
         "Drama"
       ],
       "voteAverage": 6.683,
       "popularity": 3.5394,
-      "interest": 9.0,
+      "interest": 8.0,
+      "interestSource": "ai",
       "notes": "",
       "tags": [],
       "dismissed": false
@@ -144,11 +1941,97 @@
       "posterUrl": "https://image.tmdb.org/t/p/w780/jnLnLYP5pGDfri04gxtAqAvkHMw.jpg",
       "overview": "After graduating from Emory University in 1992, top student and athlete Christopher McCandless abandons his possessions, gives his entire $24,000 savings account to charity, and hitchhikes to Alaska to live in the wilderness.",
       "genres": [
+        "Adventure",
         "Drama"
       ],
       "voteAverage": 7.794,
       "popularity": 5.5355,
-      "interest": 8.3,
+      "interest": 8.0,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 316029,
+      "mediaType": "movie",
+      "title": "The Greatest Showman",
+      "originalTitle": "The Greatest Showman",
+      "year": 2017,
+      "releaseDate": "2017-12-20",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/b9CeobiihCx1uG1tpw8hXmpi7nm.jpg",
+      "overview": "The story of American showman P.T. Barnum, founder of the circus that became the famous traveling Ringling Bros. and Barnum & Bailey Circus.",
+      "genres": [
+        "Drama"
+      ],
+      "voteAverage": 7.857,
+      "popularity": 9.2919,
+      "interest": 8.0,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 14624,
+      "mediaType": "movie",
+      "title": "The Ultimate Gift",
+      "originalTitle": "The Ultimate Gift",
+      "year": 2007,
+      "releaseDate": "2007-03-09",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/8BdVk1u110lwHFELTEO9HrPrIDa.jpg",
+      "overview": "When his wealthy grandfather finally dies, Jason Stevens fully expects to benefit when it comes to the reading of the will. But instead of a sizable inheritance, Jason receives a test, a series of tasks he must complete before he can get any money.",
+      "genres": [
+        "Romance",
+        "Drama",
+        "Family"
+      ],
+      "voteAverage": 7.635,
+      "popularity": 3.6586,
+      "interest": 8.0,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 671,
+      "mediaType": "movie",
+      "title": "Harry Potter and the Philosopher's Stone",
+      "originalTitle": "Harry Potter and the Philosopher's Stone",
+      "year": 2001,
+      "releaseDate": "2001-11-16",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/wuMc08IPKEatf9rnMNXvIDxqP4W.jpg",
+      "overview": "Harry Potter has lived under the stairs at his aunt and uncle's house his whole life. But on his 11th birthday, he learns he's a powerful wizard—with a place waiting for him at the Hogwarts School of Witchcraft and Wizardry. As he learns to harness his newfound powers with the help of the school's kindly headmaster, Harry uncovers the truth about his parents' deaths—and about the villain who's to blame.",
+      "genres": [
+        "Adventure",
+        "Fantasy"
+      ],
+      "voteAverage": 7.901,
+      "popularity": 33.9211,
+      "interest": 7.9,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 10625,
+      "mediaType": "movie",
+      "title": "Mean Girls",
+      "originalTitle": "Mean Girls",
+      "year": 2004,
+      "releaseDate": "2004-04-30",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/2ZkuQXvVhh45uSvkBej4S7Ix1NJ.jpg",
+      "overview": "Cady Heron is a hit with The Plastics, the A-list girl clique at her new school, until she makes the mistake of falling for Aaron Samuels, the ex-boyfriend of alpha Plastic Regina George.",
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
+      "voteAverage": 7.226,
+      "popularity": 11.493,
+      "interest": 7.8,
+      "interestSource": "ai",
       "notes": "",
       "tags": [],
       "dismissed": false
@@ -163,11 +2046,13 @@
       "posterUrl": "https://image.tmdb.org/t/p/w780/fPtUgMcLIboqlTlPrq0bQpKK8eq.jpg",
       "overview": "A young couple travels to a remote island to eat at an exclusive restaurant where the chef has prepared a lavish menu, with some shocking surprises.",
       "genres": [
-        "Comedy"
+        "Comedy",
+        "Horror"
       ],
       "voteAverage": 7.177,
       "popularity": 9.6937,
-      "interest": 8.3,
+      "interest": 7.8,
+      "interestSource": "ai",
       "notes": "",
       "tags": [],
       "dismissed": false
@@ -187,7 +2072,287 @@
       ],
       "voteAverage": 7.46,
       "popularity": 3.1854,
-      "interest": 8.3,
+      "interest": 7.8,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 8835,
+      "mediaType": "movie",
+      "title": "Legally Blonde",
+      "originalTitle": "Legally Blonde",
+      "year": 2001,
+      "releaseDate": "2001-07-13",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/9ohlMrJHQqKhfUKh7Zr3JQqHNLZ.jpg",
+      "overview": "Fashionable sorority queen Elle Woods has it all, but, she wants nothing more than to be Mrs. Warner Huntington III. But he dumps her before heading to Harvard Law School. Elle rallies all of her resources and gets into Harvard, determined to win him back. While there, she figures out that there is more to herself than just good looks.",
+      "genres": [
+        "Comedy"
+      ],
+      "voteAverage": 6.8,
+      "popularity": 9.6495,
+      "interest": 7.6,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 779782,
+      "mediaType": "movie",
+      "title": "The School for Good and Evil",
+      "originalTitle": "The School for Good and Evil",
+      "year": 2022,
+      "releaseDate": "2022-10-19",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/6oZeEu1GDILdwezmZ5e2xWISf1C.jpg",
+      "overview": "Best friends Sophie and Agatha navigate an enchanted school for young heroes and villains — and find themselves on opposing sides of the battle between good and evil.",
+      "genres": [
+        "Fantasy",
+        "Comedy",
+        "Adventure"
+      ],
+      "voteAverage": 7.031,
+      "popularity": 5.2713,
+      "interest": 7.6,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 240832,
+      "mediaType": "movie",
+      "title": "Lucy",
+      "originalTitle": "Lucy",
+      "year": 2014,
+      "releaseDate": "2014-07-25",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/kRbpUTRNm6QbLQFPFWUcNC4czEm.jpg",
+      "overview": "A woman, accidentally caught in a dark deal, turns the tables on her captors and transforms into a merciless warrior evolved beyond human logic.",
+      "genres": [
+        "Action",
+        "Science Fiction"
+      ],
+      "voteAverage": 6.5,
+      "popularity": 13.8851,
+      "interest": 7.5,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 1084242,
+      "mediaType": "movie",
+      "title": "Zootopia 2",
+      "originalTitle": "Zootopia 2",
+      "year": 2025,
+      "releaseDate": "2025-11-26",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/oJ7g2CifqpStmoYQyaLQgEU32qO.jpg",
+      "overview": "After cracking the biggest case in Zootopia's history, rookie cops Judy Hopps and Nick Wilde find themselves on the twisting trail of a great mystery when Gary De'Snake arrives and turns the animal metropolis upside down. To crack the case, Judy and Nick must go undercover to unexpected new parts of town, where their growing partnership is tested like never before.",
+      "genres": [
+        "Animation",
+        "Adventure",
+        "Comedy",
+        "Mystery",
+        "Family"
+      ],
+      "voteAverage": 7.68,
+      "popularity": 45.7624,
+      "interest": 7.5,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 921452,
+      "mediaType": "movie",
+      "title": "Jeanne du Barry",
+      "originalTitle": "Jeanne du Barry",
+      "year": 2023,
+      "releaseDate": "2023-05-16",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/rSTtGXebezwZ6GVTeZVaeJ9ZQF1.jpg",
+      "overview": "The life of Jeanne Bécu, who was born as the illegitimate daughter of an impoverished seamstress in 1743 and went on to rise through the Court of Louis XV to become his last official mistress.",
+      "genres": [
+        "Drama",
+        "History",
+        "Romance"
+      ],
+      "voteAverage": 6.88,
+      "popularity": 2.4525,
+      "interest": 7.3,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 96724,
+      "mediaType": "movie",
+      "title": "Anna Karenina",
+      "originalTitle": "Anna Karenina",
+      "year": 2012,
+      "releaseDate": "2012-09-06",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/b9mvt1kKqDuveD1AJuGSkBEuagU.jpg",
+      "overview": "In Imperial Russia, Anna, wife of the officer Karenin, goes to Moscow to visit her brother. On the way, she meets charming cavalry officer Vronsky, to whom she's immediately attracted. But in St. Petersburg’s high society, a relationship like this could destroy a woman’s reputation.",
+      "genres": [
+        "Drama",
+        "Romance",
+        "History"
+      ],
+      "voteAverage": 6.698,
+      "popularity": 4.8836,
+      "interest": 7.2,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 333381,
+      "mediaType": "movie",
+      "title": "Return to Sender",
+      "originalTitle": "Return to Sender",
+      "year": 2015,
+      "releaseDate": "2015-05-31",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/mBIRSvt2ebgdztuX7F7GwR0iPM0.jpg",
+      "overview": "A nurse mistakes a stranger who pays her a visit for her blind date and soon, the man rapes her and turns her life upside down. The woman works to reclaim her life and exact revenge on her assailant after he's paroled from prison.",
+      "genres": [
+        "Drama",
+        "Thriller"
+      ],
+      "voteAverage": 6.112,
+      "popularity": 3.5222,
+      "interest": 7.2,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 22824,
+      "mediaType": "movie",
+      "title": "The Fourth Kind",
+      "originalTitle": "The Fourth Kind",
+      "year": 2009,
+      "releaseDate": "2009-11-05",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/vfnsGUwurUQqlpvArBvUVc9rYXa.jpg",
+      "overview": "Since the 1960s, a disproportionate number of the population in and around Nome, Alaska, have gone missing. Despite FBI investigations, the disappearances remain a mystery. Dr. Abigail Tyler, a psychologist, may be on the verge of blowing the unsolved cases wide open when, during the course of treating her patients, she finds evidence of alien abductions.",
+      "genres": [
+        "Mystery",
+        "Science Fiction",
+        "Thriller"
+      ],
+      "voteAverage": 6.364,
+      "popularity": 3.7765,
+      "interest": 7.2,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 1084199,
+      "mediaType": "movie",
+      "title": "Companion",
+      "originalTitle": "Companion",
+      "year": 2025,
+      "releaseDate": "2025-01-22",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/oCoTgC3UyWGfyQ9thE10ulWR7bn.jpg",
+      "overview": "During a weekend getaway at a secluded lakeside estate, a group of friends finds themselves entangled in a web of secrets, deception, and advanced technology. As tensions rise and loyalties are tested, they uncover unsettling truths about themselves and the world around them.",
+      "genres": [
+        "Horror",
+        "Science Fiction",
+        "Thriller"
+      ],
+      "voteAverage": 7.012,
+      "popularity": 15.7475,
+      "interest": 7.0,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 1650233,
+      "mediaType": "movie",
+      "title": "Lovers of Mathematics",
+      "originalTitle": "Влюблённые в математику",
+      "year": 2025,
+      "releaseDate": "2025-04-11",
+      "posterUrl": null,
+      "overview": "The world of mathematics is not only formulas and numbers, but also people who inspire and drive progress. Stories about those who not only solve equations, but also seek answers to questions that can change the future.",
+      "genres": [
+        "Documentary"
+      ],
+      "voteAverage": 0.0,
+      "popularity": 0.1179,
+      "interest": 7.0,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 1165163,
+      "mediaType": "movie",
+      "title": "Sleepy Hollow",
+      "originalTitle": "Сонная Лощина",
+      "year": 2023,
+      "releaseDate": "2023-08-04",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/ojLOotl5f9FDQJmTPJrvWgfnECK.jpg",
+      "overview": "The film based on the story of the American writer Washington Irving \"The Legend of Sleepy Hollow\" tells about the relationship of a person \"suffering\" from \"teacher's syndrome\" with his environment.",
+      "genres": [
+        "Animation"
+      ],
+      "voteAverage": 0.0,
+      "popularity": 0.0824,
+      "interest": 7.0,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 1117680,
+      "mediaType": "movie",
+      "title": "The Blonde",
+      "originalTitle": "Блондинка",
+      "year": 2023,
+      "releaseDate": "2023-11-30",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/vclbphf1PcI8dKulaIg0HmHQcL3.jpg",
+      "overview": "Ira is 27 years old. And from the point of view of her mother, the director of the school, Ira lives absolutely wrong: she plays in the troupe of a small theater, earns money by washing windows and is in love with an unreliable creative person Leo, an aspiring director. She ignores \"normal\" men and does not even want to dye her hair blonde, which, according to her mother, is an easy way to success in her personal life. This state of affairs could continue for a long time, but the theater is on the verge of closing, and Lev suddenly disappears.",
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "voteAverage": 0.0,
+      "popularity": 2.5247,
+      "interest": 7.0,
+      "interestSource": "ai",
+      "notes": "",
+      "tags": [],
+      "dismissed": false
+    },
+    {
+      "tmdbId": 5876,
+      "mediaType": "movie",
+      "title": "The Mist",
+      "originalTitle": "The Mist",
+      "year": 2007,
+      "releaseDate": "2007-11-21",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/1CvJ6diBACKPVGOpcWuY4XPQdqX.jpg",
+      "overview": "After a violent storm, a dense cloud of mist envelops a small Maine town, trapping David Drayton and his five-year-old son in a local grocery store with other local residents. They soon discover that the mist conceals deadly horrors that threaten their lives, and worse, their sanity.",
+      "genres": [
+        "Horror",
+        "Science Fiction",
+        "Thriller"
+      ],
+      "voteAverage": 6.948,
+      "popularity": 7.2734,
+      "interest": 7.0,
+      "interestSource": "ai",
       "notes": "",
       "tags": [],
       "dismissed": false
@@ -209,34 +2374,12 @@
         "Romance"
       ],
       "voteAverage": 8.51,
-      "popularity": 9.8776,
-      "predictedRating": 9.3,
-      "rationale": "Raj is a rich, carefree, happy-go-lucky second generation NRI. The Comedy and Drama angle is the clearest fit.",
+      "popularity": 11.1971,
+      "predictedRating": 8.2,
+      "scoreSource": "ai",
+      "rationale": "Raj is a rich, carefree, happy-go-lucky second generation NRI. The Romance and Comedy angle is the clearest fit.",
       "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
-      "provider": null,
-      "model": null
-    },
-    {
-      "tmdbId": 496243,
-      "mediaType": "movie",
-      "title": "Parasite",
-      "originalTitle": "기생충",
-      "year": 2019,
-      "releaseDate": "2019-05-30",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
-      "overview": "All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks for their livelihood until they get entangled in an unexpected incident.",
-      "genres": [
-        "Comedy",
-        "Thriller",
-        "Drama"
-      ],
-      "voteAverage": 8.491,
-      "popularity": 28.5287,
-      "predictedRating": 9.3,
-      "rationale": "All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks for their livelihood until they get entangled in an unexpected incident. The Comedy and Drama angle is the clearest fit.",
-      "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
       "provider": null,
       "model": null
     },
@@ -255,33 +2398,36 @@
         "Romance"
       ],
       "voteAverage": 8.465,
-      "popularity": 18.4627,
-      "predictedRating": 9.3,
-      "rationale": "A man with a low IQ has accomplished great things in his life and been present during significant historic events—in each case, far exceeding what anyone imagined he could do. The Comedy and Drama angle is the clearest fit.",
+      "popularity": 22.2226,
+      "predictedRating": 8.2,
+      "scoreSource": "ai",
+      "rationale": "A man with a low IQ has accomplished great things in his life and been present during significant historic events—in each case, far exceeding what anyone imagined he could do. The Romance and Comedy angle is the clearest fit.",
       "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
       "provider": null,
       "model": null
     },
     {
-      "tmdbId": 637,
+      "tmdbId": 1630423,
       "mediaType": "movie",
-      "title": "Life Is Beautiful",
-      "originalTitle": "La vita è bella",
-      "year": 1997,
-      "releaseDate": "1997-12-20",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/74hLDKjD5aGYOotO6esUVaeISa2.jpg",
-      "overview": "A touching story of an Italian book seller of Jewish ancestry who lives in his own little fairy tale. His creative and happy life would come to an abrupt halt when his entire family is deported to a concentration camp during World War II. While locked up he tries to convince his son that the whole thing is just a game.",
+      "title": "My Dearest Assassin",
+      "originalTitle": "เลือดรักนักฆ่า",
+      "year": 2026,
+      "releaseDate": "2026-05-06",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/ul4dQcA68mtSx8J56N5gEcaCCtP.jpg",
+      "overview": "Hunted for her rare blood type, a caged woman vows to fight alongside the assassin she loves to protect their future when an old enemy resurfaces.",
       "genres": [
-        "Comedy",
-        "Drama"
+        "Action",
+        "Drama",
+        "Romance"
       ],
-      "voteAverage": 8.439,
-      "popularity": 11.4817,
-      "predictedRating": 9.3,
-      "rationale": "A touching story of an Italian book seller of Jewish ancestry who lives in his own little fairy tale. The Comedy and Drama angle is the clearest fit.",
+      "voteAverage": 8.592,
+      "popularity": 24.4176,
+      "predictedRating": 8.2,
+      "scoreSource": "ai",
+      "rationale": "Hunted for her rare blood type, a caged woman vows to fight alongside the assassin she loves to protect their future when an old enemy resurfaces. The Romance and Drama angle is the clearest fit.",
       "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
       "provider": null,
       "model": null
     },
@@ -301,233 +2447,230 @@
         "Romance"
       ],
       "voteAverage": 8.4,
-      "popularity": 4.9986,
-      "predictedRating": 9.3,
-      "rationale": "The lively João Grilo and the sly Chicó are poor guys living in the hinterland who cheat a bunch of people in a small town in Northeastern Brazil. The Comedy and Drama angle is the clearest fit.",
+      "popularity": 4.8303,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "The lively João Grilo and the sly Chicó are poor guys living in the hinterland who cheat a bunch of people in a small town in Northeastern Brazil. The Romance and Comedy angle is the clearest fit.",
       "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
       "provider": null,
       "model": null
     },
     {
-      "tmdbId": 680,
+      "tmdbId": 105,
       "mediaType": "movie",
-      "title": "Pulp Fiction",
-      "originalTitle": "Pulp Fiction",
-      "year": 1994,
-      "releaseDate": "1994-09-10",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/vQWk5YBFWF4bZaofAbv0tShwBvQ.jpg",
-      "overview": "A burger-loving hit man, his philosophical partner, a drug-addled gangster's moll and a washed-up boxer converge in this sprawling, comedic crime caper. Their adventures unfurl in three stories that ingeniously trip back and forth in time.",
+      "title": "Back to the Future",
+      "originalTitle": "Back to the Future",
+      "year": 1985,
+      "releaseDate": "1985-07-03",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg",
+      "overview": "Eighties teenager Marty McFly is accidentally sent back in time to 1955, inadvertently disrupting his parents' first meeting and attracting his mother's romantic interest. Marty must repair the damage to history by rekindling his parents' romance and - with the help of his eccentric inventor friend Doc Brown - return to 1985.",
       "genres": [
-        "Thriller",
-        "Crime",
-        "Comedy"
+        "Adventure",
+        "Comedy",
+        "Science Fiction"
       ],
-      "voteAverage": 8.481,
-      "popularity": 27.2066,
-      "predictedRating": 9.2,
-      "rationale": "A burger-loving hit man, his philosophical partner, a drug-addled gangster's moll and a washed-up boxer converge in this sprawling, comedic crime caper. The Comedy and Crime angle is the clearest fit.",
+      "voteAverage": 8.327,
+      "popularity": 22.0787,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "Eighties teenager Marty McFly is accidentally sent back in time to 1955, inadvertently disrupting his parents' first meeting and attracting his mother's romantic interest. The Romance and Adventure angle is the clearest fit.",
       "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
       "provider": null,
       "model": null
     },
     {
-      "tmdbId": 278,
+      "tmdbId": 27205,
       "mediaType": "movie",
-      "title": "The Shawshank Redemption",
-      "originalTitle": "The Shawshank Redemption",
-      "year": 1994,
-      "releaseDate": "1994-09-23",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
-      "overview": "Imprisoned in the 1940s for the double murder of his wife and her lover, upstanding banker Andy Dufresne begins a new life at the Shawshank prison, where he puts his accounting skills to work for an amoral warden. During his long stretch in prison, Dufresne comes to be admired by the other inmates -- including an older prisoner named Red -- for his integrity and unquenchable sense of hope.",
+      "title": "Inception",
+      "originalTitle": "Inception",
+      "year": 2010,
+      "releaseDate": "2010-07-15",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg",
+      "overview": "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
       "genres": [
+        "Action",
+        "Science Fiction",
+        "Adventure"
+      ],
+      "voteAverage": 8.372,
+      "popularity": 45.7487,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered... The Adventure and Science Fiction angle is the clearest fit.",
+      "source": "deterministic",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
+      "provider": null,
+      "model": null
+    },
+    {
+      "tmdbId": 637,
+      "mediaType": "movie",
+      "title": "Life Is Beautiful",
+      "originalTitle": "La vita è bella",
+      "year": 1997,
+      "releaseDate": "1997-12-20",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/74hLDKjD5aGYOotO6esUVaeISa2.jpg",
+      "overview": "A touching story of an Italian book seller of Jewish ancestry who lives in his own little fairy tale. His creative and happy life would come to an abrupt halt when his entire family is deported to a concentration camp during World War II. While locked up he tries to convince his son that the whole thing is just a game.",
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "voteAverage": 8.439,
+      "popularity": 13.9807,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "A touching story of an Italian book seller of Jewish ancestry who lives in his own little fairy tale. The Comedy and Drama angle is the clearest fit.",
+      "source": "deterministic",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
+      "provider": null,
+      "model": null
+    },
+    {
+      "tmdbId": 3082,
+      "mediaType": "movie",
+      "title": "Modern Times",
+      "originalTitle": "Modern Times",
+      "year": 1936,
+      "releaseDate": "1936-02-05",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/7uoiKOEjxBBW0AgDGQWrlfGQ90w.jpg",
+      "overview": "A bumbling tramp desires to build a home with a young woman, yet is thwarted time and time again by his lack of experience and habit of being in the wrong place at the wrong time...",
+      "genres": [
+        "Comedy",
         "Drama",
-        "Crime"
+        "Romance"
       ],
-      "voteAverage": 8.726,
-      "popularity": 48.4215,
-      "predictedRating": 9.1,
-      "rationale": "Imprisoned in the 1940s for the double murder of his wife and her lover, upstanding banker Andy Dufresne begins a new life at the Shawshank prison, where he puts his accounting... The Drama and Crime angle is the clearest fit.",
+      "voteAverage": 8.281,
+      "popularity": 6.9819,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "A bumbling tramp desires to build a home with a young woman, yet is thwarted time and time again by his lack of experience and habit of being in the wrong place at the wrong tim... The Romance and Comedy angle is the clearest fit.",
       "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
       "provider": null,
       "model": null
     },
     {
-      "tmdbId": 238,
+      "tmdbId": 569094,
       "mediaType": "movie",
-      "title": "The Godfather",
-      "originalTitle": "The Godfather",
-      "year": 1972,
-      "releaseDate": "1972-03-14",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
-      "overview": "Spanning the years 1945 to 1955, a chronicle of the fictional Italian-American Corleone crime family. When organized crime family patriarch, Vito Corleone barely survives an attempt on his life, his youngest son, Michael steps in to take care of the would-be killers, launching a campaign of bloody revenge.",
+      "title": "Spider-Man: Across the Spider-Verse",
+      "originalTitle": "Spider-Man: Across the Spider-Verse",
+      "year": 2023,
+      "releaseDate": "2023-05-31",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+      "overview": "After reuniting with Gwen Stacy, Brooklyn’s full-time, friendly neighborhood Spider-Man is catapulted across the Multiverse, where he encounters the Spider Society, a team of Spider-People charged with protecting the Multiverse's very existence. But when the heroes clash on how to handle a new threat, Miles finds himself pitted against the other Spiders and must set out on his own to save those he loves most.",
       "genres": [
+        "Animation",
+        "Action",
+        "Adventure",
+        "Science Fiction"
+      ],
+      "voteAverage": 8.34,
+      "popularity": 31.4491,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "After reuniting with Gwen Stacy, Brooklyn’s full-time, friendly neighborhood Spider-Man is catapulted across the Multiverse, where he encounters the Spider Society, a team of Sp... The Adventure and Science Fiction angle is the clearest fit.",
+      "source": "deterministic",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
+      "provider": null,
+      "model": null
+    },
+    {
+      "tmdbId": 324857,
+      "mediaType": "movie",
+      "title": "Spider-Man: Into the Spider-Verse",
+      "originalTitle": "Spider-Man: Into the Spider-Verse",
+      "year": 2018,
+      "releaseDate": "2018-12-06",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg",
+      "overview": "Struggling to find his place in the world while juggling school and family, Brooklyn teenager Miles Morales is unexpectedly bitten by a radioactive spider and develops unfathomable powers just like the one and only Spider-Man. While wrestling with the implications of his new abilities, Miles discovers a super collider created by the madman Wilson \"Kingpin\" Fisk, causing others from across the Spider-Verse to be inadvertently transported to his dimension.",
+      "genres": [
+        "Animation",
+        "Action",
+        "Adventure",
+        "Science Fiction"
+      ],
+      "voteAverage": 8.393,
+      "popularity": 28.0564,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "Struggling to find his place in the world while juggling school and family, Brooklyn teenager Miles Morales is unexpectedly bitten by a radioactive spider and develops unfathoma... The Adventure and Science Fiction angle is the clearest fit.",
+      "source": "deterministic",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
+      "provider": null,
+      "model": null
+    },
+    {
+      "tmdbId": 1891,
+      "mediaType": "movie",
+      "title": "The Empire Strikes Back",
+      "originalTitle": "The Empire Strikes Back",
+      "year": 1980,
+      "releaseDate": "1980-05-20",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/nNAeTmF4CtdSgMDplXTDPOpYzsX.jpg",
+      "overview": "The epic saga continues as Luke Skywalker, in hopes of defeating the evil Galactic Empire, learns the ways of the Jedi from aging master Yoda. But Darth Vader is more determined than ever to capture Luke. Meanwhile, rebel leader Princess Leia, cocky Han Solo, Chewbacca, and droids C-3PO and R2-D2 are thrown into various stages of capture, betrayal and despair.",
+      "genres": [
+        "Adventure",
+        "Action",
+        "Science Fiction"
+      ],
+      "voteAverage": 8.392,
+      "popularity": 13.0994,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "The epic saga continues as Luke Skywalker, in hopes of defeating the evil Galactic Empire, learns the ways of the Jedi from aging master Yoda. The Adventure and Science Fiction angle is the clearest fit.",
+      "source": "deterministic",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
+      "provider": null,
+      "model": null
+    },
+    {
+      "tmdbId": 533514,
+      "mediaType": "movie",
+      "title": "Violet Evergarden: The Movie",
+      "originalTitle": "劇場版 ヴァイオレット・エヴァーガーデン",
+      "year": 2020,
+      "releaseDate": "2020-09-18",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/bajajkoErDst0JxdFyBkABiF9rW.jpg",
+      "overview": "As the world moves on from the war and technological advances bring changes to her life, Violet still hopes to see her lost commanding officer again.",
+      "genres": [
+        "Animation",
         "Drama",
-        "Crime"
-      ],
-      "voteAverage": 8.687,
-      "popularity": 30.2387,
-      "predictedRating": 9.1,
-      "rationale": "Spanning the years 1945 to 1955, a chronicle of the fictional Italian-American Corleone crime family. The Drama and Crime angle is the clearest fit.",
-      "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
-      "provider": null,
-      "model": null
-    },
-    {
-      "tmdbId": 240,
-      "mediaType": "movie",
-      "title": "The Godfather Part II",
-      "originalTitle": "The Godfather Part II",
-      "year": 1974,
-      "releaseDate": "1974-12-20",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/hek3koDUyRQk7FIhPXsa6mT2Zc3.jpg",
-      "overview": "In the continuing saga of the Corleone crime family, a young Vito Corleone grows up in Sicily and in 1910s New York. In the 1950s, Michael Corleone attempts to expand the family business into Las Vegas, Hollywood and Cuba.",
-      "genres": [
-        "Drama",
-        "Crime"
-      ],
-      "voteAverage": 8.572,
-      "popularity": 20.3305,
-      "predictedRating": 9.1,
-      "rationale": "In the continuing saga of the Corleone crime family, a young Vito Corleone grows up in Sicily and in 1910s New York. The Drama and Crime angle is the clearest fit.",
-      "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
-      "provider": null,
-      "model": null
-    },
-    {
-      "tmdbId": 497,
-      "mediaType": "movie",
-      "title": "The Green Mile",
-      "originalTitle": "The Green Mile",
-      "year": 1999,
-      "releaseDate": "1999-12-10",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/8VG8fDNiy50H4FedGwdSVUPoaJe.jpg",
-      "overview": "A supernatural tale set on death row in a Southern prison, where gentle giant John Coffey possesses the mysterious power to heal people's ailments. When the cell block's head guard, Paul Edgecomb, recognizes Coffey's miraculous gift, he tries desperately to help stave off the condemned man's execution.",
-      "genres": [
         "Fantasy",
-        "Drama",
-        "Crime"
+        "Romance"
       ],
-      "voteAverage": 8.506,
-      "popularity": 23.0696,
-      "predictedRating": 9.1,
-      "rationale": "A supernatural tale set on death row in a Southern prison, where gentle giant John Coffey possesses the mysterious power to heal people's ailments. The Drama and Crime angle is the clearest fit.",
+      "voteAverage": 8.307,
+      "popularity": 5.8375,
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "As the world moves on from the war and technological advances bring changes to her life, Violet still hopes to see her lost commanding officer again. The Romance and Drama angle is the clearest fit.",
       "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
-      "provider": null,
-      "model": null
-    },
-    {
-      "tmdbId": 769,
-      "mediaType": "movie",
-      "title": "GoodFellas",
-      "originalTitle": "GoodFellas",
-      "year": 1990,
-      "releaseDate": "1990-09-12",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg",
-      "overview": "The true story of Henry Hill, a half-Irish, half-Sicilian Brooklyn kid who is adopted by neighbourhood gangsters at an early age and climbs the ranks of a Mafia family under the guidance of Jimmy Conway.",
-      "genres": [
-        "Drama",
-        "Crime"
-      ],
-      "voteAverage": 8.453,
-      "popularity": 19.2943,
-      "predictedRating": 9.1,
-      "rationale": "The true story of Henry Hill, a half-Irish, half-Sicilian Brooklyn kid who is adopted by neighbourhood gangsters at an early age and climbs the ranks of a Mafia family under the... The Drama and Crime angle is the clearest fit.",
-      "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
-      "provider": null,
-      "model": null
-    },
-    {
-      "tmdbId": 598,
-      "mediaType": "movie",
-      "title": "City of God",
-      "originalTitle": "Cidade de Deus",
-      "year": 2002,
-      "releaseDate": "2002-08-30",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/k7eYdWvhYQyRQoU2TB2A2Xu2TfD.jpg",
-      "overview": "In the poverty-stricken favelas of Rio de Janeiro in the 1970s, two young men choose different paths. Rocket is a budding photographer who documents the increasing drug-related violence of his neighborhood, while José “Zé” Pequeno is an ambitious drug dealer diving into a dangerous life of crime.",
-      "genres": [
-        "Drama",
-        "Crime"
-      ],
-      "voteAverage": 8.428,
-      "popularity": 11.0975,
-      "predictedRating": 9.1,
-      "rationale": "In the poverty-stricken favelas of Rio de Janeiro in the 1970s, two young men choose different paths. The Drama and Crime angle is the clearest fit.",
-      "source": "deterministic",
-      "generatedAt": "2026-07-21T18:30:02.177119Z",
+      "generatedAt": "2026-07-23T07:32:47.165916Z",
       "provider": null,
       "model": null
     }
   ],
   "aiDiscoveries": [
     {
-      "tmdbId": 381284,
+      "tmdbId": 1402,
       "mediaType": "movie",
-      "title": "Hidden Figures",
-      "originalTitle": "Hidden Figures",
-      "year": 2016,
-      "releaseDate": "2016-12-10",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/9lfz2W2uGjyow3am00rsPJ8iOyq.jpg",
-      "overview": "The untold story of Katherine G. Johnson, Dorothy Vaughan and Mary Jackson – brilliant African-American women working at NASA and serving as the brains behind one of the greatest operations in history – the launch of astronaut John Glenn into orbit. The visionary trio crossed all gender and race lines to inspire generations to dream big.",
+      "title": "The Pursuit of Happyness",
+      "originalTitle": "The Pursuit of Happyness",
+      "year": 2006,
+      "releaseDate": "2006-12-14",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/lBYOKAMcxIvuk9s9hMuecB9dPBV.jpg",
+      "overview": "A struggling salesman takes custody of his son as he's poised to begin a life-changing professional career.",
       "genres": [
         "Drama"
       ],
-      "voteAverage": 8.045,
-      "popularity": 10.906,
-      "predictedRating": 7.8,
-      "rationale": "Determined female mathematicians overcome racial segregation at NASA; the theme of perseverance and breakthrough directly echoes the inventive, morally driven spirit of Joy’s character.",
+      "voteAverage": 7.887,
+      "popularity": 9.7107,
+      "predictedRating": 8.2,
+      "scoreSource": "ai",
+      "rationale": "A heartfelt drama about a struggling salesman who becomes a father and faces homelessness while persevering to secure a better future for his son, echoing the uplifting determination seen in \"Joy\" and the resilience in \"The Intouchables\".",
       "source": "ai",
-      "generatedAt": "2026-07-21T18:30:02.185051Z",
-      "provider": "openai-compatible",
-      "model": "cohere/north-mini-code:free"
-    },
-    {
-      "tmdbId": 318846,
-      "mediaType": "movie",
-      "title": "The Big Short",
-      "originalTitle": "The Big Short",
-      "year": 2015,
-      "releaseDate": "2015-12-11",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/scVEaJEwP8zUix8vgmMoJJ9Nq0w.jpg",
-      "overview": "The men who made millions from a global economic meltdown.",
-      "genres": [
-        "Comedy",
-        "Drama"
-      ],
-      "voteAverage": 7.367,
-      "popularity": 7.2908,
-      "predictedRating": 7.8,
-      "rationale": "Underdog investors use data analysis to expose the 2008 financial crisis; the premise of statistical insight versus entrenched systems mirrors the data‑driven underdog triumph in Moneyball.",
-      "source": "ai",
-      "generatedAt": "2026-07-21T18:30:02.185051Z",
-      "provider": "openai-compatible",
-      "model": "cohere/north-mini-code:free"
-    },
-    {
-      "tmdbId": 205596,
-      "mediaType": "movie",
-      "title": "The Imitation Game",
-      "originalTitle": "The Imitation Game",
-      "year": 2014,
-      "releaseDate": "2014-11-14",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/zSqJ1qFq8NXFfi7JeIYMlzyR0dx.jpg",
-      "overview": "Based on the real life story of legendary cryptanalyst Alan Turing, the film portrays the nail-biting race against time by Turing and his brilliant team of code-breakers at Britain's top-secret Government Code and Cypher School at Bletchley Park, during the darkest days of World War II.",
-      "genres": [
-        "Drama"
-      ],
-      "voteAverage": 7.983,
-      "popularity": 13.7783,
-      "predictedRating": 8.0,
-      "rationale": "A persecuted code‑breaker’s breakthrough in WWII cryptography showcases innovation under adversity; the mood of紧张 and eventual triumph parallels the struggle‑and‑success narrative seen in Moneyball.",
-      "source": "ai",
-      "generatedAt": "2026-07-21T18:30:02.185051Z",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
       "provider": "openai-compatible",
       "model": "cohere/north-mini-code:free"
     },
@@ -546,31 +2689,34 @@
       ],
       "voteAverage": 7.692,
       "popularity": 4.5137,
-      "predictedRating": 7.5,
-      "rationale": "A quirky family road trip centers on an underdog contestant in a beauty pageant; the premise of embracing unconventional paths and finding acceptance recalls the uplifting underdog journeys in Into the Wild and Joy.",
+      "predictedRating": 8.1,
+      "scoreSource": "ai",
+      "rationale": "A quirky family road trip comedy-drama where eccentric relatives unite to support a young girl's beauty pageant dream, reflecting the warm, supportive tone of \"Me Before You\" and the inventive problem‑solving in \"Moneyball\".",
       "source": "ai",
-      "generatedAt": "2026-07-21T18:30:02.185051Z",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
       "provider": "openai-compatible",
       "model": "cohere/north-mini-code:free"
     },
     {
-      "tmdbId": 45317,
+      "tmdbId": 120467,
       "mediaType": "movie",
-      "title": "The Fighter",
-      "originalTitle": "The Fighter",
-      "year": 2010,
-      "releaseDate": "2010-12-10",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/xfsFerGhO1h6rLk8vwLgMyQ8WVJ.jpg",
-      "overview": "Boxer \"Irish\" Micky Ward's unlikely road to the world light welterweight title. His Rocky-like rise was shepherded by half-brother Dicky, a boxer-turned-trainer who rebounded in life after nearly being KO'd by drugs and crime.",
+      "title": "The Grand Budapest Hotel",
+      "originalTitle": "The Grand Budapest Hotel",
+      "year": 2014,
+      "releaseDate": "2014-02-26",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/zOVCqKUzjFKqa1eDMcOzvXwthY4.jpg",
+      "overview": "The Grand Budapest Hotel tells of a legendary concierge at a famous European hotel between the wars and his friendship with a young employee who becomes his trusted protégé. The story involves the theft and recovery of a priceless Renaissance painting, the battle for an enormous family fortune and the slow and then sudden upheavals that transformed Europe during the first half of the 20th century.",
       "genres": [
+        "Comedy",
         "Drama"
       ],
-      "voteAverage": 7.38,
-      "popularity": 3.6365,
-      "predictedRating": 7.8,
-      "rationale": "A boxer battles family loyalty and personal ambition for a championship; the theme of familial pressure and relentless drive reflects the determination displayed by Joy and the sacrifices in Into the Wild.",
+      "voteAverage": 8.026,
+      "popularity": 16.3005,
+      "predictedRating": 8.0,
+      "scoreSource": "ai",
+      "rationale": "A visually inventive comedy‑adventure set in a whimsical hotel, blending meticulous craft and quirky humor reminiscent of the stylized storytelling in \"The Devil Wears Prada\" and the inventive spirit of \"The Imitation Game\".",
       "source": "ai",
-      "generatedAt": "2026-07-21T18:30:02.185051Z",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
       "provider": "openai-compatible",
       "model": "cohere/north-mini-code:free"
     },
@@ -584,56 +2730,134 @@
       "posterUrl": "https://image.tmdb.org/t/p/w780/fASz8A0yFE3QB6LgGoOfwvFSseV.jpg",
       "overview": "During a manned mission to Mars, Astronaut Mark Watney is presumed dead after a fierce storm and left behind by his crew. But Watney has survived and finds himself stranded and alone on the hostile planet. With only meager supplies, he must draw upon his ingenuity, wit and spirit to subsist and find a way to signal to Earth that he is alive.",
       "genres": [
-        "Drama"
+        "Science Fiction",
+        "Drama",
+        "Adventure"
       ],
       "voteAverage": 7.704,
       "popularity": 17.4971,
       "predictedRating": 8.0,
-      "rationale": "An astronaut uses scientific ingenuity to survive alone on Mars; the premise of resource‑constrained problem solving and an optimistic, resourceful mood aligns with the data‑driven resilience of Moneyball.",
+      "scoreSource": "ai",
+      "rationale": "An intelligent sci‑fi survival story where an astronaut uses scientific reasoning and resourcefulness to survive alone on Mars, echoing the problem‑solving mindset of \"Moneyball\" and the optimistic perseverance in \"The Pursuit of Happyness\".",
       "source": "ai",
-      "generatedAt": "2026-07-21T18:30:02.185051Z",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
       "provider": "openai-compatible",
       "model": "cohere/north-mini-code:free"
     },
     {
-      "tmdbId": 109424,
+      "tmdbId": 212778,
       "mediaType": "movie",
-      "title": "Captain Phillips",
-      "originalTitle": "Captain Phillips",
+      "title": "Chef",
+      "originalTitle": "Chef",
+      "year": 2014,
+      "releaseDate": "2014-05-08",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/hyp8EXDmO4dSC8V6Q5jU7gD1kcg.jpg",
+      "overview": "When Chef Carl Casper suddenly quits his job at a prominent Los Angeles restaurant after refusing to compromise his creative integrity for its controlling owner, he is left to figure out what's next. Finding himself in Miami, he teams up with his ex-wife, his friend and his son to launch a food truck. Taking to the road, Chef Carl goes back to his roots to reignite his passion for the kitchen -- and zest for life and love.",
+      "genres": [
+        "Comedy"
+      ],
+      "voteAverage": 7.1,
+      "popularity": 5.4352,
+      "predictedRating": 7.9,
+      "scoreSource": "ai",
+      "rationale": "A feel‑good comedy about a chef who quits his high‑end restaurant, starts a food truck with his son, and rediscovers family bonds, reflecting the warm, life‑celebrating mood of \"Me Before You\" and the entrepreneurial spirit of \"The Founder\".",
+      "source": "ai",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
+      "provider": "openai-compatible",
+      "model": "cohere/north-mini-code:free"
+    },
+    {
+      "tmdbId": 266856,
+      "mediaType": "movie",
+      "title": "The Theory of Everything",
+      "originalTitle": "The Theory of Everything",
+      "year": 2014,
+      "releaseDate": "2014-11-07",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/7kwcLFNt887saoQAL7EY0XnW7VI.jpg",
+      "overview": "Once a healthy, active young man, Hawking received an earth-shattering diagnosis at 21 years of age. With Jane fighting tirelessly by his side, Stephen embarks on his most ambitious scientific work, studying the very thing he now has precious little of – time.",
+      "genres": [
+        "Drama",
+        "Romance"
+      ],
+      "voteAverage": 7.829,
+      "popularity": 6.6523,
+      "predictedRating": 7.8,
+      "scoreSource": "ai",
+      "rationale": "A biographical drama exploring Stephen Hawking's scientific breakthroughs and personal struggles, aligning with the historical depth of \"The Imitation Game\" and the dedication to a cause seen in \"Moneyball\".",
+      "source": "ai",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
+      "provider": "openai-compatible",
+      "model": "cohere/north-mini-code:free"
+    },
+    {
+      "tmdbId": 116745,
+      "mediaType": "movie",
+      "title": "The Secret Life of Walter Mitty",
+      "originalTitle": "The Secret Life of Walter Mitty",
       "year": 2013,
-      "releaseDate": "2013-10-10",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/8Td0kkocW6sD3uRpzwfMfkqMWhx.jpg",
-      "overview": "The true story of Captain Richard Phillips and the 2009 hijacking by Somali pirates of the US-flagged MV Maersk Alabama, the first American cargo ship to be hijacked in two hundred years.",
+      "releaseDate": "2013-12-18",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/iAo1hlzsPV9XpYcLQp6Ud065tGO.jpg",
+      "overview": "A timid magazine photo manager who lives life vicariously through daydreams embarks on a true-life adventure when a negative goes missing.",
       "genres": [
-        "Drama"
+        "Adventure",
+        "Comedy",
+        "Drama",
+        "Fantasy"
       ],
-      "voteAverage": 7.541,
-      "popularity": 6.9194,
-      "predictedRating": 7.8,
-      "rationale": "A merchant mariner endures a harrowing hijacking and captivity; the mood of tense survival and the theme of human endurance echo the raw, unforgiving journey depicted in Into the Wild.",
+      "voteAverage": 7.227,
+      "popularity": 13.7403,
+      "predictedRating": 7.7,
+      "scoreSource": "ai",
+      "rationale": "An adventurous comedy‑drama about a daydreamer who embarks on a global quest to find a missing photo for a magazine, capturing the spirit of exploration and self‑discovery present in \"Interstellar\" and the uplifting tone of \"The Pursuit of Happyness\".",
       "source": "ai",
-      "generatedAt": "2026-07-21T18:30:02.185051Z",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
       "provider": "openai-compatible",
       "model": "cohere/north-mini-code:free"
     },
     {
-      "tmdbId": 1402,
+      "tmdbId": 44865,
       "mediaType": "movie",
-      "title": "The Pursuit of Happyness",
-      "originalTitle": "The Pursuit of Happyness",
-      "year": 2006,
-      "releaseDate": "2006-12-14",
-      "posterUrl": "https://image.tmdb.org/t/p/w780/lBYOKAMcxIvuk9s9hMuecB9dPBV.jpg",
-      "overview": "A struggling salesman takes custody of his son as he's poised to begin a life-changing professional career.",
+      "title": "The Grandmaster",
+      "originalTitle": "一代宗師",
+      "year": 2013,
+      "releaseDate": "2013-01-10",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/ydBVVIscL6TsX5hYztA5YpBCwJ3.jpg",
+      "overview": "Ip Man's peaceful life in Foshan changes after Gong Yutian seeks an heir for his family in Southern China. Ip Man then meets Gong Er who challenges him for the sake of regaining her family's honor. After the Second Sino-Japanese War, Ip Man moves to Hong Kong and struggles to provide for his family. In the mean time, Gong Er chooses the path of vengeance after her father was killed by Ma San.",
       "genres": [
+        "Action",
+        "Drama",
+        "History"
+      ],
+      "voteAverage": 6.6,
+      "popularity": 4.2844,
+      "predictedRating": 7.6,
+      "scoreSource": "ai",
+      "rationale": "A martial‑arts drama chronicling the life of a legendary kung‑fu master, blending stylistic choreography with reflective storytelling reminiscent of the epic scope of \"The Grand Budapest Hotel\" and the disciplined dedication in \"The Imitation Game\".",
+      "source": "ai",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
+      "provider": "openai-compatible",
+      "model": "cohere/north-mini-code:free"
+    },
+    {
+      "tmdbId": 147773,
+      "mediaType": "movie",
+      "title": "The Way Way Back",
+      "originalTitle": "The Way Way Back",
+      "year": 2013,
+      "releaseDate": "2013-06-06",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/4DgA0EDDVv37C8xISc3Vv0rhxlL.jpg",
+      "overview": "Shy 14-year-old Duncan goes on summer vacation with his mother, her overbearing boyfriend, and her boyfriend's daughter. Having a rough time fitting in, Duncan finds an unexpected friend in Owen, manager of the Water Wizz water park.",
+      "genres": [
+        "Comedy",
         "Drama"
       ],
-      "voteAverage": 7.887,
-      "popularity": 9.7107,
-      "predictedRating": 7.8,
-      "rationale": "A father overcomes extreme homelessness while raising his son, embodying relentless optimism; the theme of hope against odds directly mirrors the moral fortitude and perseverance seen in Joy’s story.",
+      "voteAverage": 7.136,
+      "popularity": 3.7518,
+      "predictedRating": 7.5,
+      "scoreSource": "ai",
+      "rationale": "A coming‑of‑age comedy‑drama about a teenage boy navigating summer holidays with a charismatic family friend, echoing the youthful optimism and supportive relationships found in \"Little Miss Sunshine\" and \"Chef\".",
       "source": "ai",
-      "generatedAt": "2026-07-21T18:30:02.185051Z",
+      "generatedAt": "2026-07-23T07:32:47.174287Z",
       "provider": "openai-compatible",
       "model": "cohere/north-mini-code:free"
     }
