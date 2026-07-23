@@ -12,8 +12,9 @@ from filmography.ai import (
     AISuggestionBatch,
     OpenAICompatibleClient,
     resolve_ai_suggestions,
+    score_target_id,
 )
-from filmography.models import WatchedFilm
+from filmography.models import Recommendation, WatchedFilm, WatchlistFilm
 from filmography.tmdb import TMDBClient
 
 
@@ -58,7 +59,7 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     ai_client, http_client = _provider_client(httpx.MockTransport(handler))
     watched = [WatchedFilm(title="Arrival", year=2016, rating=9, review="A complete review.")]
     try:
-        batch = ai_client.suggest(watched, [], prompt="quiet science fiction", count=1)
+        batch = ai_client.suggest(watched, [], prompt="quiet science fiction", count=5)
     finally:
         http_client.close()
 
@@ -70,11 +71,96 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     assert "A complete review." in serialized_body
     assert "super-secret" not in serialized_body
     assert "exclusions" in serialized_body
-    assert cast(dict[str, object], request_body["response_format"])["type"] == "json_schema"
+    response_format = cast(dict[str, object], request_body["response_format"])
+    assert response_format["type"] == "json_schema"
+    json_schema = cast(dict[str, object], response_format["json_schema"])
+    schema = cast(dict[str, object], json_schema["schema"])
+    assert set(cast(list[str], schema["required"])) >= {
+        "recommendations",
+        "watchlistScores",
+        "discoveryScores",
+    }
+    properties = cast(dict[str, object], schema["properties"])
+    recommendations_schema = cast(dict[str, object], properties["recommendations"])
+    assert recommendations_schema["minItems"] == 5
     messages = cast(list[dict[str, str]], request_body["messages"])
     assert "Do not use Markdown" in messages[0]["content"]
     assert "Never recommend any title" in messages[0]["content"]
     assert "Do not say it was suggested by the model" in messages[0]["content"]
+
+
+def test_ai_client_requests_scores_for_non_manual_watchlist_and_taste_matches() -> None:
+    captured_profile: dict[str, object] = {}
+    generated_at = datetime(2026, 7, 20, tzinfo=UTC)
+    watchlist = [
+        WatchlistFilm(
+            tmdb_id=10,
+            title="Score Me",
+            year=2020,
+            interest=8,
+            interest_source="local",
+        ),
+        WatchlistFilm(
+            tmdb_id=11,
+            title="Manual",
+            year=2021,
+            interest=6,
+            interest_source="manual",
+        ),
+    ]
+    discovery = Recommendation(
+        tmdb_id=12,
+        title="Taste Match",
+        year=2022,
+        predicted_rating=8,
+        rationale="Local rationale.",
+        source="deterministic",
+        generated_at=generated_at,
+    )
+    watchlist_target = score_target_id("watchlist", watchlist[0])
+    discovery_target = score_target_id("discovery", discovery)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body: object = json.loads(request.content)
+        assert isinstance(body, dict)
+        messages = cast(list[dict[str, str]], body["messages"])
+        profile: object = json.loads(messages[1]["content"])
+        assert isinstance(profile, dict)
+        captured_profile.update(cast(dict[str, object], profile))
+        result = {
+            "recommendations": [
+                {
+                    "title": "Moon",
+                    "year": 2009,
+                    "predictedRating": 8.5,
+                    "rationale": "A precise isolation drama.",
+                }
+            ],
+            "watchlistScores": [{"target": watchlist_target, "predictedRating": 8.4}],
+            "discoveryScores": [{"target": discovery_target, "predictedRating": 8.7}],
+        }
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+
+    ai_client, http_client = _provider_client(httpx.MockTransport(handler))
+    try:
+        batch = ai_client.suggest(
+            [WatchedFilm(title="Arrival", rating=9)],
+            watchlist,
+            deterministic_discoveries=[discovery],
+            count=1,
+        )
+    finally:
+        http_client.close()
+
+    assert [
+        cast(dict[str, object], target)["target"]
+        for target in cast(list[object], captured_profile["watchlistScoreTargets"])
+    ] == [watchlist_target]
+    assert batch.watchlist_scores[0].predicted_rating == 8.4
+    assert batch.discovery_scores[0].predicted_rating == 8.7
 
 
 def test_ai_client_extracts_fenced_json_from_compat_provider() -> None:
@@ -145,6 +231,13 @@ def test_ai_client_normalizes_extra_fields_and_long_rationales() -> None:
                 "rationale": long_rationale,
             }
         ],
+        "watchlist_scores": [
+            {
+                "id": "watchlist:10",
+                "rating": 8.2,
+                "title": "Provider echo ignored",
+            }
+        ],
     }
     transport = httpx.MockTransport(
         lambda _request: httpx.Response(
@@ -162,6 +255,8 @@ def test_ai_client_normalizes_extra_fields_and_long_rationales() -> None:
     assert suggestion.title == "Hidden Figures"
     assert suggestion.predicted_rating == 8
     assert len(suggestion.rationale) == 500
+    assert batch.watchlist_scores[0].target == "watchlist:10"
+    assert batch.watchlist_scores[0].predicted_rating == 8.2
 
 
 def test_ai_client_drops_provider_suggestions_without_year() -> None:

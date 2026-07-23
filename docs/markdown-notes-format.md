@@ -8,7 +8,8 @@ whose names start with `.` are skipped. Keep unrelated Markdown outside the conf
 
 The filename is the title fallback. A note may start with YAML frontmatter delimited by `---`. The
 text after frontmatter becomes the public Markdown review; leading and trailing whitespace is
-trimmed.
+trimmed. An empty body stays empty in the generated snapshot and interface; catalog descriptions are
+not used as replacement review text.
 
 Minimal review note:
 
@@ -134,8 +135,11 @@ An unlabelled segment after the title is appended to the notes, so `| quiet even
 
 Interest uses the 0–10 tenth-step scale and is not inferred as a five-point score. If interest is
 omitted and TMDB enrichment succeeds, the updater fills a personal expected score from watched
-ratings, genre/tag affinity, and TMDB score; an explicit `interest` value always wins. `dismissed`
-accepts `true`, `yes`, `1`, `false`, `no`, or `0`. Dismissed films stay in the snapshot as a record
+ratings, genre/tag affinity, and TMDB score. The local estimate is calibrated to the distribution of
+your own ratings rather than freely saturating at 10. A successful `recommend` run asks the AI model
+to replace non-manual estimates using your ratings and review text; an explicit `interest` value
+always wins. `dismissed` accepts `true`, `yes`, `1`, `false`, `no`, or `0`. Dismissed films stay in
+the snapshot as a record
 of that choice but are excluded from recommendations. Markdown task markers such as `- [ ]` are
 accepted as list syntax; they do not change film status. Wiki-style links use their link target as
 the title; ordinary Markdown links use their visible label.

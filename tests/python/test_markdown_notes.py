@@ -204,11 +204,13 @@ Ted Lasso — type: series
     ]
     assert films[0].year == 2021
     assert films[0].interest == 9.5
+    assert films[0].interest_source == "manual"
     assert films[0].notes == "See on a large screen"
     assert films[0].tags == ["epic", "sci-fi"]
     assert films[1].interest == 8
     assert films[1].notes == "quiet evening"
     assert films[2].interest is None
+    assert films[2].interest_source is None
     assert films[3].dismissed is True
     assert films[4].media_type == "tv"
 

@@ -3,7 +3,11 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from filmography.models import FilmMetadata, WatchedFilm, WatchlistFilm
-from filmography.recommendations import preferred_genres, rank_deterministic
+from filmography.recommendations import (
+    calibrate_personal_score,
+    preferred_genres,
+    rank_deterministic,
+)
 
 
 def test_preferred_genres_uses_ratings_and_tags() -> None:
@@ -77,6 +81,15 @@ def test_deterministic_ranking_is_stable_without_history() -> None:
 
     assert [item.tmdb_id for item in first] == [1, 2]
     assert first == second
+
+
+def test_expected_scores_follow_the_users_upper_rating_range() -> None:
+    watched = [
+        WatchedFilm(title=f"Film {index}", rating=rating)
+        for index, rating in enumerate([8, 8, 8.2, 8.3, 8.5, 8.5, 8.7, 8.8, 9, 10])
+    ]
+
+    assert calibrate_personal_score(watched, 10) == 9.3
 
 
 def test_deterministic_ranking_excludes_unknown_year_title_match() -> None:

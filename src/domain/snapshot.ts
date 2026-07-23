@@ -79,17 +79,28 @@ export const watchedFilmSchema = filmSchema
 export const watchlistFilmSchema = filmSchema
   .extend({
     interest: optionalScoreSchema,
+    interestSource: z.enum(['manual', 'local', 'ai']).nullable().default(null),
     notes: z.string().trim(),
     tags: stringListSchema,
     dismissed: z.boolean(),
   })
   .strict()
+  .superRefine((film, context) => {
+    if (film.interest === null && film.interestSource) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Watchlist score source requires an expected score',
+        path: ['interestSource'],
+      })
+    }
+  })
 
 export const recommendationSchema = filmSchema
   .extend({
     tmdbId: z.number().int().positive(),
     mediaType: z.literal('movie').default('movie'),
     predictedRating: scoreSchema,
+    scoreSource: z.enum(['local', 'ai']).nullable().default(null),
     rationale: z.string().trim().min(1),
     source: z.enum(['deterministic', 'ai']),
     provider: nullableTextSchema,
@@ -114,6 +125,13 @@ export const recommendationSchema = filmSchema
         code: z.ZodIssueCode.custom,
         message: 'AI recommendations require a provider and model',
         path: ['provider'],
+      })
+    }
+    if (recommendation.source === 'ai' && recommendation.scoreSource === 'local') {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'AI recommendations require an AI expected score',
+        path: ['scoreSource'],
       })
     }
   })

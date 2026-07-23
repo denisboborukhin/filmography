@@ -50,7 +50,7 @@ def rank_deterministic(
     excluded = [*watched, *watchlist]
     preferences = _preference_weights(watched)
     preference_names = _preference_names(watched)
-    baseline = sum(film.rating for film in watched) / len(watched) if watched else 6.0
+    baseline = _rating_baseline(watched)
 
     ranked: list[tuple[float, float, float, str, FilmMetadata, list[str]]] = []
     seen_ids: set[int] = set()
@@ -80,7 +80,7 @@ def rank_deterministic(
     for _, _, _, _, film, matches in ranked[:limit]:
         catalog_score = film.vote_average if film.vote_average is not None else 5.0
         affinity = sum(preferences.get(_normalize_label(genre), 0.0) for genre in matches)
-        predicted = _predicted_score(baseline, affinity, catalog_score)
+        predicted = _predicted_score(watched, baseline, affinity, catalog_score)
         rationale = _rationale(film, matches)
         recommendations.append(
             Recommendation(
@@ -99,11 +99,24 @@ def predict_personal_rating(watched: list[WatchedFilm], film: FilmMetadata) -> f
 
     preferences = _preference_weights(watched)
     preference_names = _preference_names(watched)
-    baseline = sum(item.rating for item in watched) / len(watched) if watched else 6.0
+    baseline = _rating_baseline(watched)
     matches = _candidate_matches(preferences, preference_names, film)
     affinity = sum(preferences.get(_normalize_label(genre), 0.0) for _, genre in matches[:2])
     catalog_score = film.vote_average if film.vote_average is not None else 5.0
-    return _predicted_score(baseline, affinity, catalog_score)
+    return _predicted_score(watched, baseline, affinity, catalog_score)
+
+
+def calibrate_personal_score(watched: list[WatchedFilm], score: float) -> float:
+    """Map a generic estimate onto the user's observed upper scoring range."""
+
+    score = _clamp(score)
+    if not watched:
+        return _tenth_step(score)
+    mean = sum(film.rating for film in watched) / len(watched)
+    ceiling = _personal_score_ceiling(watched)
+    if score > mean and mean < 10:
+        score = mean + (score - mean) * max(ceiling - mean, 0) / (10 - mean)
+    return _tenth_step(min(score, ceiling))
 
 
 def _preference_weights(watched: list[WatchedFilm]) -> dict[str, float]:
@@ -159,9 +172,31 @@ def _tenth_step(value: float) -> float:
     return round(value * 10) / 10
 
 
-def _predicted_score(baseline: float, affinity: float, catalog_score: float) -> float:
-    raw_score = baseline + min(affinity * 0.35, 2.0) + (catalog_score - 5) * 0.15
-    return _tenth_step(_clamp(raw_score))
+def _predicted_score(
+    watched: list[WatchedFilm], baseline: float, affinity: float, catalog_score: float
+) -> float:
+    raw_score = baseline + min(affinity * 0.12, 0.8) + (catalog_score - 5) * 0.08
+    return _tenth_step(min(_clamp(raw_score), _personal_score_ceiling(watched)))
+
+
+def _rating_baseline(watched: list[WatchedFilm]) -> float:
+    neutral_score = 6.5
+    prior_weight = 3
+    return (sum(film.rating for film in watched) + neutral_score * prior_weight) / (
+        len(watched) + prior_weight
+    )
+
+
+def _personal_score_ceiling(watched: list[WatchedFilm]) -> float:
+    if not watched:
+        return 10.0
+    ratings = sorted(film.rating for film in watched)
+    position = (len(ratings) - 1) * 0.9
+    lower_index = int(position)
+    upper_index = min(lower_index + 1, len(ratings) - 1)
+    fraction = position - lower_index
+    percentile = ratings[lower_index] + (ratings[upper_index] - ratings[lower_index]) * fraction
+    return min(10.0, percentile + 0.2)
 
 
 def _rationale(film: FilmMetadata, matches: list[str]) -> str:

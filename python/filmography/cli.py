@@ -46,7 +46,10 @@ def build_parser() -> argparse.ArgumentParser:
     _add_build_options(recommend_command)
     recommend_command.add_argument("--prompt", help="optional mood or discovery request")
     recommend_command.add_argument(
-        "--count", type=int, default=8, help="number of AI suggestions to request (default: 8)"
+        "--count",
+        type=_recommendation_count,
+        default=10,
+        help="number of verified AI suggestions to publish, 5-20 (default: 10)",
     )
     return parser
 
@@ -158,6 +161,16 @@ def _add_build_options(parser: argparse.ArgumentParser) -> None:
         default=12,
         help="maximum token-free suggestions (default: 12)",
     )
+
+
+def _recommendation_count(value: str) -> int:
+    try:
+        count = int(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("AI suggestion count must be an integer") from error
+    if not 5 <= count <= 20:
+        raise argparse.ArgumentTypeError("AI suggestion count must be between 5 and 20")
+    return count
 
 
 def _create_ai_client(stack: ExitStack) -> OpenAICompatibleClient | None:

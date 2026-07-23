@@ -288,6 +288,7 @@ def _parse_watchlist_line(line: str) -> WatchlistFilm:
         title=title,
         year=year,
         interest=interest,
+        interest_source="manual" if interest is not None else None,
         notes=" — ".join(notes),
         tags=tags,
         dismissed=dismissed,

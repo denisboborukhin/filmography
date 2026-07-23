@@ -9,7 +9,12 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from filmography.ai import AIError, OpenAICompatibleClient, resolve_ai_suggestions
+from filmography.ai import (
+    AIError,
+    OpenAICompatibleClient,
+    resolve_ai_suggestions,
+    score_target_id,
+)
 from filmography.markdown_notes import Diagnostic, ImportValidationError, import_markdown_notes
 from filmography.models import (
     FilmCredits,
@@ -56,6 +61,7 @@ def build_snapshot(
     watchlist = imported.watchlist
     if catalog is not None:
         previous_watched = previous.watched if previous is not None else []
+        previous_watchlist = previous.watchlist if previous is not None else []
         watched = [
             _enrich_watched(
                 film,
@@ -66,7 +72,13 @@ def build_snapshot(
             for film in imported.watched
         ]
         watchlist = [
-            _enrich_watchlist(film, catalog, diagnostics, watched=watched)
+            _enrich_watchlist(
+                film,
+                catalog,
+                diagnostics,
+                watched=watched,
+                previous_watchlist=previous_watchlist,
+            )
             for film in imported.watchlist
         ]
 
@@ -85,6 +97,10 @@ def build_snapshot(
                 candidates,
                 generated_at=now,
                 limit=deterministic_limit,
+            )
+            deterministic = _retain_previous_ai_scores(
+                deterministic,
+                previous.deterministic_discoveries if previous is not None else [],
             )
             deterministic_refreshed = True
         except CatalogError as error:
@@ -127,35 +143,53 @@ def refresh_ai_recommendations(
     *,
     prompt: str | None = None,
     generated_at: datetime | None = None,
-    limit: int = 8,
+    limit: int = 10,
 ) -> BuildResult:
     """Return a copy with a new verified AI set, or raise without altering the input."""
 
+    if not 1 <= limit <= 20:
+        raise ValueError("AI recommendation limit must be between 1 and 20")
     now = _utc_datetime(generated_at)
-    requested = min(20, max(limit, limit * 3))
-    batch = ai_client.suggest(snapshot.watched, snapshot.watchlist, prompt=prompt, count=requested)
+    requested = min(20, limit * 3)
+    batch = ai_client.suggest(
+        snapshot.watched,
+        snapshot.watchlist,
+        deterministic_discoveries=snapshot.deterministic_discoveries,
+        prompt=prompt,
+        count=requested,
+    )
     resolved = resolve_ai_suggestions(
         batch,
         catalog,
         snapshot.watched,
         snapshot.watchlist,
+        deterministic_discoveries=snapshot.deterministic_discoveries,
         generated_at=now,
         provider=ai_client.provider,
         model=ai_client.model,
         limit=limit,
     )
-    if not resolved.recommendations:
+    required_recommendations = min(5, limit)
+    if len(resolved.recommendations) < required_recommendations:
         detail = "; ".join(resolved.warnings[:5])
         suffix = f": {detail}" if detail else ""
         raise AIError(
-            f"AI returned no new recommendations that could be verified with TMDB{suffix}"
+            f"AI returned only {len(resolved.recommendations)} verified recommendations; "
+            f"at least {required_recommendations} required{suffix}"
         )
+    scored_watchlist = _apply_ai_watchlist_scores(
+        snapshot.watchlist, dict(resolved.watchlist_scores)
+    )
+    scored_deterministic = _apply_ai_discovery_scores(
+        snapshot.deterministic_discoveries, dict(resolved.discovery_scores)
+    )
     updated = snapshot.model_copy(
         update={
             "recommendations_generated_at": now,
+            "watchlist": scored_watchlist,
             "ai_discoveries": list(resolved.recommendations),
             "deterministic_discoveries": unique_unmatched_films(
-                snapshot.deterministic_discoveries, resolved.recommendations
+                scored_deterministic, resolved.recommendations
             ),
         }
     )
@@ -165,6 +199,44 @@ def refresh_ai_recommendations(
         Diagnostic("warning", "ai-suggestion-rejected", warning) for warning in resolved.warnings
     )
     return BuildResult(updated, diagnostics)
+
+
+def _apply_ai_watchlist_scores(
+    films: list[WatchlistFilm], scores: dict[str, float]
+) -> list[WatchlistFilm]:
+    result: list[WatchlistFilm] = []
+    for film in films:
+        score = scores.get(score_target_id("watchlist", film))
+        result.append(
+            film.model_copy(update={"interest": score, "interest_source": "ai"})
+            if score is not None and film.interest_source != "manual"
+            else film
+        )
+    result.sort(
+        key=lambda film: (
+            -(film.interest if film.interest is not None else -1),
+            film.title.casefold(),
+            film.year or 0,
+        )
+    )
+    return result
+
+
+def _apply_ai_discovery_scores(
+    films: list[Recommendation], scores: dict[str, float]
+) -> list[Recommendation]:
+    result: list[Recommendation] = []
+    for film in films:
+        score = scores.get(score_target_id("discovery", film))
+        result.append(
+            film.model_copy(update={"predicted_rating": score, "score_source": "ai"})
+            if score is not None
+            else film
+        )
+    return sorted(
+        result,
+        key=lambda film: (-film.predicted_rating, film.title.casefold(), film.year or 0),
+    )
 
 
 def load_snapshot(path: Path) -> Snapshot | None:
@@ -247,19 +319,79 @@ def _enrich_watchlist(
     diagnostics: list[Diagnostic],
     *,
     watched: list[WatchedFilm],
+    previous_watchlist: list[WatchlistFilm],
 ) -> WatchlistFilm:
     metadata = _catalog_metadata(film, catalog, diagnostics, allow_popular_without_year=True)
     if metadata is None:
-        return film
+        previous_score = _previous_ai_watchlist_score(film, previous_watchlist)
+        return (
+            film.model_copy(
+                update={
+                    "interest": previous_score.interest,
+                    "interest_source": "ai",
+                }
+            )
+            if film.interest is None and previous_score is not None
+            else film
+        )
+    previous_score = _previous_ai_watchlist_score(metadata, previous_watchlist)
+    interest = film.interest
+    interest_source = film.interest_source
+    if interest is None and previous_score is not None:
+        interest = previous_score.interest
+        interest_source = "ai"
+    elif interest is None:
+        interest = predict_personal_rating(watched, metadata)
+        interest_source = "local"
     return WatchlistFilm(
         **metadata.model_dump(),
-        interest=film.interest
-        if film.interest is not None
-        else predict_personal_rating(watched, metadata),
+        interest=interest,
+        interest_source=interest_source,
         notes=film.notes,
         tags=film.tags,
         dismissed=film.dismissed,
     )
+
+
+def _previous_ai_watchlist_score(
+    film: FilmMetadata, previous_watchlist: list[WatchlistFilm]
+) -> WatchlistFilm | None:
+    return next(
+        (
+            previous
+            for previous in previous_watchlist
+            if previous.interest_source == "ai"
+            and previous.interest is not None
+            and films_match(film, previous)
+        ),
+        None,
+    )
+
+
+def _retain_previous_ai_scores(
+    recommendations: list[Recommendation], previous: list[Recommendation]
+) -> list[Recommendation]:
+    retained: list[Recommendation] = []
+    for recommendation in recommendations:
+        previous_match = next(
+            (
+                candidate
+                for candidate in previous
+                if candidate.score_source == "ai" and films_match(recommendation, candidate)
+            ),
+            None,
+        )
+        retained.append(
+            recommendation.model_copy(
+                update={
+                    "predicted_rating": previous_match.predicted_rating,
+                    "score_source": "ai",
+                }
+            )
+            if previous_match is not None
+            else recommendation
+        )
+    return retained
 
 
 def _catalog_metadata(

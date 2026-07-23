@@ -90,6 +90,44 @@ def test_recommendation_source_metadata_is_consistent() -> None:
             source="deterministic",
             generated_at=generated_at,
         )
+    with pytest.raises(ValidationError, match="AI expected score"):
+        Recommendation(
+            tmdb_id=4,
+            title="AI Film",
+            predicted_rating=8,
+            score_source="local",
+            rationale="Because",
+            source="ai",
+            generated_at=generated_at,
+            provider="openai-compatible",
+            model="test",
+        )
+
+    local = Recommendation(
+        tmdb_id=5,
+        title="Local Film",
+        predicted_rating=8,
+        rationale="Because",
+        source="deterministic",
+        generated_at=generated_at,
+    )
+    ai = Recommendation(
+        tmdb_id=6,
+        title="AI Film",
+        predicted_rating=8,
+        rationale="Because",
+        source="ai",
+        generated_at=generated_at,
+        provider="openai-compatible",
+        model="test",
+    )
+    assert local.score_source == "local"
+    assert ai.score_source == "ai"
+
+
+def test_watchlist_score_source_requires_a_score() -> None:
+    with pytest.raises(ValidationError, match="requires an expected score"):
+        WatchlistFilm(title="Later", interest_source="ai")
 
 
 def test_public_numeric_fields_do_not_coerce_strings() -> None:

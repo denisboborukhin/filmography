@@ -44,6 +44,17 @@ describe('snapshot schema', () => {
     expect(() => snapshotSchema.parse(invalid)).toThrow()
   })
 
+  it('keeps expected-score provenance consistent', () => {
+    const missingWatchlistScore = structuredClone(snapshotFixture)
+    missingWatchlistScore.watchlist[0].interest = null
+    missingWatchlistScore.watchlist[0].interestSource = 'ai'
+    expect(() => snapshotSchema.parse(missingWatchlistScore)).toThrow()
+
+    const localAiScore = structuredClone(snapshotFixture)
+    localAiScore.aiDiscoveries[0].scoreSource = 'local'
+    expect(() => snapshotSchema.parse(localAiScore)).toThrow()
+  })
+
   it('rejects local review paths and URLs with embedded credentials', () => {
     const localPath = structuredClone(snapshotFixture)
     localPath.watched[0].sourceUrl = '/Users/person/private-review.md'

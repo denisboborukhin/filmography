@@ -16,6 +16,7 @@ FilmYear = Annotated[int, Field(strict=True, ge=1878, le=2200)]
 CatalogScore = Annotated[float, Field(strict=True, ge=0, le=10)]
 Popularity = Annotated[float, Field(strict=True, ge=0)]
 MediaType = Literal["movie", "tv"]
+ScoreSource = Literal["manual", "local", "ai"]
 
 
 class PublicModel(BaseModel):
@@ -135,6 +136,7 @@ class WatchlistFilm(FilmMetadata):
     """A future film imported from the single watchlist note."""
 
     interest: Score | None = None
+    interest_source: ScoreSource | None = None
     notes: str = ""
     tags: list[str] = Field(default_factory=list)
     dismissed: bool = False
@@ -144,12 +146,19 @@ class WatchlistFilm(FilmMetadata):
     def normalize_tags(cls, values: list[str]) -> list[str]:
         return _unique_nonempty(values)
 
+    @model_validator(mode="after")
+    def interest_source_requires_score(self) -> Self:
+        if self.interest is None and self.interest_source is not None:
+            raise ValueError("watchlist score source requires an expected score")
+        return self
+
 
 class Recommendation(FilmMetadata):
     """A TMDB-verified deterministic or AI recommendation."""
 
     tmdb_id: PositiveId  # pyright: ignore[reportIncompatibleVariableOverride, reportGeneralTypeIssues]
     predicted_rating: Score
+    score_source: Literal["local", "ai"] | None = None
     rationale: str = Field(min_length=1)
     source: Literal["deterministic", "ai"]
     generated_at: datetime
@@ -170,6 +179,11 @@ class Recommendation(FilmMetadata):
                 raise ValueError("deterministic recommendations cannot include provider or model")
         elif not self.provider or not self.model:
             raise ValueError("AI recommendations require provider and model")
+        expected_score_source = "ai" if self.source == "ai" else "local"
+        if self.score_source is None:
+            object.__setattr__(self, "score_source", expected_score_source)
+        elif self.source == "ai" and self.score_source != "ai":
+            raise ValueError("AI recommendations require an AI expected score")
         return self
 
 

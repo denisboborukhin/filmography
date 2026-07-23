@@ -4,21 +4,24 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
-from typing import cast
+from typing import Literal, cast
 from urllib.parse import urlparse
 
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from filmography.models import (
+    FilmMetadata,
     Recommendation,
     WatchedFilm,
     WatchlistFilm,
     film_matches_any,
     film_titles_overlap,
 )
+from filmography.recommendations import calibrate_personal_score
 from filmography.tmdb import CatalogError, TMDBClient
 
 
@@ -37,12 +40,31 @@ class AISuggestion(BaseModel):
     rationale: str = Field(min_length=1, max_length=500)
 
 
+class AITargetScore(BaseModel):
+    """Expected personal score for an existing public snapshot record."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    target: str = Field(min_length=1)
+    predicted_rating: float = Field(alias="predictedRating", ge=0, le=10, multiple_of=0.1)
+
+
 class AISuggestionBatch(BaseModel):
     """Top-level structured response expected from the AI provider."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     recommendations: list[AISuggestion] = Field(min_length=1, max_length=20)
+    watchlist_scores: list[AITargetScore] = Field(
+        default_factory=lambda: list[AITargetScore](),
+        alias="watchlistScores",
+        max_length=200,
+    )
+    discovery_scores: list[AITargetScore] = Field(
+        default_factory=lambda: list[AITargetScore](),
+        alias="discoveryScores",
+        max_length=200,
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,6 +72,8 @@ class AIResolution:
     """Verified AI recommendations and non-fatal rejection explanations."""
 
     recommendations: tuple[Recommendation, ...]
+    watchlist_scores: tuple[tuple[str, float], ...]
+    discovery_scores: tuple[tuple[str, float], ...]
     warnings: tuple[str, ...]
 
 
@@ -95,13 +119,23 @@ class OpenAICompatibleClient:
         watched: list[WatchedFilm],
         watchlist: list[WatchlistFilm],
         *,
+        deterministic_discoveries: list[Recommendation] | None = None,
         prompt: str | None = None,
-        count: int = 8,
+        count: int = 10,
     ) -> AISuggestionBatch:
         """Send the complete taste profile and validate the provider response."""
 
         if count < 1 or count > 20:
             raise ValueError("AI recommendation count must be between 1 and 20")
+        deterministic_discoveries = deterministic_discoveries or []
+        watchlist_score_targets = [
+            _score_target_payload("watchlist", film)
+            for film in watchlist
+            if not film.dismissed and film.interest_source != "manual"
+        ]
+        discovery_score_targets = [
+            _score_target_payload("discovery", film) for film in deterministic_discoveries
+        ]
         taste_profile = {
             "watched": [
                 {
@@ -119,6 +153,10 @@ class OpenAICompatibleClient:
                     "title": film.title,
                     "year": film.year,
                     "interest": film.interest,
+                    "interestSource": film.interest_source,
+                    "genres": film.genres,
+                    "overview": film.overview,
+                    "tmdbAudienceScore": film.vote_average,
                     "tags": film.tags,
                     "notes": film.notes,
                     "dismissed": film.dismissed,
@@ -127,11 +165,13 @@ class OpenAICompatibleClient:
             ],
             "request": prompt.strip() if prompt and prompt.strip() else None,
             "count": count,
+            "watchlistScoreTargets": watchlist_score_targets,
+            "discoveryScoreTargets": discovery_score_targets,
             "exclusions": [
                 {"title": film.title, "year": film.year} for film in [*watched, *watchlist]
             ],
         }
-        response_schema = AISuggestionBatch.model_json_schema(by_alias=True)
+        response_schema = _provider_response_schema(minimum_recommendations=min(5, count))
         request_body = {
             "model": self.model,
             "messages": [
@@ -139,7 +179,10 @@ class OpenAICompatibleClient:
                     "role": "system",
                     "content": (
                         "You recommend feature films for one person. Infer taste from their "
-                        "ratings and review text. Return only unseen films and make each "
+                        "ratings and review text. Calibrate every predicted score to the person's "
+                        "actual scoring habits: preserve their observed range and treat 10.0 as "
+                        "exceptional rather than a default for a strong match. Return the "
+                        "requested number of unseen films and make each "
                         "rationale specific to the film and the supplied history. Each rationale "
                         "must name a concrete theme, premise, mood, craft element, or comparison. "
                         "Do not say it was suggested by the model, fits the profile, matches "
@@ -147,9 +190,12 @@ class OpenAICompatibleClient:
                         "0.1 increments on a 0-10 scale. "
                         "Never recommend any title from the watched, watchlist, or exclusions "
                         "arrays, including translated versions of the same film. Prefer films, "
-                        "not TV series. "
-                        "If your provider does not support response_format, still return only one "
-                        "valid JSON object with a recommendations array. Do not use Markdown."
+                        "not TV series. Return one score for every watchlistScoreTargets and "
+                        "discoveryScoreTargets item, copying its target value exactly. Explicit "
+                        "manual watchlist scores are intentionally absent and must not be "
+                        "replaced. If your provider does not support response_format, return one "
+                        "valid JSON object with recommendations, watchlistScores, and "
+                        "discoveryScores arrays. Do not use Markdown."
                     ),
                 },
                 {
@@ -179,19 +225,46 @@ class OpenAICompatibleClient:
         return _parse_suggestion_content(content)
 
 
+def score_target_id(collection: Literal["watchlist", "discovery"], film: FilmMetadata) -> str:
+    """Return a stable, public identifier that an AI provider can echo safely."""
+
+    identity = (
+        str(film.tmdb_id)
+        if film.tmdb_id is not None
+        else f"{film.media_type}:{film.title.casefold()}:{film.year or 'unknown'}"
+    )
+    return f"{collection}:{identity}"
+
+
+def _score_target_payload(
+    collection: Literal["watchlist", "discovery"], film: FilmMetadata
+) -> dict[str, object]:
+    return {
+        "target": score_target_id(collection, film),
+        "title": film.title,
+        "year": film.year,
+        "mediaType": film.media_type,
+        "genres": film.genres,
+        "overview": film.overview,
+        "tmdbAudienceScore": film.vote_average,
+    }
+
+
 def resolve_ai_suggestions(
     batch: AISuggestionBatch,
     catalog: TMDBClient,
     watched: list[WatchedFilm],
     watchlist: list[WatchlistFilm],
     *,
+    deterministic_discoveries: list[Recommendation] | None = None,
     generated_at: datetime,
     provider: str,
     model: str,
-    limit: int = 8,
+    limit: int = 10,
 ) -> AIResolution:
     """Reconcile proposed titles with TMDB and exclude all existing state."""
 
+    deterministic_discoveries = deterministic_discoveries or []
     excluded = [*watched, *watchlist]
     seen_ids: set[int] = set()
     recommendations: list[Recommendation] = []
@@ -223,7 +296,8 @@ def resolve_ai_suggestions(
         recommendations.append(
             Recommendation(
                 **match.film.model_dump(),
-                predicted_rating=suggestion.predicted_rating,
+                predicted_rating=calibrate_personal_score(watched, suggestion.predicted_rating),
+                score_source="ai",
                 rationale=_publication_rationale(suggestion.rationale, match.film.overview),
                 source="ai",
                 generated_at=generated_at,
@@ -231,7 +305,79 @@ def resolve_ai_suggestions(
                 model=model,
             )
         )
-    return AIResolution(tuple(recommendations), tuple(warnings))
+    watchlist_targets = {
+        score_target_id("watchlist", film): film
+        for film in watchlist
+        if not film.dismissed and film.interest_source != "manual"
+    }
+    discovery_targets = {
+        score_target_id("discovery", film): film for film in deterministic_discoveries
+    }
+    watchlist_scores = _resolve_target_scores(
+        batch.watchlist_scores,
+        watchlist_targets,
+        watched,
+        "watchlist",
+        warnings,
+    )
+    discovery_scores = _resolve_target_scores(
+        batch.discovery_scores,
+        discovery_targets,
+        watched,
+        "discovery",
+        warnings,
+    )
+    return AIResolution(
+        recommendations=tuple(recommendations),
+        watchlist_scores=watchlist_scores,
+        discovery_scores=discovery_scores,
+        warnings=tuple(warnings),
+    )
+
+
+def _resolve_target_scores(
+    scores: list[AITargetScore],
+    targets: Mapping[str, FilmMetadata],
+    watched: list[WatchedFilm],
+    collection: str,
+    warnings: list[str],
+) -> tuple[tuple[str, float], ...]:
+    resolved: dict[str, float] = {}
+    for score in scores:
+        if score.target not in targets:
+            warnings.append(f"ignored unknown AI {collection} score target: {score.target}")
+            continue
+        if score.target in resolved:
+            warnings.append(f"ignored duplicate AI {collection} score target: {score.target}")
+            continue
+        resolved[score.target] = calibrate_personal_score(watched, score.predicted_rating)
+    for target, film in targets.items():
+        if target not in resolved:
+            warnings.append(f"AI did not score {collection} title: {film.title}")
+    return tuple((target, resolved[target]) for target in targets if target in resolved)
+
+
+def _provider_response_schema(minimum_recommendations: int) -> dict[str, object]:
+    schema = cast(dict[str, object], AISuggestionBatch.model_json_schema(by_alias=True))
+    required_value = schema.get("required")
+    required = (
+        [item for item in cast(list[object], required_value) if isinstance(item, str)]
+        if isinstance(required_value, list)
+        else []
+    )
+    for field in ("recommendations", "watchlistScores", "discoveryScores"):
+        if field not in required:
+            required.append(field)
+    schema["required"] = required
+
+    properties_value = schema.get("properties")
+    if isinstance(properties_value, dict):
+        properties = cast(dict[str, object], properties_value)
+        recommendations_value = properties.get("recommendations")
+        if isinstance(recommendations_value, dict):
+            recommendations = cast(dict[str, object], recommendations_value)
+            recommendations["minItems"] = minimum_recommendations
+    return schema
 
 
 def _json_object(raw_json: str) -> dict[str, object]:
@@ -327,7 +473,15 @@ def _normalize_provider_json(content: str) -> dict[str, object] | None:
             normalized.append(normalized_suggestion)
     if not normalized:
         return None
-    return {"recommendations": normalized}
+    return {
+        "recommendations": normalized,
+        "watchlistScores": _normalize_target_score_list(
+            payload.get("watchlistScores", payload.get("watchlist_scores"))
+        ),
+        "discoveryScores": _normalize_target_score_list(
+            payload.get("discoveryScores", payload.get("discovery_scores"))
+        ),
+    }
 
 
 def _normalize_provider_suggestion(suggestion: dict[str, object]) -> dict[str, object] | None:
@@ -358,6 +512,32 @@ def _normalize_provider_suggestion(suggestion: dict[str, object]) -> dict[str, o
         "predictedRating": rating,
         "rationale": rationale,
     }
+
+
+def _normalize_target_score_list(value: object) -> list[dict[str, object]]:
+    if not isinstance(value, list):
+        return []
+    normalized: list[dict[str, object]] = []
+    for raw_item in cast(list[object], value):
+        if not isinstance(raw_item, dict):
+            continue
+        item = cast(dict[str, object], raw_item)
+        target = item.get("target", item.get("id"))
+        predicted_rating = item.get("predictedRating")
+        if predicted_rating is None:
+            for alias in ("predicted_rating", "score", "rating"):
+                if alias in item:
+                    predicted_rating = item[alias]
+                    break
+        if not isinstance(target, str) or not target.strip():
+            continue
+        if isinstance(predicted_rating, bool) or not isinstance(predicted_rating, (int, float)):
+            continue
+        rating = float(predicted_rating)
+        if not 0 <= rating <= 10 or abs(rating * 10 - round(rating * 10)) > 1e-9:
+            continue
+        normalized.append({"target": target, "predictedRating": rating})
+    return normalized
 
 
 def _parse_markdown_suggestions(content: str) -> AISuggestionBatch | None:

@@ -8,7 +8,7 @@ from typing import cast
 
 import httpx
 import pytest
-from filmography.ai import AIError, OpenAICompatibleClient
+from filmography.ai import AIError, OpenAICompatibleClient, score_target_id
 from filmography.builder import (
     build_snapshot,
     load_snapshot,
@@ -98,6 +98,77 @@ def test_builder_drops_previous_recommendation_that_is_now_watchlisted(tmp_path:
 
     assert snapshot.ai_discoveries == []
     assert snapshot.recommendations_generated_at is None
+
+
+def test_builder_preserves_previous_ai_scores_until_a_successful_refresh(
+    tmp_path: Path,
+) -> None:
+    reviews = tmp_path / "reviews"
+    reviews.mkdir()
+    watchlist = tmp_path / "Watchlist.md"
+    watchlist.write_text("Moon (2009)\n", encoding="utf-8")
+    generated_at = datetime(2026, 7, 20, tzinfo=UTC)
+    previous = Snapshot(
+        generated_at=generated_at,
+        watchlist=[
+            WatchlistFilm(
+                tmdb_id=17431,
+                title="Moon",
+                year=2009,
+                interest=8.4,
+                interest_source="ai",
+            )
+        ],
+        deterministic_discoveries=[
+            Recommendation(
+                tmdb_id=200,
+                title="Discovery",
+                year=2022,
+                predicted_rating=8.6,
+                score_source="ai",
+                rationale="Catalog description.",
+                source="deterministic",
+                generated_at=generated_at,
+            )
+        ],
+    )
+
+    class StableCatalog:
+        def match_movie(
+            self,
+            title: str,
+            _year: int | None = None,
+            *,
+            allow_popular_without_year: bool = False,
+        ) -> CatalogMatch:
+            assert title == "Moon"
+            return CatalogMatch(
+                "matched",
+                FilmMetadata(tmdb_id=17431, title="Moon", year=2009, vote_average=7.6),
+            )
+
+        def discover_movies(self, _genres: list[str]) -> list[FilmMetadata]:
+            return [
+                FilmMetadata(
+                    tmdb_id=200,
+                    title="Discovery",
+                    year=2022,
+                    vote_average=8,
+                )
+            ]
+
+    snapshot = build_snapshot(
+        reviews,
+        watchlist,
+        catalog=cast(TMDBClient, StableCatalog()),
+        previous=previous,
+        generated_at=generated_at,
+    ).snapshot
+
+    assert snapshot.watchlist[0].interest == 8.4
+    assert snapshot.watchlist[0].interest_source == "ai"
+    assert snapshot.deterministic_discoveries[0].predicted_rating == 8.6
+    assert snapshot.deterministic_discoveries[0].score_source == "ai"
 
 
 def test_builder_enriches_series_when_movie_lookup_is_unresolved(tmp_path: Path) -> None:
@@ -301,7 +372,8 @@ def test_watchlist_without_year_enriches_with_popular_catalog_match(tmp_path: Pa
 
     assert snapshot.watchlist[0].title == "The Menu"
     assert snapshot.watchlist[0].tmdb_id == 593643
-    assert snapshot.watchlist[0].interest == 6.0
+    assert snapshot.watchlist[0].interest == 6.5
+    assert snapshot.watchlist[0].interest_source == "local"
 
 
 def test_watchlist_expected_rating_is_predicted_when_missing_and_preserves_manual(
@@ -386,9 +458,10 @@ def test_watchlist_expected_rating_is_predicted_when_missing_and_preserves_manua
 
     moon = next(item for item in snapshot.watchlist if item.title == "Moon")
     manual = next(item for item in snapshot.watchlist if item.title == "Manual Pick")
-    assert moon.interest is not None
-    assert moon.interest > 9
+    assert moon.interest == 7.8
+    assert moon.interest_source == "local"
     assert manual.interest == 4.5
+    assert manual.interest_source == "manual"
 
 
 def test_snapshot_write_is_atomic_round_trip_and_contains_no_credentials(tmp_path: Path) -> None:
@@ -624,6 +697,179 @@ def test_successful_ai_refresh_replaces_previous_set_and_removes_local_duplicate
     assert result.recommendations_generated_at == now
 
 
+def test_ai_refresh_scores_watchlist_and_taste_matches_on_the_users_scale(
+    tmp_path: Path,
+) -> None:
+    now = datetime(2026, 7, 20, 12, tzinfo=UTC)
+    watched = [
+        WatchedFilm(title="Eight", rating=8),
+        WatchedFilm(title="Eight and a half", rating=8.5),
+        WatchedFilm(title="Nine", rating=9),
+    ]
+    local_watchlist = WatchlistFilm(
+        tmdb_id=20,
+        title="Score Me",
+        year=2020,
+        interest=8,
+        interest_source="local",
+    )
+    manual_watchlist = WatchlistFilm(
+        tmdb_id=21,
+        title="Manual",
+        year=2021,
+        interest=6,
+        interest_source="manual",
+    )
+    taste_match = Recommendation(
+        tmdb_id=22,
+        title="Taste Match",
+        year=2022,
+        predicted_rating=8,
+        rationale="Local rationale.",
+        source="deterministic",
+        generated_at=now,
+    )
+    snapshot = Snapshot(
+        generated_at=now,
+        watched=watched,
+        watchlist=[local_watchlist, manual_watchlist],
+        deterministic_discoveries=[taste_match],
+    )
+    provider_result = {
+        "recommendations": [
+            {
+                "title": "Moon",
+                "year": 2009,
+                "predictedRating": 10,
+                "rationale": "Its isolation suits the reflective reviews.",
+            }
+        ],
+        "watchlistScores": [
+            {
+                "target": score_target_id("watchlist", local_watchlist),
+                "predictedRating": 10,
+            }
+        ],
+        "discoveryScores": [
+            {
+                "target": score_target_id("discovery", taste_match),
+                "predictedRating": 9,
+            }
+        ],
+    }
+    provider_http = httpx.Client(
+        base_url="https://provider.test/v1/",
+        transport=httpx.MockTransport(
+            lambda _request: httpx.Response(
+                200,
+                json={"choices": [{"message": {"content": json.dumps(provider_result)}}]},
+            )
+        ),
+    )
+    catalog_http = httpx.Client(
+        base_url="https://catalog.test/3/",
+        transport=httpx.MockTransport(
+            lambda _request: httpx.Response(
+                200,
+                json={
+                    "results": [
+                        {
+                            "id": 17431,
+                            "title": "Moon",
+                            "release_date": "2009-06-12",
+                        }
+                    ]
+                },
+            )
+        ),
+    )
+    ai_client = OpenAICompatibleClient(
+        "secret", "new-model", "https://provider.test/v1", http_client=provider_http
+    )
+    catalog = TMDBClient("token", tmp_path / "cache", http_client=catalog_http)
+    try:
+        result = refresh_ai_recommendations(
+            snapshot,
+            ai_client,
+            catalog,
+            generated_at=now,
+            limit=1,
+        ).snapshot
+    finally:
+        provider_http.close()
+        catalog_http.close()
+
+    scored_watchlist = {film.title: film for film in result.watchlist}
+    assert scored_watchlist["Score Me"].interest == 9.1
+    assert scored_watchlist["Score Me"].interest_source == "ai"
+    assert scored_watchlist["Manual"].interest == 6
+    assert scored_watchlist["Manual"].interest_source == "manual"
+    assert result.deterministic_discoveries[0].predicted_rating == 8.7
+    assert result.deterministic_discoveries[0].score_source == "ai"
+    assert result.ai_discoveries[0].predicted_rating == 9.1
+
+
+def test_ai_refresh_rejects_fewer_than_five_verified_picks_for_standard_run(
+    tmp_path: Path,
+) -> None:
+    provider_result = {
+        "recommendations": [
+            {
+                "title": f"Film {index}",
+                "year": 2020 + index,
+                "predictedRating": 8,
+                "rationale": f"Specific rationale {index}.",
+            }
+            for index in range(4)
+        ]
+    }
+    provider_http = httpx.Client(
+        base_url="https://provider.test/v1/",
+        transport=httpx.MockTransport(
+            lambda _request: httpx.Response(
+                200,
+                json={"choices": [{"message": {"content": json.dumps(provider_result)}}]},
+            )
+        ),
+    )
+
+    def catalog_handler(request: httpx.Request) -> httpx.Response:
+        title = request.url.params["query"]
+        index = int(title.removeprefix("Film "))
+        return httpx.Response(
+            200,
+            json={
+                "results": [
+                    {
+                        "id": 100 + index,
+                        "title": title,
+                        "release_date": f"{2020 + index}-01-01",
+                    }
+                ]
+            },
+        )
+
+    catalog_http = httpx.Client(
+        base_url="https://catalog.test/3/",
+        transport=httpx.MockTransport(catalog_handler),
+    )
+    ai_client = OpenAICompatibleClient(
+        "secret", "new-model", "https://provider.test/v1", http_client=provider_http
+    )
+    catalog = TMDBClient("token", tmp_path / "cache", http_client=catalog_http)
+    try:
+        with pytest.raises(AIError, match="at least 5 required"):
+            refresh_ai_recommendations(
+                Snapshot(generated_at=datetime(2026, 7, 20, tzinfo=UTC)),
+                ai_client,
+                catalog,
+                limit=8,
+            )
+    finally:
+        provider_http.close()
+        catalog_http.close()
+
+
 def test_check_and_build_cli_without_runtime_catalog(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -663,3 +909,21 @@ def test_cli_defaults_match_static_frontend_and_ignored_cache_paths() -> None:
 
     assert args.output == Path("public/data/filmography.json")
     assert args.cache_dir == Path(".filmography-cache/tmdb")
+
+    recommend_args = build_parser().parse_args(
+        ["recommend", "--reviews", "reviews", "--watchlist", "Watchlist.md"]
+    )
+    assert recommend_args.count == 10
+
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(
+            [
+                "recommend",
+                "--reviews",
+                "reviews",
+                "--watchlist",
+                "Watchlist.md",
+                "--count",
+                "4",
+            ]
+        )

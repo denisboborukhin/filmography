@@ -39,12 +39,17 @@ uv run filmography recommend \
 
 AI output is accepted only after each title is reconciled with TMDB. Watched, watchlisted, dismissed,
 duplicate, ambiguous, and unresolved titles are excluded. If generation or validation fails, the
-updater retains the still-valid subset of the last successful AI set. Entries newly added to watched
-or watchlist are removed, while journal data and token-free discoveries may still be refreshed.
+updater retains the still-valid subset of the last successful AI set and its prior expected scores.
+Entries newly added to watched or watchlist are removed, while journal data and token-free
+discoveries may still be refreshed. A successful run also scores non-manual watchlist entries and
+local taste matches. These scores are calibrated to the user's observed scale; an `interest` written
+in the watchlist note is never replaced.
 
 Both writing commands default to `public/data/filmography.json` and the ignored
 `.filmography-cache/tmdb` directory. Use `--output`, `--cache-dir`, or `--deterministic-limit` when
-needed. `recommend --count N` requests between 1 and 20 AI suggestions; the default is 8.
+needed. `recommend --count N` publishes between 5 and 20 verified AI suggestions; the default is 10.
+The updater requests extra candidates to absorb exclusions and preserves the prior successful state
+when fewer than five can be verified.
 
 ## Review public data
 

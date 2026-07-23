@@ -188,6 +188,17 @@
     "watchlistFilm": {
       "type": "object",
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": { "interest": { "type": "null" } },
+            "required": ["interest"]
+          },
+          "then": {
+            "properties": { "interestSource": { "type": "null" } }
+          }
+        }
+      ],
       "required": [
         "tmdbId",
         "title",
@@ -219,6 +230,12 @@
         "interest": {
           "anyOf": [{ "$ref": "#/$defs/score" }, { "type": "null" }]
         },
+        "interestSource": {
+          "anyOf": [
+            { "enum": ["manual", "local", "ai"] },
+            { "type": "null" }
+          ]
+        },
         "notes": { "type": "string" },
         "tags": { "type": "array", "items": { "type": "string" } },
         "dismissed": { "type": "boolean" }
@@ -240,6 +257,14 @@
             "properties": {
               "provider": { "type": "string", "minLength": 1 },
               "model": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "source": { "const": "ai" } } },
+          "then": {
+            "properties": {
+              "scoreSource": { "const": "ai" }
             }
           }
         }
@@ -275,6 +300,12 @@
         "voteAverage": { "$ref": "#/$defs/filmMetadataProperties/properties/voteAverage" },
         "popularity": { "$ref": "#/$defs/filmMetadataProperties/properties/popularity" },
         "predictedRating": { "$ref": "#/$defs/score" },
+        "scoreSource": {
+          "anyOf": [
+            { "enum": ["local", "ai"] },
+            { "type": "null" }
+          ]
+        },
         "rationale": { "type": "string", "minLength": 1 },
         "source": { "enum": ["deterministic", "ai"] },
         "generatedAt": { "type": "string", "format": "date-time" },
