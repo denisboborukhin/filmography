@@ -66,6 +66,7 @@ export TMDB_ACCESS_TOKEN="your-tmdb-read-access-token"
 export FILMOGRAPHY_AI_API_KEY="your-provider-key"       # optional
 export FILMOGRAPHY_AI_BASE_URL="https://api.openai.com/v1" # optional; this is the default
 export FILMOGRAPHY_AI_MODEL="your-model-name"           # optional
+export FILMOGRAPHY_AI_MAX_TOKENS="8000"                 # optional; response cap, 128-32000
 ```
 
 Validate notes without writing output:
@@ -97,12 +98,18 @@ uv run filmography recommend \
 `recommend` requires the TMDB token, AI key, and model. The base URL defaults to OpenAI's compatible
 endpoint. It makes two separate provider requests: one asks for new unseen films, and one scores
 known targets from the non-manual watchlist and local taste matches against your actual rating
-history. Explicit watchlist scores always win. It requests ten verified AI picks by default and
+history. The suggestion request sends watched reviews plus a flat forbidden-title list, not full
+watchlist notes, so the model is less likely to recycle watchlisted films as "new" picks. Explicit
+watchlist scores always win. It requests ten verified AI picks by default and
 publishes a refreshed AI pick set only when at least five suggestions survive TMDB verification. If
 one AI request fails, the updater keeps the last valid data for that part while still applying the
 other successful request. Provider failures include safe response-shape diagnostics such as finish
 reason, message keys, content type, refusal text, tool-call count, and token usage. The diagnostics do
-not print API keys or the full request payload.
+not print API keys or the full request payload. If a provider returns `finish_reason='length'` and an
+EOF-style JSON parse error, raise `FILMOGRAPHY_AI_MAX_TOKENS`. If it returns `finish_reason='error'`
+with a large completion token count, lower the cap or switch to a model with better structured JSON
+support. For OpenRouter, Filmography also disables reasoning tokens for these JSON requests because
+some models otherwise spend the full output budget on `reasoning` and return no message content.
 
 Alternative providers must implement `POST /chat/completions` and support strict JSON Schema through
 the `response_format` request field. For OpenRouter, set `FILMOGRAPHY_AI_BASE_URL` to

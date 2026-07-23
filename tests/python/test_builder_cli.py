@@ -944,6 +944,51 @@ def test_check_and_build_cli_without_runtime_catalog(
     assert snapshot is not None and snapshot.watched[0].title == "Arrival"
 
 
+def test_recommend_cli_rejects_invalid_ai_max_tokens(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    reviews, watchlist = _sources(tmp_path)
+    output = tmp_path / "filmography.json"
+
+    class EmptyCatalog:
+        def __init__(self, *_args: object, **_kwargs: object) -> None:
+            pass
+
+        def __enter__(self) -> EmptyCatalog:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            pass
+
+        def discover_movies(self, _genres: list[str]) -> list[object]:
+            return []
+
+    monkeypatch.setenv("TMDB_ACCESS_TOKEN", "catalog-token")
+    monkeypatch.setenv("FILMOGRAPHY_AI_API_KEY", "ai-token")
+    monkeypatch.setenv("FILMOGRAPHY_AI_MODEL", "test-model")
+    monkeypatch.setenv("FILMOGRAPHY_AI_MAX_TOKENS", "too-many")
+    monkeypatch.setattr("filmography.cli.TMDBClient", EmptyCatalog)
+
+    result = main(
+        [
+            "recommend",
+            "--reviews",
+            str(reviews),
+            "--watchlist",
+            str(watchlist),
+            "--output",
+            str(output),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert result == 2
+    assert "FILMOGRAPHY_AI_MAX_TOKENS must be an integer" in captured.err
+    assert not output.exists()
+
+
 def test_cli_defaults_match_static_frontend_and_ignored_cache_paths() -> None:
     args = build_parser().parse_args(
         ["build", "--reviews", "reviews", "--watchlist", "Watchlist.md"]

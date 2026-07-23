@@ -76,6 +76,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     tmdb_token = os.environ.get("TMDB_ACCESS_TOKEN", "").strip()
     try:
         with ExitStack() as stack:
+            ai_client: OpenAICompatibleClient | None = None
+            if args.command == "recommend":
+                ai_client = _create_ai_client(stack)
+                if ai_client is None:
+                    return 2
             catalog = (
                 stack.enter_context(TMDBClient(tmdb_token, Path(args.cache_dir)))
                 if tmdb_token
@@ -98,9 +103,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             ai_failure: AIError | None = None
             if args.command == "recommend":
                 assert catalog is not None
-                ai_client = _create_ai_client(stack)
-                if ai_client is None:
-                    return 2
+                assert ai_client is not None
                 try:
                     result = _combine_results(
                         built,
@@ -177,6 +180,7 @@ def _create_ai_client(stack: ExitStack) -> OpenAICompatibleClient | None:
     api_key = os.environ.get("FILMOGRAPHY_AI_API_KEY", "").strip()
     model = os.environ.get("FILMOGRAPHY_AI_MODEL", "").strip()
     base_url = os.environ.get("FILMOGRAPHY_AI_BASE_URL", "https://api.openai.com/v1").strip()
+    raw_max_tokens = os.environ.get("FILMOGRAPHY_AI_MAX_TOKENS", "8000").strip()
     missing = [
         name
         for name, value in (
@@ -189,7 +193,18 @@ def _create_ai_client(stack: ExitStack) -> OpenAICompatibleClient | None:
     if missing:
         print(f"error: missing AI configuration: {', '.join(missing)}", file=sys.stderr)
         return None
-    return stack.enter_context(OpenAICompatibleClient(api_key, model, base_url))
+    try:
+        max_tokens = int(raw_max_tokens)
+    except ValueError:
+        print("error: FILMOGRAPHY_AI_MAX_TOKENS must be an integer", file=sys.stderr)
+        return None
+    try:
+        return stack.enter_context(
+            OpenAICompatibleClient(api_key, model, base_url, max_tokens=max_tokens)
+        )
+    except ValueError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return None
 
 
 def _combine_results(first: BuildResult, second: BuildResult) -> BuildResult:

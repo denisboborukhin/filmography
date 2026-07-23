@@ -58,8 +58,16 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
 
     ai_client, http_client = _provider_client(httpx.MockTransport(handler))
     watched = [WatchedFilm(title="Arrival", year=2016, rating=9, review="A complete review.")]
+    watchlist = [
+        WatchlistFilm(
+            title="The Menu",
+            original_title="The Menu",
+            year=2022,
+            notes="Do not leak this into suggestion context.",
+        )
+    ]
     try:
-        batch = ai_client.suggest(watched, [], prompt="quiet science fiction", count=5)
+        batch = ai_client.suggest(watched, watchlist, prompt="quiet science fiction", count=5)
     finally:
         http_client.close()
 
@@ -67,10 +75,18 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     assert captured["path"] == "/v1/chat/completions"
     request_body = cast(dict[str, object], captured["body"])
     assert request_body["model"] == "test-model"
+    assert request_body["max_tokens"] == 8000
+    assert "reasoning" not in request_body
     serialized_body = json.dumps(request_body)
     assert "A complete review." in serialized_body
     assert "super-secret" not in serialized_body
     assert "exclusions" in serialized_body
+    messages = cast(list[dict[str, str]], request_body["messages"])
+    profile = cast(dict[str, object], json.loads(messages[1]["content"]))
+    assert "watchlist" not in profile
+    forbidden_titles = cast(list[object], profile["forbiddenTitles"])
+    assert "The Menu (2022)" in forbidden_titles
+    assert "Do not leak this into suggestion context." not in messages[1]["content"]
     response_format = cast(dict[str, object], request_body["response_format"])
     assert response_format["type"] == "json_schema"
     json_schema = cast(dict[str, object], response_format["json_schema"])
@@ -81,10 +97,60 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     properties = cast(dict[str, object], schema["properties"])
     recommendations_schema = cast(dict[str, object], properties["recommendations"])
     assert recommendations_schema["minItems"] == 5
-    messages = cast(list[dict[str, str]], request_body["messages"])
     assert "Do not use Markdown" in messages[0]["content"]
-    assert "Never recommend any title" in messages[0]["content"]
+    assert "forbiddenTitles array is a hard blocklist" in messages[0]["content"]
     assert "Do not say it was suggested by the model" in messages[0]["content"]
+
+
+def test_ai_client_validates_max_tokens_range() -> None:
+    with pytest.raises(ValueError, match="between 128 and 32000"):
+        OpenAICompatibleClient(
+            "super-secret",
+            "test-model",
+            "https://provider.test/v1",
+            max_tokens=64000,
+        )
+
+
+def test_ai_client_disables_openrouter_reasoning_for_json_requests() -> None:
+    captured: dict[str, object] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body_value: object = json.loads(request.content)
+        assert isinstance(body_value, dict)
+        captured["body"] = body_value
+        result = {
+            "recommendations": [
+                {
+                    "title": "Moon",
+                    "year": 2009,
+                    "predictedRating": 8.5,
+                    "rationale": "Its isolation matches themes in your reviews.",
+                }
+            ]
+        }
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+
+    http_client = httpx.Client(
+        base_url="https://provider.test/v1/",
+        transport=httpx.MockTransport(handler),
+    )
+    ai_client = OpenAICompatibleClient(
+        "super-secret",
+        "test-model",
+        "https://openrouter.ai/api/v1",
+        http_client=http_client,
+    )
+    try:
+        ai_client.suggest([], [], count=1)
+    finally:
+        http_client.close()
+
+    request_body = cast(dict[str, object], captured["body"])
+    assert request_body["reasoning"] == {"effort": "none", "exclude": True}
 
 
 def test_ai_client_requests_scores_for_non_manual_watchlist_and_taste_matches() -> None:
@@ -148,6 +214,7 @@ def test_ai_client_requests_scores_for_non_manual_watchlist_and_taste_matches() 
         cast(dict[str, object], target)["target"]
         for target in cast(list[object], captured_profile["watchlistScoreTargets"])
     ] == [watchlist_target]
+    assert "watchlist" in captured_profile
     assert batch.watchlist_scores[0].predicted_rating == 8.4
     assert batch.discovery_scores[0].predicted_rating == 8.7
 

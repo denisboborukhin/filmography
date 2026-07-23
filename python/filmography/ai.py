@@ -100,6 +100,7 @@ class OpenAICompatibleClient:
         model: str,
         base_url: str,
         *,
+        max_tokens: int = 48000,
         http_client: httpx.Client | None = None,
     ) -> None:
         if not api_key.strip():
@@ -109,8 +110,12 @@ class OpenAICompatibleClient:
         parsed_url = urlparse(base_url)
         if parsed_url.scheme not in {"http", "https"} or not parsed_url.netloc:
             raise ValueError("AI base URL must be an absolute HTTP(S) URL")
+        if not 128 <= max_tokens <= 128000:
+            raise ValueError("AI max tokens must be between 128 and 128000")
         self.model = model.strip()
         self.provider = "openai-compatible"
+        self.max_tokens = max_tokens
+        self._disable_openrouter_reasoning = parsed_url.hostname == "openrouter.ai"
         self._owns_client = http_client is None
         self._client = http_client or httpx.Client(
             base_url=base_url.rstrip("/"),
@@ -140,7 +145,13 @@ class OpenAICompatibleClient:
 
         if count < 1 or count > 20:
             raise ValueError("AI recommendation count must be between 1 and 20")
-        taste_profile = _taste_profile(watched, watchlist, prompt=prompt, count=count)
+        taste_profile = _taste_profile(
+            watched,
+            watchlist,
+            prompt=prompt,
+            count=count,
+            include_watchlist_details=False,
+        )
         response_schema = _suggestion_response_schema(minimum_recommendations=min(5, count))
         return _parse_suggestion_content(
             self._post_structured_chat(
@@ -197,7 +208,7 @@ class OpenAICompatibleClient:
         response_schema: dict[str, object],
         error_context: str,
     ) -> str:
-        request_body = {
+        request_body: dict[str, object] = {
             "model": self.model,
             "messages": [
                 {"role": "system", "content": system_prompt},
@@ -215,7 +226,10 @@ class OpenAICompatibleClient:
                 },
             },
             "temperature": 0.4,
+            "max_tokens": self.max_tokens,
         }
+        if self._disable_openrouter_reasoning:
+            request_body["reasoning"] = {"effort": "none", "exclude": True}
         try:
             response = self._client.post("chat/completions", json=request_body)
             response.raise_for_status()
@@ -258,6 +272,7 @@ def _taste_profile(
     *,
     prompt: str | None = None,
     count: int | None = None,
+    include_watchlist_details: bool = True,
     watchlist_score_targets: list[dict[str, object]] | None = None,
     discovery_score_targets: list[dict[str, object]] | None = None,
 ) -> dict[str, object]:
@@ -273,7 +288,12 @@ def _taste_profile(
             }
             for film in watched
         ],
-        "watchlist": [
+        "request": prompt.strip() if prompt and prompt.strip() else None,
+        "exclusions": [{"title": film.title, "year": film.year} for film in [*watched, *watchlist]],
+        "forbiddenTitles": _forbidden_titles([*watched, *watchlist]),
+    }
+    if include_watchlist_details:
+        profile["watchlist"] = [
             {
                 "title": film.title,
                 "year": film.year,
@@ -287,10 +307,7 @@ def _taste_profile(
                 "dismissed": film.dismissed,
             }
             for film in watchlist
-        ],
-        "request": prompt.strip() if prompt and prompt.strip() else None,
-        "exclusions": [{"title": film.title, "year": film.year} for film in [*watched, *watchlist]],
-    }
+        ]
     if count is not None:
         profile["count"] = count
     if watchlist_score_targets is not None:
@@ -298,6 +315,20 @@ def _taste_profile(
     if discovery_score_targets is not None:
         profile["discoveryScoreTargets"] = discovery_score_targets
     return profile
+
+
+def _forbidden_titles(films: list[FilmMetadata]) -> list[str]:
+    titles: set[str] = set()
+    for film in films:
+        if film.year is None:
+            titles.add(film.title)
+            if film.original_title and film.original_title != film.title:
+                titles.add(film.original_title)
+            continue
+        titles.add(f"{film.title} ({film.year})")
+        if film.original_title and film.original_title != film.title:
+            titles.add(f"{film.original_title} ({film.year})")
+    return sorted(titles, key=str.casefold)
 
 
 def _suggestion_system_prompt() -> str:
@@ -310,9 +341,10 @@ def _suggestion_system_prompt() -> str:
         "rationale must name a concrete theme, premise, mood, craft element, or "
         "comparison. Do not say it was suggested by the model, fits the profile, matches "
         "preferences, or is recommended without explaining why. Scores must use 0.1 "
-        "increments on a 0-10 scale. Never recommend any title from the watched, "
-        "watchlist, or exclusions arrays, including translated versions of the same "
-        "film. Prefer films, not TV series. If your provider does not support "
+        "increments on a 0-10 scale. Never recommend any title from watched, "
+        "exclusions, or forbiddenTitles, including translated versions of the same "
+        "film. The forbiddenTitles array is a hard blocklist, not a source of ideas. "
+        "Prefer films, not TV series. If your provider does not support "
         "response_format, return one valid JSON object with a recommendations array. "
         "Do not use Markdown."
     )
