@@ -95,11 +95,12 @@ uv run filmography recommend \
 ```
 
 `recommend` requires the TMDB token, AI key, and model. The base URL defaults to OpenAI's compatible
-endpoint. It requests ten verified AI picks by default, publishes only a result with at least five,
-and also asks the model to score non-manual watchlist entries and local taste matches against your
-actual rating history. Explicit watchlist scores always win. If the AI request fails or too few
-suggestions survive TMDB verification, the updater retains the still-valid previous AI picks and
-AI-generated expected scores while continuing to refresh the journal and local discoveries.
+endpoint. It makes two separate provider requests: one asks for new unseen films, and one scores
+known targets from the non-manual watchlist and local taste matches against your actual rating
+history. Explicit watchlist scores always win. It requests ten verified AI picks by default and
+publishes a refreshed AI pick set only when at least five suggestions survive TMDB verification. If
+one AI request fails, the updater keeps the last valid data for that part while still applying the
+other successful request.
 
 Alternative providers must implement `POST /chat/completions` and support strict JSON Schema through
 the `response_format` request field. For OpenRouter, set `FILMOGRAPHY_AI_BASE_URL` to

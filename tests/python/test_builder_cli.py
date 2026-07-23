@@ -527,6 +527,23 @@ def test_ai_refresh_requests_extra_candidates_and_reports_rejections(tmp_path: P
         profile: object = json.loads(str(typed_user_message["content"]))
         assert isinstance(profile, dict)
         typed_profile = cast(dict[str, object], profile)
+        response_format = cast(dict[str, object], typed_body["response_format"])
+        json_schema = cast(dict[str, object], response_format["json_schema"])
+        if json_schema["name"] == "film_scores":
+            return httpx.Response(
+                200,
+                json={
+                    "choices": [
+                        {
+                            "message": {
+                                "content": json.dumps(
+                                    {"watchlistScores": [], "discoveryScores": []}
+                                )
+                            }
+                        }
+                    ]
+                },
+            )
         raw_count = typed_profile["count"]
         assert isinstance(raw_count, int)
         captured_count = raw_count
@@ -596,6 +613,9 @@ def test_recommend_cli_failure_preserves_previous_verified_ai_set(
         def suggest(self, *_args: object, **_kwargs: object) -> None:
             raise AIError("provider unavailable")
 
+        def score_targets(self, *_args: object, **_kwargs: object) -> None:
+            raise AIError("provider unavailable")
+
     def failing_ai_factory(_stack: ExitStack) -> FailingAI:
         return FailingAI()
 
@@ -638,7 +658,7 @@ def test_successful_ai_refresh_replaces_previous_set_and_removes_local_duplicate
         generated_at=now,
     )
     original = original.model_copy(update={"deterministic_discoveries": [local_pick]})
-    provider_result = {
+    suggestion_result: dict[str, object] = {
         "recommendations": [
             {
                 "title": "Moon",
@@ -648,14 +668,25 @@ def test_successful_ai_refresh_replaces_previous_set_and_removes_local_duplicate
             }
         ]
     }
+
+    def provider_handler(request: httpx.Request) -> httpx.Response:
+        body: object = json.loads(request.content)
+        assert isinstance(body, dict)
+        response_format = cast(dict[str, object], body["response_format"])
+        json_schema = cast(dict[str, object], response_format["json_schema"])
+        result: dict[str, object] = (
+            suggestion_result
+            if json_schema["name"] == "film_recommendations"
+            else {"watchlistScores": [], "discoveryScores": []}
+        )
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+
     provider_http = httpx.Client(
         base_url="https://provider.test/v1/",
-        transport=httpx.MockTransport(
-            lambda _request: httpx.Response(
-                200,
-                json={"choices": [{"message": {"content": json.dumps(provider_result)}}]},
-            )
-        ),
+        transport=httpx.MockTransport(provider_handler),
     )
     catalog_http = httpx.Client(
         base_url="https://catalog.test/3/",
@@ -735,7 +766,7 @@ def test_ai_refresh_scores_watchlist_and_taste_matches_on_the_users_scale(
         watchlist=[local_watchlist, manual_watchlist],
         deterministic_discoveries=[taste_match],
     )
-    provider_result = {
+    suggestion_result = {
         "recommendations": [
             {
                 "title": "Moon",
@@ -743,7 +774,9 @@ def test_ai_refresh_scores_watchlist_and_taste_matches_on_the_users_scale(
                 "predictedRating": 10,
                 "rationale": "Its isolation suits the reflective reviews.",
             }
-        ],
+        ]
+    }
+    score_result = {
         "watchlistScores": [
             {
                 "target": score_target_id("watchlist", local_watchlist),
@@ -757,14 +790,23 @@ def test_ai_refresh_scores_watchlist_and_taste_matches_on_the_users_scale(
             }
         ],
     }
+
+    def provider_handler(request: httpx.Request) -> httpx.Response:
+        body: object = json.loads(request.content)
+        assert isinstance(body, dict)
+        response_format = cast(dict[str, object], body["response_format"])
+        json_schema = cast(dict[str, object], response_format["json_schema"])
+        result = (
+            suggestion_result if json_schema["name"] == "film_recommendations" else score_result
+        )
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+
     provider_http = httpx.Client(
         base_url="https://provider.test/v1/",
-        transport=httpx.MockTransport(
-            lambda _request: httpx.Response(
-                200,
-                json={"choices": [{"message": {"content": json.dumps(provider_result)}}]},
-            )
-        ),
+        transport=httpx.MockTransport(provider_handler),
     )
     catalog_http = httpx.Client(
         base_url="https://catalog.test/3/",

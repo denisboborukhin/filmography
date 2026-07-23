@@ -34,8 +34,8 @@ send personal scores or browsing behavior to another service.
 `filmography build` sends film titles, years, or TMDB IDs to TMDB for metadata matching and discovery.
 `filmography recommend` additionally sends the configured provider a taste profile derived from
 ratings, tags, full review text, the watchlist, local taste-match candidates, and the optional
-prompt. The provider returns expected scores for non-manual watchlist entries and taste matches as
-well as new-film suggestions.
+prompt. It makes one provider request for new-film suggestions and a separate provider request for
+expected scores on non-manual watchlist entries and local taste matches.
 
 Review the selected AI provider's retention and training policy before use. If reviews contain
 sensitive information, use token-free recommendations or redact those notes before running

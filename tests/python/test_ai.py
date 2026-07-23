@@ -77,8 +77,6 @@ def test_ai_client_sends_complete_profile_and_parses_structured_output() -> None
     schema = cast(dict[str, object], json_schema["schema"])
     assert set(cast(list[str], schema["required"])) >= {
         "recommendations",
-        "watchlistScores",
-        "discoveryScores",
     }
     properties = cast(dict[str, object], schema["properties"])
     recommendations_schema = cast(dict[str, object], properties["recommendations"])
@@ -128,14 +126,6 @@ def test_ai_client_requests_scores_for_non_manual_watchlist_and_taste_matches() 
         assert isinstance(profile, dict)
         captured_profile.update(cast(dict[str, object], profile))
         result = {
-            "recommendations": [
-                {
-                    "title": "Moon",
-                    "year": 2009,
-                    "predictedRating": 8.5,
-                    "rationale": "A precise isolation drama.",
-                }
-            ],
             "watchlistScores": [{"target": watchlist_target, "predictedRating": 8.4}],
             "discoveryScores": [{"target": discovery_target, "predictedRating": 8.7}],
         }
@@ -146,11 +136,10 @@ def test_ai_client_requests_scores_for_non_manual_watchlist_and_taste_matches() 
 
     ai_client, http_client = _provider_client(httpx.MockTransport(handler))
     try:
-        batch = ai_client.suggest(
+        batch = ai_client.score_targets(
             [WatchedFilm(title="Arrival", rating=9)],
             watchlist,
             deterministic_discoveries=[discovery],
-            count=1,
         )
     finally:
         http_client.close()
@@ -231,13 +220,6 @@ def test_ai_client_normalizes_extra_fields_and_long_rationales() -> None:
                 "rationale": long_rationale,
             }
         ],
-        "watchlist_scores": [
-            {
-                "id": "watchlist:10",
-                "rating": 8.2,
-                "title": "Provider echo ignored",
-            }
-        ],
     }
     transport = httpx.MockTransport(
         lambda _request: httpx.Response(
@@ -255,8 +237,36 @@ def test_ai_client_normalizes_extra_fields_and_long_rationales() -> None:
     assert suggestion.title == "Hidden Figures"
     assert suggestion.predicted_rating == 8
     assert len(suggestion.rationale) == 500
+
+
+def test_ai_client_normalizes_score_response_aliases() -> None:
+    result = {
+        "providerNote": "ignored",
+        "watchlist_scores": [
+            {
+                "id": "watchlist:10",
+                "rating": 8.2,
+                "title": "Provider echo ignored",
+            }
+        ],
+        "discovery_scores": [{"target": "discovery:20", "score": 7.9}],
+    }
+    transport = httpx.MockTransport(
+        lambda _request: httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": json.dumps(result)}}]},
+        )
+    )
+    ai_client, http_client = _provider_client(transport)
+    try:
+        batch = ai_client.score_targets([], [])
+    finally:
+        http_client.close()
+
     assert batch.watchlist_scores[0].target == "watchlist:10"
     assert batch.watchlist_scores[0].predicted_rating == 8.2
+    assert batch.discovery_scores[0].target == "discovery:20"
+    assert batch.discovery_scores[0].predicted_rating == 7.9
 
 
 def test_ai_client_drops_provider_suggestions_without_year() -> None:

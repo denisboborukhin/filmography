@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from filmography.ai import (
     AIError,
     OpenAICompatibleClient,
+    resolve_ai_scores,
     resolve_ai_suggestions,
     score_target_id,
 )
@@ -145,60 +146,107 @@ def refresh_ai_recommendations(
     generated_at: datetime | None = None,
     limit: int = 10,
 ) -> BuildResult:
-    """Return a copy with a new verified AI set, or raise without altering the input."""
+    """Return a copy with independently refreshed AI picks and target scores."""
 
     if not 1 <= limit <= 20:
         raise ValueError("AI recommendation limit must be between 1 and 20")
     now = _utc_datetime(generated_at)
     requested = min(20, limit * 3)
-    batch = ai_client.suggest(
-        snapshot.watched,
-        snapshot.watchlist,
-        deterministic_discoveries=snapshot.deterministic_discoveries,
-        prompt=prompt,
-        count=requested,
-    )
-    resolved = resolve_ai_suggestions(
-        batch,
-        catalog,
-        snapshot.watched,
-        snapshot.watchlist,
-        deterministic_discoveries=snapshot.deterministic_discoveries,
-        generated_at=now,
-        provider=ai_client.provider,
-        model=ai_client.model,
-        limit=limit,
-    )
-    required_recommendations = min(5, limit)
-    if len(resolved.recommendations) < required_recommendations:
-        detail = "; ".join(resolved.warnings[:5])
-        suffix = f": {detail}" if detail else ""
-        raise AIError(
-            f"AI returned only {len(resolved.recommendations)} verified recommendations; "
-            f"at least {required_recommendations} required{suffix}"
+    diagnostics: list[Diagnostic] = []
+    ai_discoveries = snapshot.ai_discoveries
+    deterministic_discoveries = snapshot.deterministic_discoveries
+    watchlist = snapshot.watchlist
+    suggestion_failed = False
+    scoring_failed = False
+    suggestion_error: AIError | None = None
+    scoring_error: AIError | None = None
+    scoring_applied = False
+
+    try:
+        suggestion_batch = ai_client.suggest(
+            snapshot.watched,
+            snapshot.watchlist,
+            prompt=prompt,
+            count=requested,
         )
-    scored_watchlist = _apply_ai_watchlist_scores(
-        snapshot.watchlist, dict(resolved.watchlist_scores)
-    )
-    scored_deterministic = _apply_ai_discovery_scores(
-        snapshot.deterministic_discoveries, dict(resolved.discovery_scores)
-    )
+        resolved_suggestions = resolve_ai_suggestions(
+            suggestion_batch,
+            catalog,
+            snapshot.watched,
+            snapshot.watchlist,
+            deterministic_discoveries=snapshot.deterministic_discoveries,
+            generated_at=now,
+            provider=ai_client.provider,
+            model=ai_client.model,
+            limit=limit,
+        )
+        required_recommendations = min(5, limit)
+        if len(resolved_suggestions.recommendations) < required_recommendations:
+            detail = "; ".join(resolved_suggestions.warnings[:5])
+            suffix = f": {detail}" if detail else ""
+            raise AIError(
+                f"AI returned only {len(resolved_suggestions.recommendations)} verified "
+                f"recommendations; at least {required_recommendations} required{suffix}"
+            )
+        ai_discoveries = list(resolved_suggestions.recommendations)
+        deterministic_discoveries = unique_unmatched_films(
+            deterministic_discoveries, ai_discoveries
+        )
+        diagnostics.extend(
+            Diagnostic("warning", "ai-suggestion-rejected", warning)
+            for warning in resolved_suggestions.warnings
+        )
+    except AIError as error:
+        suggestion_failed = True
+        suggestion_error = error
+        diagnostics.append(Diagnostic("warning", "ai-suggestions-failed", str(error)))
+
+    try:
+        score_batch = ai_client.score_targets(
+            snapshot.watched,
+            watchlist,
+            deterministic_discoveries=deterministic_discoveries,
+            prompt=prompt,
+        )
+        resolved_scores = resolve_ai_scores(
+            score_batch,
+            snapshot.watched,
+            watchlist,
+            deterministic_discoveries,
+        )
+        scoring_applied = bool(resolved_scores.watchlist_scores or resolved_scores.discovery_scores)
+        watchlist = _apply_ai_watchlist_scores(watchlist, dict(resolved_scores.watchlist_scores))
+        deterministic_discoveries = _apply_ai_discovery_scores(
+            deterministic_discoveries, dict(resolved_scores.discovery_scores)
+        )
+        diagnostics.extend(
+            Diagnostic("warning", "ai-score-rejected", warning)
+            for warning in resolved_scores.warnings
+        )
+    except AIError as error:
+        scoring_failed = True
+        scoring_error = error
+        diagnostics.append(Diagnostic("warning", "ai-scoring-failed", str(error)))
+
+    if suggestion_failed and not scoring_applied:
+        if scoring_failed and scoring_error is not None:
+            raise AIError(f"{suggestion_error}; {scoring_error}") from scoring_error
+        if suggestion_error is not None:
+            raise suggestion_error
+
     updated = snapshot.model_copy(
         update={
             "recommendations_generated_at": now,
-            "watchlist": scored_watchlist,
-            "ai_discoveries": list(resolved.recommendations),
+            "watchlist": watchlist,
+            "ai_discoveries": ai_discoveries,
             "deterministic_discoveries": unique_unmatched_films(
-                scored_deterministic, resolved.recommendations
+                deterministic_discoveries, ai_discoveries
             ),
         }
     )
     # model_copy does not rerun model validators, so explicitly validate the serialized result.
     updated = Snapshot.model_validate(updated.model_dump())
-    diagnostics = tuple(
-        Diagnostic("warning", "ai-suggestion-rejected", warning) for warning in resolved.warnings
-    )
-    return BuildResult(updated, diagnostics)
+    return BuildResult(updated, tuple(diagnostics))
 
 
 def _apply_ai_watchlist_scores(
