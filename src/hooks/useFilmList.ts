@@ -11,7 +11,7 @@ export function useFilmList<TFilm extends Film>(
 ) {
   const [query, setQuery] = useState('')
   const [genre, setGenre] = useState('all')
-  const [sort, setSort] = useState<FilmListSort>('title')
+  const [sort, setSort] = useState<FilmListSort>('personal')
   const genres = useMemo(() => genresForFilms(films), [films])
   const visibleFilms = useMemo(
     () =>

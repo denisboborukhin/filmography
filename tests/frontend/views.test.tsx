@@ -42,6 +42,15 @@ describe('journal views', () => {
     expect(screen.getByLabelText('TMDB audience score: 8.5 out of 10')).toBeInTheDocument()
   })
 
+  it('sorts watched films by personal score by default', () => {
+    render(<WatchedView films={snapshotFixture.watched} />)
+
+    expect(screen.getByLabelText('Sort')).toHaveValue('personal')
+    expect(
+      within(screen.getAllByRole('article')[0]).getByRole('link', { name: 'Spirited Away' }),
+    ).toBeInTheDocument()
+  })
+
   it('leaves an unwritten review empty instead of substituting catalog text', () => {
     const film = structuredClone(snapshotFixture.watched[0])
     film.review = ''
@@ -70,6 +79,17 @@ describe('journal views', () => {
     expect(screen.getByLabelText('Personal expected score: 9.0 out of 10')).toBeInTheDocument()
     expect(screen.getByLabelText('TMDB audience score: 8.4 out of 10')).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Highest expected personal score' })).toBeInTheDocument()
+  })
+
+  it('sorts watchlist films by expected personal score by default', () => {
+    render(<WatchlistView films={snapshotFixture.watchlist} />)
+
+    expect(screen.getByLabelText('Sort')).toHaveValue('personal')
+    expect(
+      within(screen.getAllByRole('article')[0]).getByRole('link', {
+        name: 'Howl’s Moving Castle',
+      }),
+    ).toBeInTheDocument()
   })
 
   it('links watchlist cards to their TMDB pages', () => {
@@ -112,6 +132,24 @@ describe('journal views', () => {
     await user.selectOptions(screen.getByLabelText('Sort'), 'tmdb')
 
     expect(within(screen.getAllByRole('article')[0]).getByText('AI pick')).toBeInTheDocument()
+  })
+
+  it('sorts discoveries by expected personal score by default within source groups', () => {
+    render(
+      <DiscoveriesView
+        ai={snapshotFixture.aiDiscoveries}
+        deterministic={snapshotFixture.deterministicDiscoveries}
+        generatedAt={snapshotFixture.recommendationsGeneratedAt}
+      />,
+    )
+
+    expect(screen.getByLabelText('Sort')).toHaveValue('personal')
+    expect(within(screen.getAllByRole('article')[0]).getByText('AI pick')).toBeInTheDocument()
+    expect(
+      within(screen.getAllByRole('article')[1]).getByRole('link', {
+        name: 'My Neighbor Totoro',
+      }),
+    ).toBeInTheDocument()
   })
 
   it('filters discoveries by genre', async () => {
